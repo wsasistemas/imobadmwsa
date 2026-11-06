@@ -86,7 +86,7 @@ check("histórico com os eventos do Asaas", (await um("select count(*)::int c fr
 console.log("\nSegurança");
 const priv = await q(`select p.proname, has_function_privilege('authenticated', p.oid, 'execute') a, has_function_privilege('anon', p.oid, 'execute') n
   from pg_proc p join pg_namespace s on s.oid = p.pronamespace where s.nspname = 'public' and p.proname like 'adm\\_srv\\_%'`);
-check("funções adm_srv_* existem (3)", priv.length === 3, JSON.stringify(priv));
+check("funções adm_srv_* da Fase 2 existem", ["adm_srv_asaas_evento", "adm_srv_empresa_cobranca", "adm_srv_gravar_asaas"].every((n) => priv.some((x) => x.proname === n)), JSON.stringify(priv));
 check("nem anon nem authenticated executam adm_srv_*", priv.every((x) => !x.a && !x.n), JSON.stringify(priv));
 
 console.log(`\n${ok} ok, ${falhas} falha(s)`);

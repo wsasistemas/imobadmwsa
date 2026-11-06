@@ -184,11 +184,11 @@ Cada sistema ──► public.empresa_liberada(p_app, p_ref) ──► true/fals
 
 ## Fase 3: régua e avisos de cobrança
 
-- [ ] `processar_regua` envia D-3, D+1, D+5, D+8 e D+11 conforme `adm.regua`, sem repetir (`adm.avisos_enviados`)
-- [ ] Envio por WhatsApp (integração escolhida em P8) e por e-mail, com o link `invoice_url`
-- [ ] Job pg_cron `adm-regua-diaria` às `5 3 * * *` (UTC), que equivale a 00:05 em Brasília
-- [ ] Teste: rodar duas vezes no mesmo dia → nenhum aviso duplicado
-- [ ] Teste: fatura com 11 dias de atraso → empresa `suspensa` e evento gravado
+- [x] `processar_regua` envia D-3, D+1, D+5, D+8 e D+11 conforme `adm.regua`, sem repetir (`adm.avisos_enviados`)
+- [x] Envio por WhatsApp (integração escolhida em P8) e por e-mail, com o link `invoice_url`
+- [x] Job pg_cron `adm-regua-diaria` às `5 3 * * *` (UTC), que equivale a 00:05 em Brasília
+- [x] Teste: rodar duas vezes no mesmo dia → nenhum aviso duplicado
+- [x] Teste: fatura com 11 dias de atraso → empresa `suspensa` e evento gravado
 
 ## Fase 4: painel (base e telas de cobrança)
 
