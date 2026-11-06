@@ -113,6 +113,13 @@ export const api = {
   listarSistemas: () => rpc<Sistema[]>("adm_listar_sistemas"),
   salvarSistema: (app: string, tipo: string, descricao: string, funcaoMembro: string | null, cobra: boolean) =>
     rpc<void>("adm_salvar_sistema", { p_app: app, p_tipo_ref: tipo, p_descricao_ref: descricao, p_funcao_membro: funcaoMembro, p_cobra: cobra }),
+  empresasDoSistema: (app: string, busca?: string) =>
+    rpc<{
+      vinculo_id: string; empresa_id: string; empresa: string; cnpj: string | null; schema_ref: string | null;
+      tenant_ref: string | null; plano: string | null; valor_mensal: number; ativo: boolean;
+      acesso_manual: "liberado" | "bloqueado" | null; liberado: boolean; situacao: Situacao; dias_atraso: number;
+      suspende_em: string | null; desde: string;
+    }[]>("adm_empresas_do_sistema", { p_app: app, p_busca: busca || null }),
   schemasDisponiveis: () =>
     rpc<{ schema_name: string; tabelas: number; na_central: boolean; nome_central: string | null }[]>("adm_schemas_disponiveis"),
   adicionarSistema: (schema: string, nome: string, url: string, tipo: "schema" | "tenant", descricao: string) =>

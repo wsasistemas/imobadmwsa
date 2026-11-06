@@ -146,6 +146,12 @@ let semSchema = false;
 try { await q("select public.adm_adicionar_sistema('nao_existe', 'X', null, 'schema', null)"); } catch { semSchema = true; }
 check("schema inexistente é recusado", semSchema);
 
+console.log("\nEmpresas do sistema");
+const doSis = await q("select * from public.adm_empresas_do_sistema('imobsystem', null)");
+check("lista as empresas vinculadas ao sistema", doSis.length >= 5 && doSis.every((x) => x.tenant_ref), String(doSis.length));
+check("traz situação e acesso de cada uma", doSis.some((x) => x.situacao === "suspensa" && x.liberado === false));
+check("busca pelo nome", (await q("select * from public.adm_empresas_do_sistema('imobsystem', 'Alfa')")).length === 1);
+
 console.log("\nSegurança");
 const priv = await q(`select p.proname, has_function_privilege('authenticated', p.oid, 'execute') a, has_function_privilege('anon', p.oid, 'execute') n
   from pg_proc p join pg_namespace s on s.oid = p.pronamespace
