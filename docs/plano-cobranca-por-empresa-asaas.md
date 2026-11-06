@@ -150,7 +150,9 @@ Cada sistema ──► public.empresa_liberada(p_app, p_ref) ──► true/fals
 - [ ] Premissas P1 a P9 confirmadas; integração de WhatsApp de saída escolhida (P8)
 - [ ] `.env` e `.env.*` no `.gitignore` deste repo, antes de qualquer commit
 - [ ] Commit do estado atual (só código, sem `.env`) e branch `feat/cobranca-empresas` criada
-- [ ] Conta Asaas **sandbox** e secrets `ASAAS_API_KEY`, `ASAAS_ENVIRONMENT=sandbox` e `ASAAS_WEBHOOK_TOKEN` no Supabase
+- [ ] Conta Asaas **sandbox** e secrets `ADM_ASAAS_API_KEY`, `ADM_ASAAS_ENVIRONMENT=sandbox` e `ADM_ASAAS_WEBHOOK_TOKEN` no Supabase
+  (prefixo `ADM_` obrigatório: os secrets valem para o projeto inteiro e o imobdocerias já usa `ASAAS_API_KEY` para as lojas)
+- [ ] Secrets da Meta (`ADM_META_APP_ID`, `ADM_META_APP_SECRET`, `ADM_META_VERIFY_TOKEN`) e do Google (`ADM_GOOGLE_CLIENT_ID`, `ADM_GOOGLE_CLIENT_SECRET`)
 - [ ] Levantado no ikvj: `acessos.aplicativos`, `imobdoces.lojas`, `public.imobiliarias` e `public.saas_leads` (colunas, policies e volume)
 - [ ] `pg_cron`, `pg_net` e Vault habilitados no ikvj
 - [ ] Pedidos externos abertos, porque são demorados:
@@ -277,7 +279,7 @@ Para cada sistema: ImobDoces, ImobSystem, Imobenviomassa e ImobDesk.
 
 ## Fase 11: produção
 
-- [ ] Asaas em produção (chave, `ASAAS_ENVIRONMENT=production`, webhook registrado de novo)
+- [ ] Asaas em produção (chave em `ADM_ASAAS_API_KEY`, `ADM_ASAAS_ENVIRONMENT=production`, webhook registrado de novo)
 - [ ] App da Meta em modo **Live**, com as permissões aprovadas e a página da WSA conectada
 - [ ] App do Google publicado (fora do modo de teste) e agendas conectadas
 - [ ] Formulário do www.imobsystems.com.br trocado para `leads-entrada`. A ponte da `saas_leads` continua ligada
