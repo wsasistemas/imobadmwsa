@@ -192,24 +192,24 @@ Cada sistema ──► public.empresa_liberada(p_app, p_ref) ──► true/fals
 
 ## Fase 4: painel (base e telas de cobrança)
 
-- [ ] Client Supabase apontando para o ikvj (variáveis na Vercel e no `.env` local, fora do git)
-- [ ] Design system do imobdocerias:
+- [x] Client Supabase apontando para o ikvj (`src/lib/adm/supabase.ts`: URL e chave publicável embutidas, que são públicas; `VITE_ADM_SUPABASE_*` opcionais)
+- [x] Design system do imobdocerias:
   - tokens de `styles.css` (`:root` e `.dark`) copiados do arquivo **atual** do imobdocerias;
   - fontes Fraunces e Plus Jakarta Sans;
   - utility `menu-ativo`.
-- [ ] Ícones coloridos:
+- [x] Ícones coloridos:
   - `@iconify/react` + `@iconify-json/fluent-color` + `@iconify-json/flat-color-icons` + `@iconify-json/logos` (as coleções só no build);
   - `scripts/gerar-icones.mjs` → `src/components/icones/icones.data.ts`;
   - `icone-colorido.tsx`.
-- [ ] Menu do mockup v2:
+- [x] Menu do mockup v2:
   - registro único de menu no padrão `menuRegistry.ts` do imobatendimento;
   - grupos Menu principal, Gestão Comercial, Gestão Marketing e Configurações;
   - submenu com seta;
   - "Sair" no rodapé.
-- [ ] Telas: Painel, Empresas, Ficha da empresa, Mensalidades, Sistemas e schemas, Régua de cobrança, Permissões por aplicativo
-- [ ] Acesso ao painel só para super admin (`pa_sou_super_admin`). Os outros logins veem "Acesso bloqueado"
-- [ ] Rotas e menus do CRM imobiliário copiado (empreendimentos, espelho, unidades, simulador, visitas, WhatsApp, relatórios de imóveis) retirados. Os componentes úteis (Kanban, calendário, formulários) ficam para a Fase 8
-- [ ] `npm run build` sem erro e telas conferidas no navegador em 1366×768 e 390px
+- [x] Telas: Painel, Empresas, Ficha da empresa, Mensalidades, Sistemas e schemas, Régua de cobrança, Permissões por aplicativo
+- [x] Acesso ao painel só para super admin (`pa_sou_super_admin`). Os outros logins veem "Acesso bloqueado"
+- [x] Rotas e menus do CRM imobiliário copiado (empreendimentos, espelho, unidades, simulador, visitas, WhatsApp, relatórios de imóveis) retirados. Os componentes úteis (Kanban, calendário, formulários) ficam para a Fase 8
+- [x] `npm run build` sem erro e telas conferidas no navegador em 1366×768 e 390px
 
 ## Fase 5: banco `comercial` e entrada pelo site
 

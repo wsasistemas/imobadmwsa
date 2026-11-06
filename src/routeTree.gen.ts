@@ -16,27 +16,16 @@ import { Route as McpRouteImport } from './routes/mcp'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
-import { Route as AuthenticatedAgendaRouteImport } from './routes/_authenticated/agenda'
+import { Route as AuthenticatedComoFuncionaRouteImport } from './routes/_authenticated/como-funciona'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated/relatorios'
-import { Route as AuthenticatedSimuladorRouteImport } from './routes/_authenticated/simulador'
-import { Route as AuthenticatedWhatsappRouteImport } from './routes/_authenticated/whatsapp'
+import { Route as AuthenticatedMensalidadesRouteImport } from './routes/_authenticated/mensalidades'
+import { Route as AuthenticatedPermissoesRouteImport } from './routes/_authenticated/permissoes'
+import { Route as AuthenticatedReguaRouteImport } from './routes/_authenticated/regua'
+import { Route as AuthenticatedSistemasRouteImport } from './routes/_authenticated/sistemas'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
-import { Route as AuthenticatedAdminUnidadesRouteImport } from './routes/_authenticated/admin.unidades'
-import { Route as AuthenticatedConfiguracoesIndexRouteImport } from './routes/_authenticated/configuracoes.index'
-import { Route as AuthenticatedConfiguracoesConstrutorasRouteImport } from './routes/_authenticated/configuracoes.construtoras'
-import { Route as AuthenticatedConfiguracoesCorretoresRouteImport } from './routes/_authenticated/configuracoes.corretores'
-import { Route as AuthenticatedConfiguracoesWhatsappRouteImport } from './routes/_authenticated/configuracoes.whatsapp'
-import { Route as AuthenticatedEmpreendimentosIndexRouteImport } from './routes/_authenticated/empreendimentos.index'
-import { Route as AuthenticatedEmpreendimentosNovoRouteImport } from './routes/_authenticated/empreendimentos.novo'
-import { Route as AuthenticatedEspelhoIndexRouteImport } from './routes/_authenticated/espelho.index'
-import { Route as AuthenticatedEspelhoIdRouteImport } from './routes/_authenticated/espelho.$id'
-import { Route as AuthenticatedLeadsIndexRouteImport } from './routes/_authenticated/leads.index'
-import { Route as AuthenticatedLeadsIdRouteImport } from './routes/_authenticated/leads.$id'
-import { Route as AuthenticatedEmpreendimentosIdIndexRouteImport } from './routes/_authenticated/empreendimentos.$id.index'
-import { Route as AuthenticatedEmpreendimentosIdEditarRouteImport } from './routes/_authenticated/empreendimentos.$id.editar'
-import { Route as ApiPublicHooksAutomacoesRouteImport } from './routes/api/public/hooks/automacoes'
+import { Route as AuthenticatedEmpresasIndexRouteImport } from './routes/_authenticated/empresas.index'
+import { Route as AuthenticatedEmpresasIdRouteImport } from './routes/_authenticated/empresas.$id'
 import { Route as ApiPublicWebhooksWhatsappRouteImport } from './routes/api/public/webhooks.whatsapp'
 
 const IndexRoute = IndexRouteImport.update({
@@ -75,29 +64,36 @@ const Char91DotwellKnownChar93OauthProtectedResourceRoute =
     path: '/.well-known/oauth-protected-resource',
     getParentRoute: () => rootRouteImport,
   } as any)
-const AuthenticatedAgendaRoute = AuthenticatedAgendaRouteImport.update({
-  id: '/agenda',
-  path: '/agenda',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
+const AuthenticatedComoFuncionaRoute =
+  AuthenticatedComoFuncionaRouteImport.update({
+    id: '/como-funciona',
+    path: '/como-funciona',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedRelatoriosRoute = AuthenticatedRelatoriosRouteImport.update({
-  id: '/relatorios',
-  path: '/relatorios',
+const AuthenticatedMensalidadesRoute =
+  AuthenticatedMensalidadesRouteImport.update({
+    id: '/mensalidades',
+    path: '/mensalidades',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedPermissoesRoute = AuthenticatedPermissoesRouteImport.update({
+  id: '/permissoes',
+  path: '/permissoes',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedSimuladorRoute = AuthenticatedSimuladorRouteImport.update({
-  id: '/simulador',
-  path: '/simulador',
+const AuthenticatedReguaRoute = AuthenticatedReguaRouteImport.update({
+  id: '/regua',
+  path: '/regua',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedWhatsappRoute = AuthenticatedWhatsappRouteImport.update({
-  id: '/whatsapp',
-  path: '/whatsapp',
+const AuthenticatedSistemasRoute = AuthenticatedSistemasRouteImport.update({
+  id: '/sistemas',
+  path: '/sistemas',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
@@ -111,87 +107,17 @@ const Char91DotmcpChar93InvokeToolToolRoute =
     path: '/.mcp/invoke-tool/$tool',
     getParentRoute: () => rootRouteImport,
   } as any)
-const AuthenticatedAdminUnidadesRoute =
-  AuthenticatedAdminUnidadesRouteImport.update({
-    id: '/admin/unidades',
-    path: '/admin/unidades',
+const AuthenticatedEmpresasIndexRoute =
+  AuthenticatedEmpresasIndexRouteImport.update({
+    id: '/empresas/',
+    path: '/empresas/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedConfiguracoesIndexRoute =
-  AuthenticatedConfiguracoesIndexRouteImport.update({
-    id: '/configuracoes/',
-    path: '/configuracoes/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedConfiguracoesConstrutorasRoute =
-  AuthenticatedConfiguracoesConstrutorasRouteImport.update({
-    id: '/configuracoes/construtoras',
-    path: '/configuracoes/construtoras',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedConfiguracoesCorretoresRoute =
-  AuthenticatedConfiguracoesCorretoresRouteImport.update({
-    id: '/configuracoes/corretores',
-    path: '/configuracoes/corretores',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedConfiguracoesWhatsappRoute =
-  AuthenticatedConfiguracoesWhatsappRouteImport.update({
-    id: '/configuracoes/whatsapp',
-    path: '/configuracoes/whatsapp',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedEmpreendimentosIndexRoute =
-  AuthenticatedEmpreendimentosIndexRouteImport.update({
-    id: '/empreendimentos/',
-    path: '/empreendimentos/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedEmpreendimentosNovoRoute =
-  AuthenticatedEmpreendimentosNovoRouteImport.update({
-    id: '/empreendimentos/novo',
-    path: '/empreendimentos/novo',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedEspelhoIndexRoute =
-  AuthenticatedEspelhoIndexRouteImport.update({
-    id: '/espelho/',
-    path: '/espelho/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedEspelhoIdRoute = AuthenticatedEspelhoIdRouteImport.update({
-  id: '/espelho/$id',
-  path: '/espelho/$id',
+const AuthenticatedEmpresasIdRoute = AuthenticatedEmpresasIdRouteImport.update({
+  id: '/empresas/$id',
+  path: '/empresas/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedLeadsIndexRoute = AuthenticatedLeadsIndexRouteImport.update({
-  id: '/leads/',
-  path: '/leads/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedLeadsIdRoute = AuthenticatedLeadsIdRouteImport.update({
-  id: '/leads/$id',
-  path: '/leads/$id',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedEmpreendimentosIdIndexRoute =
-  AuthenticatedEmpreendimentosIdIndexRouteImport.update({
-    id: '/empreendimentos/$id/',
-    path: '/empreendimentos/$id/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedEmpreendimentosIdEditarRoute =
-  AuthenticatedEmpreendimentosIdEditarRouteImport.update({
-    id: '/empreendimentos/$id/editar',
-    path: '/empreendimentos/$id/editar',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const ApiPublicHooksAutomacoesRoute =
-  ApiPublicHooksAutomacoesRouteImport.update({
-    id: '/api/public/hooks/automacoes',
-    path: '/api/public/hooks/automacoes',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const ApiPublicWebhooksWhatsappRoute =
   ApiPublicWebhooksWhatsappRouteImport.update({
     id: '/api/public/webhooks/whatsapp',
@@ -206,28 +132,17 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/agenda': typeof AuthenticatedAgendaRoute
+  '/como-funciona': typeof AuthenticatedComoFuncionaRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/relatorios': typeof AuthenticatedRelatoriosRoute
-  '/simulador': typeof AuthenticatedSimuladorRoute
-  '/whatsapp': typeof AuthenticatedWhatsappRoute
+  '/mensalidades': typeof AuthenticatedMensalidadesRoute
+  '/permissoes': typeof AuthenticatedPermissoesRoute
+  '/regua': typeof AuthenticatedReguaRoute
+  '/sistemas': typeof AuthenticatedSistemasRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
-  '/admin/unidades': typeof AuthenticatedAdminUnidadesRoute
-  '/configuracoes/construtoras': typeof AuthenticatedConfiguracoesConstrutorasRoute
-  '/configuracoes/corretores': typeof AuthenticatedConfiguracoesCorretoresRoute
-  '/configuracoes/whatsapp': typeof AuthenticatedConfiguracoesWhatsappRoute
-  '/empreendimentos/novo': typeof AuthenticatedEmpreendimentosNovoRoute
-  '/espelho/$id': typeof AuthenticatedEspelhoIdRoute
-  '/leads/$id': typeof AuthenticatedLeadsIdRoute
-  '/configuracoes/': typeof AuthenticatedConfiguracoesIndexRoute
-  '/empreendimentos/': typeof AuthenticatedEmpreendimentosIndexRoute
-  '/espelho/': typeof AuthenticatedEspelhoIndexRoute
-  '/leads/': typeof AuthenticatedLeadsIndexRoute
-  '/empreendimentos/$id/editar': typeof AuthenticatedEmpreendimentosIdEditarRoute
-  '/api/public/hooks/automacoes': typeof ApiPublicHooksAutomacoesRoute
+  '/empresas/$id': typeof AuthenticatedEmpresasIdRoute
+  '/empresas/': typeof AuthenticatedEmpresasIndexRoute
   '/api/public/webhooks/whatsapp': typeof ApiPublicWebhooksWhatsappRoute
-  '/empreendimentos/$id/': typeof AuthenticatedEmpreendimentosIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -236,28 +151,17 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/agenda': typeof AuthenticatedAgendaRoute
+  '/como-funciona': typeof AuthenticatedComoFuncionaRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/relatorios': typeof AuthenticatedRelatoriosRoute
-  '/simulador': typeof AuthenticatedSimuladorRoute
-  '/whatsapp': typeof AuthenticatedWhatsappRoute
+  '/mensalidades': typeof AuthenticatedMensalidadesRoute
+  '/permissoes': typeof AuthenticatedPermissoesRoute
+  '/regua': typeof AuthenticatedReguaRoute
+  '/sistemas': typeof AuthenticatedSistemasRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
-  '/admin/unidades': typeof AuthenticatedAdminUnidadesRoute
-  '/configuracoes/construtoras': typeof AuthenticatedConfiguracoesConstrutorasRoute
-  '/configuracoes/corretores': typeof AuthenticatedConfiguracoesCorretoresRoute
-  '/configuracoes/whatsapp': typeof AuthenticatedConfiguracoesWhatsappRoute
-  '/empreendimentos/novo': typeof AuthenticatedEmpreendimentosNovoRoute
-  '/espelho/$id': typeof AuthenticatedEspelhoIdRoute
-  '/leads/$id': typeof AuthenticatedLeadsIdRoute
-  '/configuracoes': typeof AuthenticatedConfiguracoesIndexRoute
-  '/empreendimentos': typeof AuthenticatedEmpreendimentosIndexRoute
-  '/espelho': typeof AuthenticatedEspelhoIndexRoute
-  '/leads': typeof AuthenticatedLeadsIndexRoute
-  '/empreendimentos/$id/editar': typeof AuthenticatedEmpreendimentosIdEditarRoute
-  '/api/public/hooks/automacoes': typeof ApiPublicHooksAutomacoesRoute
+  '/empresas/$id': typeof AuthenticatedEmpresasIdRoute
+  '/empresas': typeof AuthenticatedEmpresasIndexRoute
   '/api/public/webhooks/whatsapp': typeof ApiPublicWebhooksWhatsappRoute
-  '/empreendimentos/$id': typeof AuthenticatedEmpreendimentosIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -268,28 +172,17 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/_authenticated/agenda': typeof AuthenticatedAgendaRoute
+  '/_authenticated/como-funciona': typeof AuthenticatedComoFuncionaRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
-  '/_authenticated/simulador': typeof AuthenticatedSimuladorRoute
-  '/_authenticated/whatsapp': typeof AuthenticatedWhatsappRoute
+  '/_authenticated/mensalidades': typeof AuthenticatedMensalidadesRoute
+  '/_authenticated/permissoes': typeof AuthenticatedPermissoesRoute
+  '/_authenticated/regua': typeof AuthenticatedReguaRoute
+  '/_authenticated/sistemas': typeof AuthenticatedSistemasRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
-  '/_authenticated/admin/unidades': typeof AuthenticatedAdminUnidadesRoute
-  '/_authenticated/configuracoes/construtoras': typeof AuthenticatedConfiguracoesConstrutorasRoute
-  '/_authenticated/configuracoes/corretores': typeof AuthenticatedConfiguracoesCorretoresRoute
-  '/_authenticated/configuracoes/whatsapp': typeof AuthenticatedConfiguracoesWhatsappRoute
-  '/_authenticated/empreendimentos/novo': typeof AuthenticatedEmpreendimentosNovoRoute
-  '/_authenticated/espelho/$id': typeof AuthenticatedEspelhoIdRoute
-  '/_authenticated/leads/$id': typeof AuthenticatedLeadsIdRoute
-  '/_authenticated/configuracoes/': typeof AuthenticatedConfiguracoesIndexRoute
-  '/_authenticated/empreendimentos/': typeof AuthenticatedEmpreendimentosIndexRoute
-  '/_authenticated/espelho/': typeof AuthenticatedEspelhoIndexRoute
-  '/_authenticated/leads/': typeof AuthenticatedLeadsIndexRoute
-  '/_authenticated/empreendimentos/$id/editar': typeof AuthenticatedEmpreendimentosIdEditarRoute
-  '/api/public/hooks/automacoes': typeof ApiPublicHooksAutomacoesRoute
+  '/_authenticated/empresas/$id': typeof AuthenticatedEmpresasIdRoute
+  '/_authenticated/empresas/': typeof AuthenticatedEmpresasIndexRoute
   '/api/public/webhooks/whatsapp': typeof ApiPublicWebhooksWhatsappRoute
-  '/_authenticated/empreendimentos/$id/': typeof AuthenticatedEmpreendimentosIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -300,28 +193,17 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
-    | '/agenda'
+    | '/como-funciona'
     | '/dashboard'
-    | '/relatorios'
-    | '/simulador'
-    | '/whatsapp'
+    | '/mensalidades'
+    | '/permissoes'
+    | '/regua'
+    | '/sistemas'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
-    | '/admin/unidades'
-    | '/configuracoes/construtoras'
-    | '/configuracoes/corretores'
-    | '/configuracoes/whatsapp'
-    | '/empreendimentos/novo'
-    | '/espelho/$id'
-    | '/leads/$id'
-    | '/configuracoes/'
-    | '/empreendimentos/'
-    | '/espelho/'
-    | '/leads/'
-    | '/empreendimentos/$id/editar'
-    | '/api/public/hooks/automacoes'
+    | '/empresas/$id'
+    | '/empresas/'
     | '/api/public/webhooks/whatsapp'
-    | '/empreendimentos/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -330,28 +212,17 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
-    | '/agenda'
+    | '/como-funciona'
     | '/dashboard'
-    | '/relatorios'
-    | '/simulador'
-    | '/whatsapp'
+    | '/mensalidades'
+    | '/permissoes'
+    | '/regua'
+    | '/sistemas'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
-    | '/admin/unidades'
-    | '/configuracoes/construtoras'
-    | '/configuracoes/corretores'
-    | '/configuracoes/whatsapp'
-    | '/empreendimentos/novo'
-    | '/espelho/$id'
-    | '/leads/$id'
-    | '/configuracoes'
-    | '/empreendimentos'
-    | '/espelho'
-    | '/leads'
-    | '/empreendimentos/$id/editar'
-    | '/api/public/hooks/automacoes'
+    | '/empresas/$id'
+    | '/empresas'
     | '/api/public/webhooks/whatsapp'
-    | '/empreendimentos/$id'
   id:
     | '__root__'
     | '/'
@@ -361,28 +232,17 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
-    | '/_authenticated/agenda'
+    | '/_authenticated/como-funciona'
     | '/_authenticated/dashboard'
-    | '/_authenticated/relatorios'
-    | '/_authenticated/simulador'
-    | '/_authenticated/whatsapp'
+    | '/_authenticated/mensalidades'
+    | '/_authenticated/permissoes'
+    | '/_authenticated/regua'
+    | '/_authenticated/sistemas'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
-    | '/_authenticated/admin/unidades'
-    | '/_authenticated/configuracoes/construtoras'
-    | '/_authenticated/configuracoes/corretores'
-    | '/_authenticated/configuracoes/whatsapp'
-    | '/_authenticated/empreendimentos/novo'
-    | '/_authenticated/espelho/$id'
-    | '/_authenticated/leads/$id'
-    | '/_authenticated/configuracoes/'
-    | '/_authenticated/empreendimentos/'
-    | '/_authenticated/espelho/'
-    | '/_authenticated/leads/'
-    | '/_authenticated/empreendimentos/$id/editar'
-    | '/api/public/hooks/automacoes'
+    | '/_authenticated/empresas/$id'
+    | '/_authenticated/empresas/'
     | '/api/public/webhooks/whatsapp'
-    | '/_authenticated/empreendimentos/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -395,7 +255,6 @@ export interface RootRouteChildren {
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
-  ApiPublicHooksAutomacoesRoute: typeof ApiPublicHooksAutomacoesRoute
   ApiPublicWebhooksWhatsappRoute: typeof ApiPublicWebhooksWhatsappRoute
 }
 
@@ -450,11 +309,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/agenda': {
-      id: '/_authenticated/agenda'
-      path: '/agenda'
-      fullPath: '/agenda'
-      preLoaderRoute: typeof AuthenticatedAgendaRouteImport
+    '/_authenticated/como-funciona': {
+      id: '/_authenticated/como-funciona'
+      path: '/como-funciona'
+      fullPath: '/como-funciona'
+      preLoaderRoute: typeof AuthenticatedComoFuncionaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard': {
@@ -464,25 +323,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/relatorios': {
-      id: '/_authenticated/relatorios'
-      path: '/relatorios'
-      fullPath: '/relatorios'
-      preLoaderRoute: typeof AuthenticatedRelatoriosRouteImport
+    '/_authenticated/mensalidades': {
+      id: '/_authenticated/mensalidades'
+      path: '/mensalidades'
+      fullPath: '/mensalidades'
+      preLoaderRoute: typeof AuthenticatedMensalidadesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/simulador': {
-      id: '/_authenticated/simulador'
-      path: '/simulador'
-      fullPath: '/simulador'
-      preLoaderRoute: typeof AuthenticatedSimuladorRouteImport
+    '/_authenticated/permissoes': {
+      id: '/_authenticated/permissoes'
+      path: '/permissoes'
+      fullPath: '/permissoes'
+      preLoaderRoute: typeof AuthenticatedPermissoesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/whatsapp': {
-      id: '/_authenticated/whatsapp'
-      path: '/whatsapp'
-      fullPath: '/whatsapp'
-      preLoaderRoute: typeof AuthenticatedWhatsappRouteImport
+    '/_authenticated/regua': {
+      id: '/_authenticated/regua'
+      path: '/regua'
+      fullPath: '/regua'
+      preLoaderRoute: typeof AuthenticatedReguaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/sistemas': {
+      id: '/_authenticated/sistemas'
+      path: '/sistemas'
+      fullPath: '/sistemas'
+      preLoaderRoute: typeof AuthenticatedSistemasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/.lovable/oauth/consent': {
@@ -499,103 +365,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/admin/unidades': {
-      id: '/_authenticated/admin/unidades'
-      path: '/admin/unidades'
-      fullPath: '/admin/unidades'
-      preLoaderRoute: typeof AuthenticatedAdminUnidadesRouteImport
+    '/_authenticated/empresas/': {
+      id: '/_authenticated/empresas/'
+      path: '/empresas'
+      fullPath: '/empresas/'
+      preLoaderRoute: typeof AuthenticatedEmpresasIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/configuracoes/': {
-      id: '/_authenticated/configuracoes/'
-      path: '/configuracoes'
-      fullPath: '/configuracoes/'
-      preLoaderRoute: typeof AuthenticatedConfiguracoesIndexRouteImport
+    '/_authenticated/empresas/$id': {
+      id: '/_authenticated/empresas/$id'
+      path: '/empresas/$id'
+      fullPath: '/empresas/$id'
+      preLoaderRoute: typeof AuthenticatedEmpresasIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/configuracoes/construtoras': {
-      id: '/_authenticated/configuracoes/construtoras'
-      path: '/configuracoes/construtoras'
-      fullPath: '/configuracoes/construtoras'
-      preLoaderRoute: typeof AuthenticatedConfiguracoesConstrutorasRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/configuracoes/corretores': {
-      id: '/_authenticated/configuracoes/corretores'
-      path: '/configuracoes/corretores'
-      fullPath: '/configuracoes/corretores'
-      preLoaderRoute: typeof AuthenticatedConfiguracoesCorretoresRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/configuracoes/whatsapp': {
-      id: '/_authenticated/configuracoes/whatsapp'
-      path: '/configuracoes/whatsapp'
-      fullPath: '/configuracoes/whatsapp'
-      preLoaderRoute: typeof AuthenticatedConfiguracoesWhatsappRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/empreendimentos/': {
-      id: '/_authenticated/empreendimentos/'
-      path: '/empreendimentos'
-      fullPath: '/empreendimentos/'
-      preLoaderRoute: typeof AuthenticatedEmpreendimentosIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/empreendimentos/novo': {
-      id: '/_authenticated/empreendimentos/novo'
-      path: '/empreendimentos/novo'
-      fullPath: '/empreendimentos/novo'
-      preLoaderRoute: typeof AuthenticatedEmpreendimentosNovoRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/espelho/': {
-      id: '/_authenticated/espelho/'
-      path: '/espelho'
-      fullPath: '/espelho/'
-      preLoaderRoute: typeof AuthenticatedEspelhoIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/espelho/$id': {
-      id: '/_authenticated/espelho/$id'
-      path: '/espelho/$id'
-      fullPath: '/espelho/$id'
-      preLoaderRoute: typeof AuthenticatedEspelhoIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/leads/': {
-      id: '/_authenticated/leads/'
-      path: '/leads'
-      fullPath: '/leads/'
-      preLoaderRoute: typeof AuthenticatedLeadsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/leads/$id': {
-      id: '/_authenticated/leads/$id'
-      path: '/leads/$id'
-      fullPath: '/leads/$id'
-      preLoaderRoute: typeof AuthenticatedLeadsIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/empreendimentos/$id/': {
-      id: '/_authenticated/empreendimentos/$id/'
-      path: '/empreendimentos/$id'
-      fullPath: '/empreendimentos/$id/'
-      preLoaderRoute: typeof AuthenticatedEmpreendimentosIdIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/empreendimentos/$id/editar': {
-      id: '/_authenticated/empreendimentos/$id/editar'
-      path: '/empreendimentos/$id/editar'
-      fullPath: '/empreendimentos/$id/editar'
-      preLoaderRoute: typeof AuthenticatedEmpreendimentosIdEditarRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/api/public/hooks/automacoes': {
-      id: '/api/public/hooks/automacoes'
-      path: '/api/public/hooks/automacoes'
-      fullPath: '/api/public/hooks/automacoes'
-      preLoaderRoute: typeof ApiPublicHooksAutomacoesRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/api/public/webhooks/whatsapp': {
       id: '/api/public/webhooks/whatsapp'
@@ -608,51 +390,25 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAgendaRoute: typeof AuthenticatedAgendaRoute
+  AuthenticatedComoFuncionaRoute: typeof AuthenticatedComoFuncionaRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRoute
-  AuthenticatedSimuladorRoute: typeof AuthenticatedSimuladorRoute
-  AuthenticatedWhatsappRoute: typeof AuthenticatedWhatsappRoute
-  AuthenticatedAdminUnidadesRoute: typeof AuthenticatedAdminUnidadesRoute
-  AuthenticatedConfiguracoesConstrutorasRoute: typeof AuthenticatedConfiguracoesConstrutorasRoute
-  AuthenticatedConfiguracoesCorretoresRoute: typeof AuthenticatedConfiguracoesCorretoresRoute
-  AuthenticatedConfiguracoesWhatsappRoute: typeof AuthenticatedConfiguracoesWhatsappRoute
-  AuthenticatedEmpreendimentosNovoRoute: typeof AuthenticatedEmpreendimentosNovoRoute
-  AuthenticatedEspelhoIdRoute: typeof AuthenticatedEspelhoIdRoute
-  AuthenticatedLeadsIdRoute: typeof AuthenticatedLeadsIdRoute
-  AuthenticatedConfiguracoesIndexRoute: typeof AuthenticatedConfiguracoesIndexRoute
-  AuthenticatedEmpreendimentosIndexRoute: typeof AuthenticatedEmpreendimentosIndexRoute
-  AuthenticatedEspelhoIndexRoute: typeof AuthenticatedEspelhoIndexRoute
-  AuthenticatedLeadsIndexRoute: typeof AuthenticatedLeadsIndexRoute
-  AuthenticatedEmpreendimentosIdEditarRoute: typeof AuthenticatedEmpreendimentosIdEditarRoute
-  AuthenticatedEmpreendimentosIdIndexRoute: typeof AuthenticatedEmpreendimentosIdIndexRoute
+  AuthenticatedMensalidadesRoute: typeof AuthenticatedMensalidadesRoute
+  AuthenticatedPermissoesRoute: typeof AuthenticatedPermissoesRoute
+  AuthenticatedReguaRoute: typeof AuthenticatedReguaRoute
+  AuthenticatedSistemasRoute: typeof AuthenticatedSistemasRoute
+  AuthenticatedEmpresasIdRoute: typeof AuthenticatedEmpresasIdRoute
+  AuthenticatedEmpresasIndexRoute: typeof AuthenticatedEmpresasIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAgendaRoute: AuthenticatedAgendaRoute,
+  AuthenticatedComoFuncionaRoute: AuthenticatedComoFuncionaRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRoute,
-  AuthenticatedSimuladorRoute: AuthenticatedSimuladorRoute,
-  AuthenticatedWhatsappRoute: AuthenticatedWhatsappRoute,
-  AuthenticatedAdminUnidadesRoute: AuthenticatedAdminUnidadesRoute,
-  AuthenticatedConfiguracoesConstrutorasRoute:
-    AuthenticatedConfiguracoesConstrutorasRoute,
-  AuthenticatedConfiguracoesCorretoresRoute:
-    AuthenticatedConfiguracoesCorretoresRoute,
-  AuthenticatedConfiguracoesWhatsappRoute:
-    AuthenticatedConfiguracoesWhatsappRoute,
-  AuthenticatedEmpreendimentosNovoRoute: AuthenticatedEmpreendimentosNovoRoute,
-  AuthenticatedEspelhoIdRoute: AuthenticatedEspelhoIdRoute,
-  AuthenticatedLeadsIdRoute: AuthenticatedLeadsIdRoute,
-  AuthenticatedConfiguracoesIndexRoute: AuthenticatedConfiguracoesIndexRoute,
-  AuthenticatedEmpreendimentosIndexRoute:
-    AuthenticatedEmpreendimentosIndexRoute,
-  AuthenticatedEspelhoIndexRoute: AuthenticatedEspelhoIndexRoute,
-  AuthenticatedLeadsIndexRoute: AuthenticatedLeadsIndexRoute,
-  AuthenticatedEmpreendimentosIdEditarRoute:
-    AuthenticatedEmpreendimentosIdEditarRoute,
-  AuthenticatedEmpreendimentosIdIndexRoute:
-    AuthenticatedEmpreendimentosIdIndexRoute,
+  AuthenticatedMensalidadesRoute: AuthenticatedMensalidadesRoute,
+  AuthenticatedPermissoesRoute: AuthenticatedPermissoesRoute,
+  AuthenticatedReguaRoute: AuthenticatedReguaRoute,
+  AuthenticatedSistemasRoute: AuthenticatedSistemasRoute,
+  AuthenticatedEmpresasIdRoute: AuthenticatedEmpresasIdRoute,
+  AuthenticatedEmpresasIndexRoute: AuthenticatedEmpresasIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -669,7 +425,6 @@ const rootRouteChildren: RootRouteChildren = {
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
-  ApiPublicHooksAutomacoesRoute: ApiPublicHooksAutomacoesRoute,
   ApiPublicWebhooksWhatsappRoute: ApiPublicWebhooksWhatsappRoute,
 }
 export const routeTree = rootRouteImport

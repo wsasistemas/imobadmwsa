@@ -5,23 +5,27 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * ImobSystem — Design System
- * Paleta traduzida para oklch a partir dos HEX do PRD:
- *   #1B4F72 primary  |  #E67E22 accent   |  #27AE60 success
- *   #F39C12 warning  |  #E74C3C danger   |  #F8F9FA bg
- *   #FFFFFF card     |  #2C3E50 text     |  #7F8C8D muted
- * Fonte: Inter (carregada via <link> em __root.tsx)
+ * Design system definition.
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root and .dark blocks define the actual color values using oklch.
+ * All colors MUST use oklch format.
+ *
+ * To add a new semantic color:
+ * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 2. Register it in @theme inline as --color-<name>: var(--<name>)
  */
 
 @theme inline {
-  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
-
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --radius-2xl: calc(var(--radius) + 8px);
-
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -30,6 +34,20 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-soft: var(--primary-soft);
+  --color-abobora: var(--abobora);
+  --color-abobora-soft: var(--abobora-soft);
+  --color-abobora-dark: var(--abobora-dark);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-soft: var(--warning-soft);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-info-soft: var(--info-soft);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -38,14 +56,15 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
-  --color-success: var(--success);
-  --color-success-foreground: var(--success-foreground);
-  --color-warning: var(--warning);
-  --color-warning-foreground: var(--warning-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -54,106 +73,153 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-
-  --shadow-card: 0 1px 3px oklch(0.2 0.03 240 / 0.08), 0 1px 2px oklch(0.2 0.03 240 / 0.04);
-  --shadow-elevated: 0 8px 24px -8px oklch(0.2 0.03 240 / 0.18);
+  --color-chat-out: var(--chat-out);
+  --color-chat-out-foreground: var(--chat-out-foreground);
+  --color-chat-in: var(--chat-in);
+  --color-chat-in-foreground: var(--chat-in-foreground);
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
 }
 
+/* Paleta azul WSA + abóbora clarinho, copiada do imobdocerias (src/styles.css, 06/11/2026).
+ * Fundo coral bem claro da logo WSA, copiado do Imobenviomassa (cartões continuam brancos).
+ * O vermelho fica só no --destructive. */
 :root {
-  --radius: 0.5rem; /* 8px padrão; cards usam rounded-xl (12px) */
-
-  --background: oklch(0.981 0.003 247);       /* #F8F9FA */
-  --foreground: oklch(0.32 0.036 251);        /* #2C3E50 */
-
-  --card: oklch(1 0 0);                        /* #FFFFFF */
-  --card-foreground: oklch(0.32 0.036 251);
-
+  --radius: 0.75rem;
+  --background: oklch(0.972 0.016 40);
+  --foreground: oklch(0.24 0.03 255);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.24 0.03 255);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.32 0.036 251);
-
-  --primary: oklch(0.375 0.078 252);           /* #1B4F72 azul marinho */
-  --primary-foreground: oklch(1 0 0);
-
-  --secondary: oklch(0.958 0.006 247);
-  --secondary-foreground: oklch(0.32 0.036 251);
-
-  --muted: oklch(0.958 0.006 247);
-  --muted-foreground: oklch(0.58 0.014 240);   /* #7F8C8D */
-
-  --accent: oklch(0.688 0.156 51);             /* #E67E22 laranja */
-  --accent-foreground: oklch(1 0 0);
-
-  --success: oklch(0.638 0.166 149);           /* #27AE60 */
-  --success-foreground: oklch(1 0 0);
-  --warning: oklch(0.756 0.156 68);            /* #F39C12 */
-  --warning-foreground: oklch(0.22 0.03 60);
-  --destructive: oklch(0.628 0.212 27);        /* #E74C3C */
-  --destructive-foreground: oklch(1 0 0);
-
-  --border: oklch(0.912 0.008 247);
-  --input: oklch(0.912 0.008 247);
-  --ring: oklch(0.375 0.078 252);
-
-  /* Sidebar — mesma paleta, tons alinhados ao primary */
-  --sidebar: oklch(0.375 0.078 252);
-  --sidebar-foreground: oklch(0.97 0.005 247);
-  --sidebar-primary: oklch(0.688 0.156 51);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.32 0.062 252);
-  --sidebar-accent-foreground: oklch(1 0 0);
-  --sidebar-border: oklch(0.32 0.062 252);
-  --sidebar-ring: oklch(0.688 0.156 51);
+  --popover-foreground: oklch(0.24 0.03 255);
+  --primary: oklch(0.55 0.11 250);
+  --primary-foreground: oklch(0.99 0.005 250);
+  --primary-dark: oklch(0.46 0.1 252);
+  --primary-soft: oklch(0.95 0.022 250);
+  --abobora: oklch(0.8 0.11 62);
+  --abobora-soft: oklch(0.965 0.032 68);
+  --abobora-dark: oklch(0.5 0.11 50);
+  --secondary: oklch(0.955 0.016 40);
+  --secondary-foreground: oklch(0.3 0.03 255);
+  --muted: oklch(0.955 0.016 40);
+  --muted-foreground: oklch(0.5 0.025 255);
+  --accent: oklch(0.965 0.032 68);
+  --accent-foreground: oklch(0.3 0.03 255);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.99 0.01 60);
+  --success: oklch(0.52 0.12 150);
+  --success-foreground: oklch(0.99 0.01 60);
+  --success-soft: oklch(0.95 0.04 150);
+  --warning: oklch(0.58 0.13 65);
+  --warning-foreground: oklch(0.99 0.01 60);
+  --warning-soft: oklch(0.96 0.05 80);
+  --info: oklch(0.52 0.09 225);
+  --info-foreground: oklch(0.99 0.01 60);
+  --info-soft: oklch(0.95 0.025 225);
+  --border: oklch(0.905 0.02 40);
+  --input: oklch(0.85 0.022 40);
+  --ring: oklch(0.55 0.11 250);
+  --chart-1: oklch(0.55 0.11 250);
+  --chart-2: oklch(0.72 0.12 60);
+  --chart-3: oklch(0.62 0.09 180);
+  --chart-4: oklch(0.4 0.07 260);
+  --chart-5: oklch(0.68 0.12 35);
+  --sidebar: oklch(0.958 0.022 40);
+  --sidebar-foreground: oklch(0.45 0.03 255);
+  --sidebar-primary: oklch(0.55 0.11 250);
+  --sidebar-primary-foreground: oklch(0.99 0.005 250);
+  --sidebar-accent: oklch(0.93 0.048 62);
+  --sidebar-accent-foreground: oklch(0.24 0.03 255);
+  --sidebar-border: oklch(0.9 0.022 40);
+  --sidebar-ring: oklch(0.55 0.11 250);
+  --chat-out: oklch(0.93 0.07 145);
+  --chat-out-foreground: oklch(0.24 0.03 150);
+  --chat-in: oklch(1 0 0);
+  --chat-in-foreground: oklch(0.24 0.03 255);
 }
 
 .dark {
-  --background: oklch(0.18 0.02 251);
-  --foreground: oklch(0.97 0.005 247);
-  --card: oklch(0.24 0.028 251);
-  --card-foreground: oklch(0.97 0.005 247);
-  --popover: oklch(0.24 0.028 251);
-  --popover-foreground: oklch(0.97 0.005 247);
-  --primary: oklch(0.688 0.156 51);
-  --primary-foreground: oklch(0.18 0.02 251);
-  --secondary: oklch(0.28 0.032 251);
-  --secondary-foreground: oklch(0.97 0.005 247);
-  --muted: oklch(0.28 0.032 251);
-  --muted-foreground: oklch(0.72 0.014 240);
-  --accent: oklch(0.688 0.156 51);
-  --accent-foreground: oklch(0.18 0.02 251);
-  --success: oklch(0.68 0.16 149);
-  --success-foreground: oklch(0.14 0.02 149);
-  --warning: oklch(0.78 0.15 68);
-  --warning-foreground: oklch(0.2 0.03 60);
-  --destructive: oklch(0.68 0.2 27);
-  --destructive-foreground: oklch(0.97 0.005 247);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.688 0.156 51);
-  --sidebar: oklch(0.22 0.028 251);
-  --sidebar-foreground: oklch(0.97 0.005 247);
-  --sidebar-primary: oklch(0.688 0.156 51);
-  --sidebar-primary-foreground: oklch(0.18 0.02 251);
-  --sidebar-accent: oklch(0.3 0.032 251);
-  --sidebar-accent-foreground: oklch(0.97 0.005 247);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.688 0.156 51);
+  --background: oklch(0.19 0.02 255);
+  --foreground: oklch(0.94 0.01 250);
+  --card: oklch(0.23 0.025 255);
+  --card-foreground: oklch(0.94 0.01 250);
+  --popover: oklch(0.23 0.025 255);
+  --popover-foreground: oklch(0.94 0.01 250);
+  --primary: oklch(0.64 0.11 250);
+  --primary-foreground: oklch(0.99 0.005 250);
+  --primary-dark: oklch(0.72 0.1 250);
+  --primary-soft: oklch(0.3 0.05 250);
+  --abobora: oklch(0.78 0.11 62);
+  --abobora-soft: oklch(0.31 0.05 60);
+  --abobora-dark: oklch(0.86 0.09 65);
+  --secondary: oklch(0.27 0.025 255);
+  --secondary-foreground: oklch(0.92 0.01 250);
+  --muted: oklch(0.27 0.025 255);
+  --muted-foreground: oklch(0.72 0.02 255);
+  --accent: oklch(0.3 0.045 60);
+  --accent-foreground: oklch(0.95 0.01 250);
+  --destructive: oklch(0.66 0.19 25);
+  --destructive-foreground: oklch(0.99 0.01 60);
+  --success: oklch(0.72 0.13 150);
+  --success-foreground: oklch(0.18 0.02 150);
+  --success-soft: oklch(0.3 0.05 150);
+  --warning: oklch(0.78 0.13 75);
+  --warning-foreground: oklch(0.2 0.03 75);
+  --warning-soft: oklch(0.32 0.05 75);
+  --info: oklch(0.72 0.09 225);
+  --info-foreground: oklch(0.18 0.02 225);
+  --info-soft: oklch(0.3 0.04 225);
+  --border: oklch(0.32 0.025 255);
+  --input: oklch(0.4 0.025 255);
+  --ring: oklch(0.64 0.11 250);
+  --chart-1: oklch(0.66 0.11 250);
+  --chart-2: oklch(0.76 0.12 60);
+  --chart-3: oklch(0.7 0.09 180);
+  --chart-4: oklch(0.58 0.07 260);
+  --chart-5: oklch(0.72 0.12 35);
+  --sidebar: oklch(0.165 0.02 255);
+  --sidebar-foreground: oklch(0.76 0.02 255);
+  --sidebar-primary: oklch(0.6 0.11 250);
+  --sidebar-primary-foreground: oklch(0.99 0.005 250);
+  --sidebar-accent: oklch(0.28 0.045 60);
+  --sidebar-accent-foreground: oklch(0.95 0.01 250);
+  --sidebar-border: oklch(0.27 0.025 255);
+  --sidebar-ring: oklch(0.64 0.11 250);
+  --chat-out: oklch(0.42 0.09 152);
+  --chat-out-foreground: oklch(0.97 0.02 145);
+  --chat-in: oklch(0.25 0.02 255);
+  --chat-in-foreground: oklch(0.96 0.006 250);
 }
 
 @layer base {
   * {
     border-color: var(--color-border);
   }
-  html, body, #root {
-    height: 100%;
-  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+    font-weight: 600;
   }
 }
 
-@utility card-radius {
-  border-radius: 12px;
+/* Item ativo do menu do painel: azul até 55% e abóbora no fim (padrão do Imobenviomassa). */
+@utility menu-ativo {
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary) 55%, var(--abobora) 100%);
+  color: var(--primary-foreground);
+  box-shadow: 0 6px 16px -6px oklch(0.55 0.11 250 / 0.45);
+}
+
+/* Conteúdo do painel cabe em qualquer largura (360px em diante): a coluna do grid pode encolher e o texto trunca. */
+.painel-conteudo :where(.grid) > * {
+  min-width: 0;
+}
+
+#lovable-badge {
+  display: none !important;
 }
