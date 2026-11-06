@@ -1,6 +1,6 @@
 // adm-asaas-registrar-webhook — cadastra (ou atualiza) na conta Asaas da WSA o webhook que aponta
 // para adm-asaas-webhook, com o authToken = secret ADM_ASAAS_WEBHOOK_TOKEN. Só o super admin.
-import { asaasConfig, asaasFetch, cors, erroAsaas, exigirSuperAdmin, json } from "../_shared/asaas.ts";
+import { asaasConfig, asaasFetch, cors, erroAsaas, exigirSuperAdmin, json, webhookToken } from "../_shared/asaas.ts";
 
 const NOME = "ImobAdm WSA - mensalidades";
 const EVENTOS = [
@@ -15,7 +15,7 @@ Deno.serve(async (req) => {
 
   const quem = await exigirSuperAdmin(req);
   if (!quem.ok) return quem.res;
-  const token = Deno.env.get("ADM_ASAAS_WEBHOOK_TOKEN") ?? "";
+  const token = webhookToken();
   if (!asaasConfig().apiKey) return json({ ok: false, erro: "Cadastre o secret ADM_ASAAS_API_KEY." }, 500);
   if (token.length < 32) return json({ ok: false, erro: "Cadastre o secret ADM_ASAAS_WEBHOOK_TOKEN (32+ caracteres)." }, 500);
 

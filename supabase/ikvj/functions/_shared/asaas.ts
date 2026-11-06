@@ -14,10 +14,16 @@ export function json(body: unknown, status = 200) {
 }
 
 export function asaasConfig() {
-  const apiKey = Deno.env.get("ADM_ASAAS_API_KEY") ?? "";
-  const env = Deno.env.get("ADM_ASAAS_ENVIRONMENT") === "production" ? "production" : "sandbox";
+  // trim: secrets colados no painel costumam vir com espaço ou quebra de linha no fim
+  const apiKey = (Deno.env.get("ADM_ASAAS_API_KEY") ?? "").trim();
+  const env = (Deno.env.get("ADM_ASAAS_ENVIRONMENT") ?? "").trim().toLowerCase() === "production" ? "production" : "sandbox";
   const base = env === "production" ? "https://api.asaas.com/v3" : "https://api-sandbox.asaas.com/v3";
   return { apiKey, env, base };
+}
+
+/** Token do webhook (secret ADM_ASAAS_WEBHOOK_TOKEN), sem espaços nas pontas. */
+export function webhookToken() {
+  return (Deno.env.get("ADM_ASAAS_WEBHOOK_TOKEN") ?? "").trim();
 }
 
 export async function asaasFetch(path: string, init: RequestInit = {}) {
