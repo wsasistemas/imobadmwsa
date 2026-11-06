@@ -19,7 +19,8 @@ await db.exec(`
   create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('test.uid', true), '')::uuid $$;
   create schema acessos;
   create table acessos.aplicativos (schema_name text primary key, nome text not null, url text, oculto boolean not null default false,
-    controle_ativo boolean not null default false, ultima_verificacao_em timestamptz);
+    controle_ativo boolean not null default false, ultima_verificacao_em timestamptz, schema_dados text);
+  create schema imobpesagens;
   create function acessos.sou_super_admin() returns boolean language sql stable as $$ select current_setting('test.super', true) = '1' $$;
   create schema imobdoces;
   create function imobdoces.membro_da_loja(p text) returns boolean language sql stable as $$ select false $$;
@@ -132,6 +133,18 @@ await q("select set_config('test.super', '0', false)");
 let negou = false;
 try { await q("select public.adm_avisos($1)", [b]); } catch { negou = true; }
 check("histórico só para o super admin", negou);
+
+console.log("\nSistemas novos");
+await q("select set_config('test.super', '1', false)");
+const disp = await q("select * from public.adm_schemas_disponiveis()");
+check("schema fora da Central aparece como disponível", disp.some((x) => x.schema_name === "imobpesagens"), JSON.stringify(disp));
+check("sistema já cadastrado não aparece", disp.every((x) => x.schema_name !== "imobdoces"));
+await q("select public.adm_adicionar_sistema('imobpesagens', 'ImobPesagens', null, 'schema', 'um cliente por schema')");
+check("entra na Central com o controle desligado", (await um("select controle_ativo c from acessos.aplicativos where schema_name='imobpesagens'")).c === false);
+check("entra em adm.sistemas", (await um("select count(*)::int c from adm.sistemas where app='imobpesagens'")).c === 1);
+let semSchema = false;
+try { await q("select public.adm_adicionar_sistema('nao_existe', 'X', null, 'schema', null)"); } catch { semSchema = true; }
+check("schema inexistente é recusado", semSchema);
 
 console.log("\nSegurança");
 const priv = await q(`select p.proname, has_function_privilege('authenticated', p.oid, 'execute') a, has_function_privilege('anon', p.oid, 'execute') n

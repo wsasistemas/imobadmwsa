@@ -1,7 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
+import { Plus } from "lucide-react";
+
+import { AdicionarSistema } from "@/components/adm/dialogos";
 import { Carregando, Cartao, Erro, Pagina, Selo, Vazio } from "@/components/adm/ui";
+import { Button } from "@/components/ui/button";
 import type { NomeIcone } from "@/components/icones/icone-colorido";
 import { api } from "@/lib/adm/api";
 import { dataHora } from "@/lib/adm/formato";
@@ -23,7 +27,8 @@ const instalada = (d: string | null) => !!d && Date.now() - new Date(d).getTime(
 function Sistemas() {
   const q = useQuery({ queryKey: ["sistemas"], queryFn: api.listarSistemas });
   return (
-    <Pagina titulo="Sistemas e schemas" texto={<>Os aplicativos no Supabase central (<code>ikvjaowvpvxojvcfwnct</code>) e como cada um separa as empresas.</>}>
+    <Pagina titulo="Sistemas e schemas" texto={<>Os aplicativos no Supabase central (<code>ikvjaowvpvxojvcfwnct</code>) e como cada um separa as empresas.</>}
+      acoes={<AdicionarSistema gatilho={<Button className="gap-1.5"><Plus className="size-4" />Adicionar sistema</Button>} />}>
       {q.isLoading ? <Carregando /> : q.error ? <Erro erro={q.error} /> : (q.data ?? []).length === 0 ? (
         <Vazio icone="flat-color-icons:data-configuration" titulo="Nenhum sistema" texto="Os sistemas vêm da Central de Acessos (acessos.aplicativos)." />
       ) : (
@@ -32,7 +37,7 @@ function Sistemas() {
             <Cartao key={s.app} icone={ICONE[s.app] ?? "fluent-color:apps-24"} titulo={s.nome}
               extra={instalada(s.ultima_verificacao_em) ? <Selo tom="ok">Verificação instalada</Selo> : <Selo tom="war">Sem verificação</Selo>}>
               <dl className="divide-y divide-border text-sm">
-                <div className="flex justify-between gap-3 py-2"><dt className="text-muted-foreground">Schema</dt><dd><code className="rounded bg-muted px-1.5 py-0.5 text-xs">{s.app}</code></dd></div>
+                <div className="flex justify-between gap-3 py-2"><dt className="text-muted-foreground">Schema</dt><dd><code className="rounded bg-muted px-1.5 py-0.5 text-xs">{s.app === "imobsystem" ? "public" : s.app}</code></dd></div>
                 <div className="flex justify-between gap-3 py-2"><dt className="text-muted-foreground">Separação da empresa</dt><dd className="text-right">{s.descricao_ref ?? (s.tipo_ref === "schema" ? "um schema por empresa" : "tenant")}</dd></div>
                 <div className="flex justify-between gap-3 py-2"><dt className="text-muted-foreground">Empresas</dt><dd><b>{s.empresas}</b>{Number(s.suspensas) > 0 ? <span className="text-destructive"> · {s.suspensas} suspensa(s)</span> : null}</dd></div>
                 <div className="flex justify-between gap-3 py-2"><dt className="text-muted-foreground">Última checagem do site</dt><dd>{s.ultima_verificacao_em ? dataHora(s.ultima_verificacao_em) : "nunca"}</dd></div>

@@ -66,11 +66,8 @@ export const SITUACAO_FATURA: Record<SituacaoFatura, { rotulo: string; tom: Tom 
   estornada: { rotulo: "Estornada", tom: "err" },
 };
 
-export const NOME_SISTEMA: Record<string, string> = {
-  imobsystem: "ImobSystem", imobdoces: "ImobDoces", imobenviomassa: "Imobenviomassa", imobdesk: "ImobDesk",
-  suprimentos: "Suprimentos", imobimoveis: "ImobImóveis",
-};
-export const nomeSistema = (app: string) => NOME_SISTEMA[app] ?? app;
+/** Etiqueta do sistema = nome do schema no Supabase (o mesmo que aparece em Database → Schemas). */
+export const nomeSistema = (app: string) => app;
 
 /** Texto do histórico (adm.eventos) em português simples. */
 export function textoEvento(tipo: string, d: Record<string, unknown>): string {

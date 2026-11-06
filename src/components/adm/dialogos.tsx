@@ -146,7 +146,7 @@ export function VincularSistema({ gatilho, empresaId }: { gatilho: ReactNode; em
         <Campo rotulo="Sistema *">
           <select className={SELECT} value={app} onChange={(e) => setApp(e.target.value)} required>
             <option value="">Escolha…</option>
-            {(sistemas.data ?? []).map((s) => <option key={s.app} value={s.app}>{s.nome}</option>)}
+            {(sistemas.data ?? []).map((s) => <option key={s.app} value={s.app}>{s.app} — {s.nome}</option>)}
           </select>
         </Campo>
         <Campo rotulo={sis?.tipo_ref === "schema" ? "Schema da empresa *" : "Id do tenant da empresa *"} dica={sis?.descricao_ref ?? undefined}>
@@ -157,6 +157,63 @@ export function VincularSistema({ gatilho, empresaId }: { gatilho: ReactNode; em
           <Campo rotulo="Valor mensal (R$) *"><Input value={valor} onChange={(e) => setValor(e.target.value)} inputMode="decimal" required placeholder="290,00" /></Campo>
         </div>
         <Rodape salvando={m.isPending} rotulo="Vincular" />
+      </form>
+    </Janela>
+  );
+}
+
+// ------------------------------------------------------------------ Adicionar sistema (schema do banco)
+export function AdicionarSistema({ gatilho }: { gatilho: ReactNode }) {
+  const [aberto, setAberto] = useState(false);
+  const qc = useQueryClient();
+  const disp = useQuery({ queryKey: ["schemas-disponiveis"], queryFn: api.schemasDisponiveis, enabled: aberto });
+  const [schema, setSchema] = useState("");
+  const [nome, setNome] = useState("");
+  const [url, setUrl] = useState("");
+  const [tipo, setTipo] = useState<"schema" | "tenant">("tenant");
+  const [descricao, setDescricao] = useState("");
+
+  const m = useMutation({
+    mutationFn: () => api.adicionarSistema(schema, nome, url, tipo, descricao),
+    onSuccess: () => {
+      toast.success("Sistema adicionado.");
+      qc.invalidateQueries({ queryKey: ["sistemas"] });
+      qc.invalidateQueries({ queryKey: ["schemas-disponiveis"] });
+      setAberto(false); setSchema(""); setNome(""); setUrl(""); setDescricao("");
+    },
+    onError: (e) => toast.error(mensagemErro(e)),
+  });
+
+  return (
+    <Janela gatilho={gatilho} titulo="Adicionar sistema" aberto={aberto} setAberto={setAberto}
+      descricao="Escolha um schema do banco que ainda não é cobrado. Ele entra na Central de Acessos com o controle desligado (nenhum login muda).">
+      <form onSubmit={(e) => { e.preventDefault(); m.mutate(); }} className="space-y-3">
+        <Campo rotulo="Schema no Supabase *">
+          <select className={SELECT} value={schema} required onChange={(e) => {
+            const s = disp.data?.find((x) => x.schema_name === e.target.value);
+            setSchema(e.target.value);
+            if (!nome) setNome(s?.nome_central ?? e.target.value);
+          }}>
+            <option value="">{disp.isLoading ? "Carregando…" : "Escolha…"}</option>
+            {(disp.data ?? []).map((s) => (
+              <option key={s.schema_name} value={s.schema_name}>{s.schema_name} · {s.tabelas} tabelas{s.na_central ? " · já na Central" : ""}</option>
+            ))}
+          </select>
+        </Campo>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Campo rotulo="Nome do sistema *"><Input value={nome} onChange={(e) => setNome(e.target.value)} required /></Campo>
+          <Campo rotulo="Endereço do site"><Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://…imobsystems.com.br" /></Campo>
+        </div>
+        <Campo rotulo="Como separa as empresas *">
+          <select className={SELECT} value={tipo} onChange={(e) => setTipo(e.target.value as "schema" | "tenant")}>
+            <option value="tenant">Várias empresas no mesmo schema (coluna de empresa/tenant)</option>
+            <option value="schema">Um schema por empresa</option>
+          </select>
+        </Campo>
+        <Campo rotulo="Onde fica a empresa" dica="Ex.: unidade em imobeducacional.unidades (unidade_id)">
+          <Input value={descricao} onChange={(e) => setDescricao(e.target.value)} />
+        </Campo>
+        <Rodape salvando={m.isPending} rotulo="Adicionar sistema" />
       </form>
     </Janela>
   );
