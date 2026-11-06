@@ -153,8 +153,12 @@ INSERT INTO adm.sistemas (app, tipo_ref, descricao_ref, funcao_membro)
 SELECT a.schema_name,
        CASE a.schema_name WHEN 'imobdoces' THEN 'schema' ELSE 'tenant' END,
        CASE a.schema_name
-         WHEN 'imobdoces' THEN 'um schema por loja (loja_<slug>)'
-         WHEN 'imobsystem' THEN 'coluna imobiliaria_id no public'
+         WHEN 'imobdoces'      THEN 'um schema por loja (loja_<slug>)'
+         WHEN 'imobsystem'     THEN 'tenant em public.tenants'
+         WHEN 'imobimoveis'    THEN 'tenant em imobimoveis.tenants'
+         WHEN 'imobenviomassa' THEN 'imobiliária em imobenviomassa.imobiliarias'
+         WHEN 'suprimentos'    THEN 'imobiliária em suprimentos.imobiliarias'
+         WHEN 'imobdesk'       THEN 'empresa em imobdesk.empresas'
        END,
        CASE a.schema_name WHEN 'imobdoces' THEN 'imobdoces.membro_da_loja' END
   FROM acessos.aplicativos a
