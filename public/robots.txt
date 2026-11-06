@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /dashboard
+Disallow: /leads
+Disallow: /empreendimentos
+Disallow: /simulador
+Disallow: /configuracoes
+Allow: /auth
+Allow: /

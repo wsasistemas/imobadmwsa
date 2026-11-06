@@ -1,0 +1,1 @@
+GRANT INSERT, DELETE ON public.user_roles TO authenticated;

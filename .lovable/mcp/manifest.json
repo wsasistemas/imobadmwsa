@@ -1,0 +1,187 @@
+{
+  "version": 1,
+  "sdk_version": "0.20.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://ugktswcnuvivjzkjpfjg.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "imobsystem-mcp",
+      "version": "0.1.0",
+      "title": "ImobSystem MCP"
+    },
+    "tools": [
+      {
+        "name": "list_leads",
+        "title": "Listar leads",
+        "description": "Lista os leads da imobiliária do usuário autenticado. Suporta filtros opcionais por estágio do funil, score e limite de resultados.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "estagio": {
+              "description": "Filtra por estágio do funil.",
+              "type": "string",
+              "enum": [
+                "novo_lead",
+                "em_qualificacao",
+                "qualificado",
+                "proposta_enviada",
+                "visita_agendada",
+                "em_negociacao",
+                "fechado_ganho",
+                "fechado_perdido"
+              ]
+            },
+            "score": {
+              "description": "Filtra por score do lead.",
+              "type": "string",
+              "enum": [
+                "novo",
+                "frio",
+                "morno",
+                "quente",
+                "perdido",
+                "fechado"
+              ]
+            },
+            "limit": {
+              "description": "Máximo de resultados (padrão 20).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_lead",
+        "title": "Criar lead",
+        "description": "Cria um novo lead na imobiliária do usuário autenticado. O corretor responsável é o próprio usuário chamador.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "nome": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Nome completo do lead."
+            },
+            "email": {
+              "description": "E-mail do lead.",
+              "type": "string",
+              "format": "email",
+              "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+            },
+            "telefone": {
+              "description": "Telefone/WhatsApp do lead.",
+              "type": "string"
+            },
+            "origem": {
+              "description": "Origem do lead (padrão: outro).",
+              "type": "string",
+              "enum": [
+                "site",
+                "whatsapp",
+                "instagram",
+                "facebook",
+                "google_ads",
+                "indicacao",
+                "portal",
+                "outro"
+              ]
+            },
+            "observacoes": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "nome"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_empreendimentos",
+        "title": "Listar empreendimentos",
+        "description": "Lista empreendimentos (lançamentos) disponíveis na imobiliária.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "status": {
+              "description": "Filtra por status.",
+              "type": "string",
+              "enum": [
+                "em_lancamento",
+                "em_obras",
+                "pronto_para_morar",
+                "entregue",
+                "esgotado"
+              ]
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_visitas",
+        "title": "Listar visitas",
+        "description": "Lista visitas da imobiliária, opcionalmente filtradas por status.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "agendada",
+                "confirmada",
+                "realizada",
+                "cancelada",
+                "nao_compareceu"
+              ]
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
