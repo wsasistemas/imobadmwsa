@@ -213,14 +213,15 @@ Cada sistema ──► public.empresa_liberada(p_app, p_ref) ──► true/fals
 
 ## Fase 5: banco `comercial` e entrada pelo site
 
-- [ ] Migration `comercial_schema_tabelas`: as 12 tabelas, a semente das etapas, índices (whatsapp e email únicos parciais), RLS e policies
-- [ ] Migration `comercial_funcoes`: `receber_lead`, `mover_etapa`, normalização de telefone e RPCs `public.com_*`
-- [ ] Edge `leads-entrada`: chave do site (comparada pelo hash), Turnstile, limite por IP, idempotência e resposta `{ok}`
-- [ ] Gatilho em `public.saas_leads` → `comercial.receber_lead` (a ponte enquanto o site não muda)
-- [ ] Boas-vindas no WhatsApp com o link `/agendar/<token>` (o link funciona a partir da Fase 7; até lá, só a mensagem)
-- [ ] Teste: o mesmo lead enviado 2 vezes → 1 contato, 1 negócio e 1 anotação `lead_repetido`
-- [ ] Teste: chave errada ou sem Turnstile → 401, nada gravado
-- [ ] Carga: `saas_leads` importada com origem `importado`, sem disparar WhatsApp
+- [x] Migration `comercial_01_schema_tabelas`: 12 tabelas (com `vendedores`), semente das 8 etapas e da fonte do site, índices únicos parciais de WhatsApp e e-mail. Sem policies: tudo fechado e acessado só por funções (mesmo modelo do `adm`)
+- [x] Migration `comercial_02_funcoes`: `receber_lead`, `mover_etapa` (Ganho → `adm.criar_empresa_do_negocio`), normalização de telefone, `public.com_srv_*` e `public.com_*`
+- [x] Edge `leads-entrada`: chave do site (pelo hash), Turnstile obrigatório quando houver o secret `ADM_TURNSTILE_SECRET`, isca anti-robô, 5 envios por IP em 10 min, idempotência por `id_envio`
+- [x] Ponte: gatilho em `public.leads` (o site atual grava aqui) **e** em `public.saas_leads` → `comercial.receber_lead`
+- [x] Boas-vindas no WhatsApp (`com-boas-vindas`, pg_cron a cada minuto só com pendente, template `boas_vindas_lead`, só leads das últimas 48 h). Envia quando houver os secrets `ADM_WHATSAPP_*`
+- [x] Teste: o mesmo lead enviado 2 vezes → 1 contato, 1 negócio e 1 anotação `lead_repetido` (fase5.test.mjs, 43 cenários)
+- [x] Teste: chave ausente ou errada → 401, nada gravado (testado no ikvj). Turnstile → 401 quando o secret estiver cadastrado
+- [x] Carga: `public.leads` (2) e `public.saas_leads` (6) importados com origem `importado`, sem WhatsApp → 7 contatos (1 repetido unido)
+- [x] Tela Fonte de leads › Landing pages e sites: páginas, chave (aparece 1 vez), código para colar no site e últimos leads
 
 ## Fase 6: Facebook e Instagram
 

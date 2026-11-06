@@ -44,7 +44,7 @@ export const MENU: GrupoMenu[] = [
         label: "Fonte de leads",
         icone: "logos:meta-icon",
         filhos: [
-          { to: "/fontes/landing", label: "Landing pages e sites", icone: "fluent-color:person-add-24", fase: 5 },
+          { to: "/fontes/landing", label: "Landing pages e sites", icone: "fluent-color:person-add-24" },
           { to: "/fontes/meta", label: "Facebook e Instagram", icone: "logos:facebook", fase: 6 },
           { to: "/fontes/linkedin", label: "LinkedIn", icone: "logos:linkedin-icon", depois: true },
           { to: "/fontes/tiktok", label: "TikTok", icone: "logos:tiktok-icon", depois: true },

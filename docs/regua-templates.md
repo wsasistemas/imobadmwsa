@@ -60,3 +60,13 @@ do Asaas, `{{5}}` data da suspensão.
 
 Não recebem aviso: empresa em cortesia ou cancelada, fatura paga, empresa com prazo extra vigente
 (menos o D-3) e empresa sem WhatsApp ou e-mail financeiro cadastrado.
+
+## Template de boas-vindas ao lead (Fase 5)
+
+### `boas_vindas_lead` (categoria Marketing ou Utilidade, Português BR)
+```
+Olá, {{1}}! Aqui é da WSA Sistemas. Recebemos o seu contato e queremos entender o que você precisa.
+Escolha o melhor horário para uma conversa rápida (vídeo, 30 min): {{2}}
+```
+`{{1}}` primeiro nome, `{{2}}` link de agendamento (`<ADM_AGENDA_URL>/agendar/<token>`; a página chega na Fase 7).
+Secret opcional `ADM_AGENDA_URL`: endereço público do painel (padrão `https://imobwsa.vercel.app`).

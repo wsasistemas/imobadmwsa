@@ -66,6 +66,17 @@ export interface LoginAcesso {
   decisao: boolean | null; efetivo: boolean;
 }
 
+export interface Fonte {
+  id: string; tipo: "site" | "meta" | "linkedin" | "tiktok" | "manual" | "whatsapp"; nome: string; dominio: string | null;
+  tem_chave: boolean; chave_prefixo: string | null; sistema_padrao: string | null; ativo: boolean;
+  total_leads: number; ultimo_lead_em: string | null; criado_em: string;
+}
+export interface LeadRecebido {
+  id: number; origem: string; recebido_em: string; erro: string | null; negocio_id: string | null; fonte: string | null;
+  nome: string | null; whatsapp: string | null; email: string | null; empresa_nome: string | null; etapa: string | null;
+  boas_vindas: "pendente" | "enviada" | "falhou" | "nao_enviar" | null; repetido: boolean | null;
+}
+
 /** Mensagem legível: a regra de negócio devolve a frase pronta em `message`. */
 export function mensagemErro(e: unknown): string {
   const msg = (e as { message?: string } | null)?.message;
@@ -120,6 +131,11 @@ export const api = {
       acesso_manual: "liberado" | "bloqueado" | null; liberado: boolean; situacao: Situacao; dias_atraso: number;
       suspende_em: string | null; desde: string;
     }[]>("adm_empresas_do_sistema", { p_app: app, p_busca: busca || null }),
+  // Comercial: fontes de lead (Fase 5)
+  listarFontes: () => rpc<Fonte[]>("com_listar_fontes"),
+  salvarFonte: (p: Partial<Fonte>) => rpc<string>("com_salvar_fonte", { p }),
+  gerarChaveFonte: (fonte: string) => rpc<string>("com_gerar_chave_fonte", { p_fonte: fonte }),
+  leadsRecebidos: (fonte?: string | null, limite = 50) => rpc<LeadRecebido[]>("com_leads_recebidos", { p_fonte: fonte ?? null, p_limite: limite }),
   schemasDisponiveis: () =>
     rpc<{ schema_name: string; tabelas: number; na_central: boolean; nome_central: string | null }[]>("adm_schemas_disponiveis"),
   adicionarSistema: (schema: string, nome: string, url: string, tipo: "schema" | "tenant", descricao: string) =>
