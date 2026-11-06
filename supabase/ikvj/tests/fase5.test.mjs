@@ -124,7 +124,7 @@ const p3 = (await um("select comercial.receber_lead('site', $1::jsonb, $2) r", [
 check("lead de quem já foi ganho abre um negócio novo", p3.novo_negocio === true && p3.negocio_id !== r1.negocio_id, JSON.stringify(p3));
 
 console.log("\nPainel");
-check("lista fontes", (await um("select public.com_listar_fontes() f")).f.length === 1);
+check("lista fontes (site + Facebook e Instagram)", (await um("select public.com_listar_fontes() f")).f.length === 2);
 const lr = (await um("select public.com_leads_recebidos(null, 20) l")).l;
 check("lista leads recebidos com contato e etapa", lr.length > 0 && lr.some((x) => x.etapa === "Novo lead" && x.nome), JSON.stringify(lr[0]));
 await q("select set_config('test.super', '0', false)");
