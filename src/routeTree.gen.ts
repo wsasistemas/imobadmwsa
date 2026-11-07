@@ -27,6 +27,7 @@ import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[
 import { Route as AuthenticatedEmpresasIndexRouteImport } from './routes/_authenticated/empresas.index'
 import { Route as AuthenticatedEmpresasIdRouteImport } from './routes/_authenticated/empresas.$id'
 import { Route as AuthenticatedFontesLandingRouteImport } from './routes/_authenticated/fontes.landing'
+import { Route as AuthenticatedFontesMetaRouteImport } from './routes/_authenticated/fontes.meta'
 import { Route as ApiPublicWebhooksWhatsappRouteImport } from './routes/api/public/webhooks.whatsapp'
 
 const IndexRoute = IndexRouteImport.update({
@@ -125,6 +126,11 @@ const AuthenticatedFontesLandingRoute =
     path: '/fontes/landing',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedFontesMetaRoute = AuthenticatedFontesMetaRouteImport.update({
+  id: '/fontes/meta',
+  path: '/fontes/meta',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ApiPublicWebhooksWhatsappRoute =
   ApiPublicWebhooksWhatsappRouteImport.update({
     id: '/api/public/webhooks/whatsapp',
@@ -149,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/empresas/$id': typeof AuthenticatedEmpresasIdRoute
   '/fontes/landing': typeof AuthenticatedFontesLandingRoute
+  '/fontes/meta': typeof AuthenticatedFontesMetaRoute
   '/empresas/': typeof AuthenticatedEmpresasIndexRoute
   '/api/public/webhooks/whatsapp': typeof ApiPublicWebhooksWhatsappRoute
 }
@@ -169,6 +176,7 @@ export interface FileRoutesByTo {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/empresas/$id': typeof AuthenticatedEmpresasIdRoute
   '/fontes/landing': typeof AuthenticatedFontesLandingRoute
+  '/fontes/meta': typeof AuthenticatedFontesMetaRoute
   '/empresas': typeof AuthenticatedEmpresasIndexRoute
   '/api/public/webhooks/whatsapp': typeof ApiPublicWebhooksWhatsappRoute
 }
@@ -191,6 +199,7 @@ export interface FileRoutesById {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/empresas/$id': typeof AuthenticatedEmpresasIdRoute
   '/_authenticated/fontes/landing': typeof AuthenticatedFontesLandingRoute
+  '/_authenticated/fontes/meta': typeof AuthenticatedFontesMetaRoute
   '/_authenticated/empresas/': typeof AuthenticatedEmpresasIndexRoute
   '/api/public/webhooks/whatsapp': typeof ApiPublicWebhooksWhatsappRoute
 }
@@ -213,6 +222,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/empresas/$id'
     | '/fontes/landing'
+    | '/fontes/meta'
     | '/empresas/'
     | '/api/public/webhooks/whatsapp'
   fileRoutesByTo: FileRoutesByTo
@@ -233,6 +243,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/empresas/$id'
     | '/fontes/landing'
+    | '/fontes/meta'
     | '/empresas'
     | '/api/public/webhooks/whatsapp'
   id:
@@ -254,6 +265,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/empresas/$id'
     | '/_authenticated/fontes/landing'
+    | '/_authenticated/fontes/meta'
     | '/_authenticated/empresas/'
     | '/api/public/webhooks/whatsapp'
   fileRoutesById: FileRoutesById
@@ -399,6 +411,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFontesLandingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/fontes/meta': {
+      id: '/_authenticated/fontes/meta'
+      path: '/fontes/meta'
+      fullPath: '/fontes/meta'
+      preLoaderRoute: typeof AuthenticatedFontesMetaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/webhooks/whatsapp': {
       id: '/api/public/webhooks/whatsapp'
       path: '/api/public/webhooks/whatsapp'
@@ -418,6 +437,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSistemasRoute: typeof AuthenticatedSistemasRoute
   AuthenticatedEmpresasIdRoute: typeof AuthenticatedEmpresasIdRoute
   AuthenticatedFontesLandingRoute: typeof AuthenticatedFontesLandingRoute
+  AuthenticatedFontesMetaRoute: typeof AuthenticatedFontesMetaRoute
   AuthenticatedEmpresasIndexRoute: typeof AuthenticatedEmpresasIndexRoute
 }
 
@@ -430,6 +450,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSistemasRoute: AuthenticatedSistemasRoute,
   AuthenticatedEmpresasIdRoute: AuthenticatedEmpresasIdRoute,
   AuthenticatedFontesLandingRoute: AuthenticatedFontesLandingRoute,
+  AuthenticatedFontesMetaRoute: AuthenticatedFontesMetaRoute,
   AuthenticatedEmpresasIndexRoute: AuthenticatedEmpresasIndexRoute,
 }
 

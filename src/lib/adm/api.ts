@@ -77,6 +77,12 @@ export interface LeadRecebido {
   boas_vindas: "pendente" | "enviada" | "falhou" | "nao_enviar" | null; repetido: boolean | null;
 }
 
+export interface MetaConexao {
+  id: string; page_id: string; page_nome: string | null; ig_usuario: string | null; token_valido: boolean; assinada: boolean;
+  detalhe: string | null; verificado_em: string | null; ultimo_lead_em: string | null; total_leads: number; criado_em: string;
+  formularios: { form_id: string; nome: string | null; situacao: string | null; sistema: string | null; ativo: boolean; total_leads: number }[];
+}
+
 /** Mensagem legível: a regra de negócio devolve a frase pronta em `message`. */
 export function mensagemErro(e: unknown): string {
   const msg = (e as { message?: string } | null)?.message;
@@ -136,6 +142,19 @@ export const api = {
   salvarFonte: (p: Partial<Fonte>) => rpc<string>("com_salvar_fonte", { p }),
   gerarChaveFonte: (fonte: string) => rpc<string>("com_gerar_chave_fonte", { p_fonte: fonte }),
   leadsRecebidos: (fonte?: string | null, limite = 50) => rpc<LeadRecebido[]>("com_leads_recebidos", { p_fonte: fonte ?? null, p_limite: limite }),
+  // Comercial: Facebook e Instagram (Fase 6)
+  metaConexoes: () => rpc<MetaConexao[]>("com_meta_conexoes"),
+  metaFormularioSalvar: (form: string, sistema: string | null, ativo: boolean) =>
+    rpc<void>("com_meta_formulario_salvar", { p_form_id: form, p_sistema: sistema, p_ativo: ativo }),
+  metaSituacao: () => edge<{ configurado: boolean; webhook_configurado: boolean; webhook_url: string; retorno_url: string }>("adm-meta", { acao: "situacao" }),
+  metaInicio: (retorno: string) => edge<{ url: string }>("adm-meta", { acao: "inicio", retorno }),
+  metaPaginas: (sessao: string) =>
+    edge<{ paginas: { id: string; nome: string; instagramNome: string | null; podeLeads: boolean }[] }>("adm-meta", { acao: "paginas", sessao }),
+  metaConectar: (sessao: string, paginaId: string) =>
+    edge<{ conexaoId: string; assinada: boolean; formularios: number | null }>("adm-meta", { acao: "conectar", sessao, paginaId }),
+  metaFormularios: (conexaoId: string) => edge<{ formularios: number }>("adm-meta", { acao: "formularios", conexaoId }),
+  metaVerificar: (conexaoId: string) => edge<{ valido: boolean; detalhe: string | null }>("adm-meta", { acao: "verificar", conexaoId }),
+  metaDesconectar: (conexaoId: string) => edge<{ ok: boolean }>("adm-meta", { acao: "desconectar", conexaoId }),
   schemasDisponiveis: () =>
     rpc<{ schema_name: string; tabelas: number; na_central: boolean; nome_central: string | null }[]>("adm_schemas_disponiveis"),
   adicionarSistema: (schema: string, nome: string, url: string, tipo: "schema" | "tenant", descricao: string) =>

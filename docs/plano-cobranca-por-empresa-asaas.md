@@ -225,13 +225,13 @@ Cada sistema ──► public.empresa_liberada(p_app, p_ref) ──► true/fals
 
 ## Fase 6: Facebook e Instagram
 
-- [ ] Telas Fonte de leads › Facebook e Instagram, LinkedIn e TikTok (estas duas com Conectar desligado), copiadas do imobatendimento
-- [ ] Fluxo de conexão: login do Facebook → token longo → escolha da página → `subscribed_apps` (leadgen) → token no Vault
-- [ ] Lista de formulários da página, com o sistema de cada um e o liga/desliga
-- [ ] Edge `meta-leadgen-webhook`: `hub.challenge`, HMAC `X-Hub-Signature-256`, busca do lead, origem `facebook` ou `instagram` pelo `platform`, `receber_lead`
-- [ ] Token inválido → selo na tela e evento
-- [ ] Teste com a ferramenta de teste de Lead Ads da Meta → lead no funil com a origem certa
-- [ ] Teste: assinatura HMAC errada → 403, nada gravado
+- [x] Tela Fonte de leads › Facebook e Instagram (layout de Permissões). LinkedIn e TikTok ficam no menu marcados como "depois"
+- [x] Fluxo de conexão (Edge `adm-meta`, reaproveitado do imobimoveis-meta): login do Facebook → token longo → escolha da página → `subscribed_apps` (leadgen) → token no Vault
+- [x] Lista de formulários da página, com o sistema de cada um e o liga/desliga
+- [x] Edge `meta-leadgen-webhook`: `hub.challenge`, HMAC `X-Hub-Signature-256`, busca do lead, origem `facebook` ou `instagram` pelo `platform`, `receber_lead` (erro passageiro → 500 para a Meta reenviar)
+- [x] Token inválido → `token_valido = false` + detalhe, selo "Token recusado" na tela
+- [ ] Teste com a ferramenta de teste de Lead Ads da Meta → lead no funil com a origem certa (NÃO FEITO: falta o app da Meta e os secrets `ADM_META_*`)
+- [ ] Teste: assinatura HMAC errada → 401, nada gravado (NÃO FEITO: só dá para testar com `ADM_META_APP_SECRET` cadastrado; hoje responde "não configurado")
 
 ## Fase 7: Google Agenda e agendamento automático
 
