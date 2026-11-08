@@ -230,8 +230,8 @@ Cada sistema ──► public.empresa_liberada(p_app, p_ref) ──► true/fals
 - [x] Lista de formulários da página, com o sistema de cada um e o liga/desliga
 - [x] Edge `meta-leadgen-webhook`: `hub.challenge`, HMAC `X-Hub-Signature-256`, busca do lead, origem `facebook` ou `instagram` pelo `platform`, `receber_lead` (erro passageiro → 500 para a Meta reenviar)
 - [x] Token inválido → `token_valido = false` + detalhe, selo "Token recusado" na tela
-- [ ] Teste com a ferramenta de teste de Lead Ads da Meta → lead no funil com a origem certa (NÃO FEITO: falta o app da Meta e os secrets `ADM_META_*`)
-- [ ] Teste: assinatura HMAC errada → 401, nada gravado (NÃO FEITO: só dá para testar com `ADM_META_APP_SECRET` cadastrado; hoje responde "não configurado")
+- [x] Teste com a ferramenta de teste de Lead Ads da Meta → lead no funil com a origem facebook, classificado e com as respostas (08/11, app Ao vivo)
+- [x] Teste: assinatura HMAC errada → 401, nada gravado (08/11)
 
 ## Fase 7: Google Agenda e agendamento automático
 
