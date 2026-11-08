@@ -10,7 +10,8 @@ export interface AppMeta {
   redirectUri: string;
 }
 
-export const PERMISSOES_META = ["leads_retrieval", "pages_manage_metadata", "pages_show_list", "pages_read_engagement", "business_management"];
+// pages_manage_ads: a Graph exige para listar /{page}/leadgen_forms (erro #200 sem ela).
+export const PERMISSOES_META = ["leads_retrieval", "pages_manage_ads", "pages_manage_metadata", "pages_show_list", "pages_read_engagement", "business_management"];
 export const VERSAO_PADRAO = "v23.0";
 
 const env = (n: string) => (Deno.env.get(n) ?? "").trim();
