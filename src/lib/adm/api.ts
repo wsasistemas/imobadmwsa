@@ -89,6 +89,48 @@ export function mensagemErro(e: unknown): string {
   return msg && !msg.startsWith("{") ? msg : "Não foi possível concluir a ação. Tente de novo.";
 }
 
+// ------------------------------------------------------------------ Comercial: leads, funil e classificação (Fase 8)
+export type Temperatura = "quente" | "morno" | "frio";
+export type OrigemLead = "site" | "instagram" | "facebook" | "linkedin" | "tiktok" | "manual" | "importado" | "whatsapp";
+
+export interface CardNegocio {
+  negocio_id: string; contato_id: string; nome: string; empresa: string | null; cargo: string | null;
+  whatsapp: string | null; email: string | null; origem: OrigemLead; formulario: string | null; campanha: string | null;
+  sistemas: string[]; valor: number | null; etapa: string; etapa_nome: string; etapa_cor: string;
+  temperatura: Temperatura | null; pontuacao: number | null; proxima_acao: string | null; prazo_em: string | null;
+  boas_vindas: string | null; motivo_perda: string | null; empresa_id: string | null; sem_resposta_24h: boolean;
+  reuniao: { inicio: string; fim: string; situacao: string; meet_url: string | null } | null;
+  criado_em: string; ultima_interacao: string | null;
+}
+
+export interface Motivo { motivo: string; pontos: number }
+
+export interface FichaNegocio extends CardNegocio {
+  classificacao: { pontos?: number; temperatura?: Temperatura; motivos?: Motivo[]; sistemas?: string[]; proxima_acao?: string; manual?: boolean };
+  atividades: { id: number; tipo: string; texto: string; detalhe: Record<string, unknown> | null; autor: string | null; criado_em: string }[];
+  recebidos: { id: number; origem: string; recebido_em: string; fonte: string | null; respostas: Record<string, unknown> }[];
+}
+
+export interface EtapaFunil {
+  chave: string; nome: string; cor: string; final: boolean; ganho: boolean; total: number; valor: number; negocios: CardNegocio[];
+}
+
+export interface ResumoLeads {
+  novos_30d: number; novos_30d_antes: number; site_30d: number; instagram_30d: number; facebook_30d: number;
+  quentes_abertos: number; mornos_abertos: number; frios_abertos: number; sem_resposta_24h: number; reunioes_30d: number;
+  por_origem: Record<string, number>; total: number;
+}
+
+export interface RegrasQualificacao {
+  limites: { quente: number; morno: number };
+  mover_quente: boolean;
+  pontos: Record<"whatsapp" | "email_corporativo" | "empresa" | "cargo_decisor" | "sistema" | "urgencia" | "intencao" | "pesquisando", number>;
+  cargos_decisores: string[]; palavras_urgencia: string[]; palavras_intencao: string[]; palavras_pesquisando: string[];
+  emails_pessoais: string[]; sistemas: Record<string, string[]>;
+}
+
+export interface Previa { pontos: number; temperatura: Temperatura; motivos: Motivo[]; sistemas: string[]; proxima_acao: string }
+
 async function rpc<T>(fn: string, args: Record<string, unknown> = {}): Promise<T> {
   const { data, error } = await sb.rpc(fn, args);
   if (error) throw error;
@@ -155,6 +197,23 @@ export const api = {
   metaFormularios: (conexaoId: string) => edge<{ formularios: number }>("adm-meta", { acao: "formularios", conexaoId }),
   metaVerificar: (conexaoId: string) => edge<{ valido: boolean; detalhe: string | null }>("adm-meta", { acao: "verificar", conexaoId }),
   metaDesconectar: (conexaoId: string) => edge<{ ok: boolean }>("adm-meta", { acao: "desconectar", conexaoId }),
+  // Comercial: leads, funil e classificação (Fase 8)
+  leads: (origem?: string | null, temperatura?: string | null, busca?: string | null) =>
+    rpc<CardNegocio[]>("com_leads", { p_origem: origem ?? null, p_temperatura: temperatura ?? null, p_busca: busca || null, p_limite: 500 }),
+  resumoLeads: () => rpc<ResumoLeads>("com_leads_resumo"),
+  funil: (sistema?: string | null) => rpc<EtapaFunil[]>("com_funil", { p_sistema: sistema ?? null }),
+  negocio: (id: string) => rpc<FichaNegocio | null>("com_negocio", { p_id: id }),
+  moverEtapa: (negocio: string, etapa: string, motivo?: string | null) =>
+    rpc<{ ok: boolean; etapa: string; empresa_id: string | null }>("com_mover_etapa", { p_negocio: negocio, p_etapa: etapa, p_motivo: motivo ?? null }),
+  anotar: (negocio: string, texto: string) => rpc<void>("com_anotar", { p_negocio: negocio, p_texto: texto }),
+  salvarNegocio: (negocio: string, p: { valor?: number | null; sistemas?: string[]; temperatura?: Temperatura | null }) =>
+    rpc<void>("com_negocio_salvar", { p_negocio: negocio, p }),
+  novoContato: (p: Record<string, string>) =>
+    rpc<{ ok: boolean; erro?: string; negocio_id?: string; repetido?: boolean }>("com_novo_contato", { p }),
+  regrasQualificacao: () => rpc<RegrasQualificacao>("com_config_qualificacao"),
+  salvarRegrasQualificacao: (regras: RegrasQualificacao) => rpc<number>("com_config_qualificacao_salvar", { p_regras: regras }),
+  previaClassificacao: (dados: Record<string, string>) => rpc<Previa>("com_classificar_previa", { p_dados: dados }),
+
   schemasDisponiveis: () =>
     rpc<{ schema_name: string; tabelas: number; na_central: boolean; nome_central: string | null }[]>("adm_schemas_disponiveis"),
   adicionarSistema: (schema: string, nome: string, url: string, tipo: "schema" | "tenant", descricao: string) =>

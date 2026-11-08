@@ -18,6 +18,8 @@ import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as AuthenticatedComoFuncionaRouteImport } from './routes/_authenticated/como-funciona'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedFunilRouteImport } from './routes/_authenticated/funil'
+import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated/leads'
 import { Route as AuthenticatedMensalidadesRouteImport } from './routes/_authenticated/mensalidades'
 import { Route as AuthenticatedPermissoesRouteImport } from './routes/_authenticated/permissoes'
 import { Route as AuthenticatedReguaRouteImport } from './routes/_authenticated/regua'
@@ -75,6 +77,16 @@ const AuthenticatedComoFuncionaRoute =
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFunilRoute = AuthenticatedFunilRouteImport.update({
+  id: '/funil',
+  path: '/funil',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLeadsRoute = AuthenticatedLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMensalidadesRoute =
@@ -147,6 +159,8 @@ export interface FileRoutesByFullPath {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/como-funciona': typeof AuthenticatedComoFuncionaRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/funil': typeof AuthenticatedFunilRoute
+  '/leads': typeof AuthenticatedLeadsRoute
   '/mensalidades': typeof AuthenticatedMensalidadesRoute
   '/permissoes': typeof AuthenticatedPermissoesRoute
   '/regua': typeof AuthenticatedReguaRoute
@@ -168,6 +182,8 @@ export interface FileRoutesByTo {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/como-funciona': typeof AuthenticatedComoFuncionaRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/funil': typeof AuthenticatedFunilRoute
+  '/leads': typeof AuthenticatedLeadsRoute
   '/mensalidades': typeof AuthenticatedMensalidadesRoute
   '/permissoes': typeof AuthenticatedPermissoesRoute
   '/regua': typeof AuthenticatedReguaRoute
@@ -191,6 +207,8 @@ export interface FileRoutesById {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/como-funciona': typeof AuthenticatedComoFuncionaRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/funil': typeof AuthenticatedFunilRoute
+  '/_authenticated/leads': typeof AuthenticatedLeadsRoute
   '/_authenticated/mensalidades': typeof AuthenticatedMensalidadesRoute
   '/_authenticated/permissoes': typeof AuthenticatedPermissoesRoute
   '/_authenticated/regua': typeof AuthenticatedReguaRoute
@@ -214,6 +232,8 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/como-funciona'
     | '/dashboard'
+    | '/funil'
+    | '/leads'
     | '/mensalidades'
     | '/permissoes'
     | '/regua'
@@ -235,6 +255,8 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/como-funciona'
     | '/dashboard'
+    | '/funil'
+    | '/leads'
     | '/mensalidades'
     | '/permissoes'
     | '/regua'
@@ -257,6 +279,8 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/_authenticated/como-funciona'
     | '/_authenticated/dashboard'
+    | '/_authenticated/funil'
+    | '/_authenticated/leads'
     | '/_authenticated/mensalidades'
     | '/_authenticated/permissoes'
     | '/_authenticated/regua'
@@ -348,6 +372,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/funil': {
+      id: '/_authenticated/funil'
+      path: '/funil'
+      fullPath: '/funil'
+      preLoaderRoute: typeof AuthenticatedFunilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/leads': {
+      id: '/_authenticated/leads'
+      path: '/leads'
+      fullPath: '/leads'
+      preLoaderRoute: typeof AuthenticatedLeadsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/mensalidades': {
       id: '/_authenticated/mensalidades'
       path: '/mensalidades'
@@ -431,6 +469,8 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedComoFuncionaRoute: typeof AuthenticatedComoFuncionaRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedFunilRoute: typeof AuthenticatedFunilRoute
+  AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRoute
   AuthenticatedMensalidadesRoute: typeof AuthenticatedMensalidadesRoute
   AuthenticatedPermissoesRoute: typeof AuthenticatedPermissoesRoute
   AuthenticatedReguaRoute: typeof AuthenticatedReguaRoute
@@ -444,6 +484,8 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedComoFuncionaRoute: AuthenticatedComoFuncionaRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedFunilRoute: AuthenticatedFunilRoute,
+  AuthenticatedLeadsRoute: AuthenticatedLeadsRoute,
   AuthenticatedMensalidadesRoute: AuthenticatedMensalidadesRoute,
   AuthenticatedPermissoesRoute: AuthenticatedPermissoesRoute,
   AuthenticatedReguaRoute: AuthenticatedReguaRoute,

@@ -250,8 +250,13 @@ Cada sistema ──► public.empresa_liberada(p_app, p_ref) ──► true/fals
 
 ## Fase 8: Gestão Comercial (telas) e Ganho → cliente
 
-- [ ] Leads & Contatos: lista com KPIs, filtros por origem, ficha do contato, importar CSV e novo contato
-- [ ] Funil de Vendas: Kanban arrastável, filtro por sistema, configurar etapas, motivo da perda obrigatório em "Perdido"
+- [x] Classificação automática do lead pelas respostas (migration `comercial_04_qualificacao`): pontos 0–100 → quente / morno / frio, sistema de interesse por palavra-chave, próxima ação com prazo (1 h / 24 h / 3 dias). Quente vai sozinho para "Qualificação". Lead repetido não rebaixa. Temperatura à mão trava a automática. Regras editáveis na tela (Funil › Regras de classificação), com prévia
+- [x] Teste: fase8.test.mjs (40 cenários) + fases 1, 2, 3, 5 e 6 sem regressão
+- [ ] Migration `comercial_04_qualificacao` aplicada no ikvj (NÃO FEITO: o classificador bloqueou; colar no SQL Editor)
+- [x] Leads & Contatos: lista com KPIs, filtros por origem e temperatura, busca, ficha do lead (motivos da nota, respostas do formulário, histórico, anotar, etapa, valor, temperatura) e novo contato
+- [ ] Importar CSV (NÃO FEITO)
+- [x] Funil de Vendas: Kanban arrastável, filtro por sistema, quentes no topo, motivo da perda obrigatório em "Perdido"
+- [ ] Configurar etapas pela tela (NÃO FEITO)
 - [ ] Agendamentos: semana e mês com as reuniões e os horários ocupados do Google, cores lead / equipe / ocupado, nova reunião pela equipe (cria no Google)
 - [ ] Relatórios Comerciais: conversão por fonte (leads → reunião → ganho → receita nova) e funil do mês, com exportação
 - [ ] "Ganho" → `adm.criar_empresa_do_negocio` + `adm-asaas-cliente-assinatura`, pedindo na hora o CNPJ, o plano e o dia de vencimento

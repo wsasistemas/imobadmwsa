@@ -1,4 +1,6 @@
-import type { Situacao, SituacaoFatura } from "./api";
+import type { NomeIcone } from "@/components/icones/icone-colorido";
+
+import type { Situacao, SituacaoFatura, Temperatura } from "./api";
 
 export const brl = (v: number | string | null | undefined) =>
   Number(v ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -64,6 +66,52 @@ export const SITUACAO_FATURA: Record<SituacaoFatura, { rotulo: string; tom: Tom 
   paga: { rotulo: "Paga", tom: "ok" },
   cancelada: { rotulo: "Cancelada", tom: "neu" },
   estornada: { rotulo: "Estornada", tom: "err" },
+};
+
+// ------------------------------------------------------------------ Comercial (Fase 8)
+export const TEMPERATURA: Record<Temperatura, { rotulo: string; tom: Tom; icone: NomeIcone; texto: string }> = {
+  quente: { rotulo: "Quente", tom: "err", icone: "flat-color-icons:high-priority", texto: "Contato em até 1 hora" },
+  morno: { rotulo: "Morno", tom: "war", icone: "flat-color-icons:medium-priority", texto: "Contato em até 24 horas" },
+  frio: { rotulo: "Frio", tom: "info", icone: "flat-color-icons:low-priority", texto: "Nutrir e tentar de novo" },
+};
+
+export const ORIGEM: Record<string, { rotulo: string; icone: NomeIcone }> = {
+  site: { rotulo: "Site", icone: "fluent-color:globe-24" },
+  instagram: { rotulo: "Instagram", icone: "logos:instagram-icon" },
+  facebook: { rotulo: "Facebook", icone: "logos:facebook" },
+  linkedin: { rotulo: "LinkedIn", icone: "logos:linkedin-icon" },
+  tiktok: { rotulo: "TikTok", icone: "logos:tiktok-icon" },
+  whatsapp: { rotulo: "WhatsApp", icone: "fluent-color:chat-24" },
+  manual: { rotulo: "Manual", icone: "fluent-color:person-add-24" },
+  importado: { rotulo: "Importado", icone: "flat-color-icons:database" },
+};
+
+/** Cor da etapa (coluna `cor` de comercial.etapas) → classe Tailwind da barra e tom do selo. */
+export const COR_ETAPA: Record<string, { barra: string; tom: Tom }> = {
+  info: { barra: "bg-info", tom: "info" },
+  primary: { barra: "bg-primary", tom: "info" },
+  abobora: { barra: "bg-abobora", tom: "war" },
+  warning: { barra: "bg-warning", tom: "war" },
+  success: { barra: "bg-success", tom: "ok" },
+  muted: { barra: "bg-muted-foreground", tom: "neu" },
+};
+
+/** "há 35 min", "há 2 h", "ontem", "há 3 dias". */
+export function ha(d: string | null | undefined): string {
+  if (!d) return "—";
+  const min = Math.max(0, Math.round((Date.now() - new Date(d).getTime()) / 60_000));
+  if (min < 1) return "agora";
+  if (min < 60) return `há ${min} min`;
+  const h = Math.round(min / 60);
+  if (h < 24) return `há ${h} h`;
+  const dias = Math.round(h / 24);
+  return dias === 1 ? "ontem" : `há ${dias} dias`;
+}
+
+/** Nome de pergunta do formulário da Meta ("qual_o_seu_prazo?") em texto legível. */
+export const pergunta = (k: string) => {
+  const t = k.replace(/_/g, " ").replace(/\s+/g, " ").trim();
+  return t.charAt(0).toUpperCase() + t.slice(1);
 };
 
 /** Etiqueta do sistema = nome do schema no Supabase (o mesmo que aparece em Database → Schemas). */

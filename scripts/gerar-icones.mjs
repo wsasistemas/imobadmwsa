@@ -21,6 +21,10 @@ const ICONES = [
   "fluent-color:link-24", "fluent-color:people-24", "fluent-color:history-24", "flat-color-icons:currency-exchange",
   "fluent-color:building-multiple-24", "fluent-color:building-store-24", "flat-color-icons:plus",
   "flat-color-icons:search", "fluent-color:settings-24", "fluent-color:globe-24", "logos:instagram-icon",
+  // Fase 8: leads, funil e classificação
+  "fluent-color:calendar-checkmark-24", "fluent-color:trophy-24", "fluent-color:video-24", "fluent-color:text-bullet-list-square-24",
+  "fluent-color:poll-24", "flat-color-icons:phone", "flat-color-icons:rules", "flat-color-icons:flash-on",
+  "flat-color-icons:high-priority", "flat-color-icons:medium-priority", "flat-color-icons:low-priority",
 ];
 
 const colecoes = new Map();

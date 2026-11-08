@@ -205,13 +205,15 @@ export async function lerLead(app: AppMeta, leadgenId: string, tokenPagina: stri
   for (const f of l.field_data ?? []) campos[f.name.toLowerCase()] = (f.values ?? []).join(", ");
   const nome = campos.full_name || [campos.first_name, campos.last_name].filter(Boolean).join(" ") || campos.nome || "";
   const conhecidos = new Set(["full_name", "first_name", "last_name", "nome", "email", "phone_number", "telefone", "whatsapp", "company_name", "empresa", "job_title", "cargo"]);
-  const extras = Object.entries(campos).filter(([k]) => !conhecidos.has(k)).map(([k, v]) => `${k}: ${v}`).join("\n");
+  const outras = Object.fromEntries(Object.entries(campos).filter(([k]) => !conhecidos.has(k)));
+  const extras = Object.entries(outras).map(([k, v]) => `${k}: ${v}`).join("\n");
   return {
     plataforma: (l.platform ?? "").toLowerCase() === "ig" ? "instagram" : "facebook",
     dados: {
       nome, email: campos.email ?? "", telefone: campos.phone_number || campos.telefone || campos.whatsapp || "",
       empresa: campos.company_name || campos.empresa || "", cargo: campos.job_title || campos.cargo || "",
       campanha: [l.campaign_name, l.ad_name].filter(Boolean).join(" · "), mensagem: extras,
+      respostas: outras, // perguntas personalizadas do formulário, uma a uma (aparecem na ficha e entram na classificação)
       consentimento: true,
     } as Record<string, unknown>,
   };
