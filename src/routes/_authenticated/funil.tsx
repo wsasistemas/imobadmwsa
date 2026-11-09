@@ -106,8 +106,10 @@ function Funil() {
               onDragOver={(e) => { e.preventDefault(); setSobre(col.chave); }}
               onDragLeave={() => setSobre((s) => (s === col.chave ? null : s))}
               onDrop={(e) => soltar(e, col.chave)}
-              className={cn("flex shrink-0 flex-col rounded-xl border border-border bg-muted/40 transition-colors",
-                col.negocios.length === 0 ? "w-[190px]" : "w-[268px]", sobre === col.chave && "border-primary bg-primary-soft")}
+              className={cn("flex min-w-0 flex-col rounded-xl border border-border bg-muted/40 transition-colors",
+                // As colunas dividem a largura da tela; só rola para o lado quando não cabem nem no tamanho mínimo.
+                col.negocios.length === 0 ? "flex-[0.6_1_150px] min-w-[150px]" : "flex-[1_1_210px] min-w-[210px]",
+                sobre === col.chave && "border-primary bg-primary-soft")}
             >
               <div className="border-b border-border px-3 py-2.5">
                 <div className={cn("mb-2 h-1 rounded-full", COR_ETAPA[col.cor]?.barra ?? "bg-primary")} />

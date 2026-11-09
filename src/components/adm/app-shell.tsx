@@ -143,7 +143,8 @@ export function AppShell({ email }: { email: string | null }) {
             </div>
           ) : null}
         </header>
-        <main className="painel-conteudo mx-auto min-w-0 max-w-[1400px] px-4 py-6 sm:px-6">
+        {/* O Funil usa a largura toda para caber as 8 colunas; as outras telas ficam com a leitura confortável. */}
+        <main className={cn("painel-conteudo mx-auto min-w-0 px-4 py-6 sm:px-6", pathname.startsWith("/funil") ? "max-w-none" : "max-w-[1400px]")}>
           <Outlet />
         </main>
       </div>
