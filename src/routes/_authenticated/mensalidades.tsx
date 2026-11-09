@@ -41,7 +41,7 @@ function Mensalidades() {
     <Pagina titulo="Mensalidades" texto="Uma fatura por empresa por mês (soma dos sistemas). As do Asaas chegam e são baixadas sozinhas pelo webhook.">
       {q.isLoading ? <Carregando /> : q.error ? <Erro erro={q.error} /> : (
         <>
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
             <Kpi icone="flat-color-icons:calendar" tom="info" rotulo="A vencer" valor={brl(soma(grupos.a_vencer))} detalhe={`${grupos.a_vencer.length} faturas`} />
             <Kpi icone="fluent-color:clock-24" tom="war" rotulo="Atraso 1 a 10 dias" valor={brl(soma(ate10))} detalhe={`${ate10.length} faturas · ainda no ar`} />
             <Kpi icone="flat-color-icons:lock" tom="err" rotulo="Atraso +10 dias" valor={brl(soma(mais10))} detalhe={`${mais10.length} faturas · suspensas`} />

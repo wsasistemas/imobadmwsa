@@ -202,7 +202,7 @@ function Meta() {
                   </Button>
                 </div>
               </div>
-              {atual.detalhe ? <p className="border-b border-border bg-warning-soft/60 px-4 py-2 text-xs text-warning">{atual.detalhe}</p> : null}
+              {atual.detalhe ? <p className="border-b border-border bg-warning-soft/60 px-4 py-2 text-xs text-warning-strong">{atual.detalhe}</p> : null}
               {atual.formularios.length === 0 ? (
                 <Vazio icone="fluent-color:people-list-24" titulo="Nenhum formulário" texto="Crie um formulário de Lead Ads na página e clique em Atualizar formulários." />
               ) : (

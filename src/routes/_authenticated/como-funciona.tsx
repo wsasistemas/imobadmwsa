@@ -45,7 +45,7 @@ function ComoFunciona() {
           <Cartao icone="fluent-color:shield-checkmark-24" titulo="Situações">
             <ul className="space-y-2 text-sm">
               <li><b className="text-success">Em dia</b> · nenhuma fatura vencida</li>
-              <li><b className="text-warning">Em atraso</b> · vencida há 1 a 10 dias (ou com prazo extra): continua no ar</li>
+              <li><b className="text-warning-strong">Em atraso</b> · vencida há 1 a 10 dias (ou com prazo extra): continua no ar</li>
               <li><b className="text-destructive">Suspensa</b> · mais de 10 dias, ou suspensa à mão: fora do ar</li>
               <li><b className="text-info">Cortesia</b> · não cobra e nunca suspende</li>
               <li><b>Cancelada</b> · sem acesso</li>

@@ -121,7 +121,7 @@ function Sistemas() {
               )}
 
               {!instalada(atual.ultima_verificacao_em) ? (
-                <p className="flex gap-2 border-t border-border bg-warning-soft/60 px-4 py-3 text-xs text-warning">
+                <p className="flex gap-2 border-t border-border bg-warning-soft/60 px-4 py-3 text-xs text-warning-strong">
                   <IconeColorido nome="fluent-color:warning-24" tamanho={16} />
                   O site deste sistema não consultou a Central nos últimos 30 dias. A trava por empresa (empresa_liberada) entra em cada site na Fase 9: sem ela a suspensão não tira o sistema do ar.
                 </p>

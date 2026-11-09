@@ -52,11 +52,11 @@ function Leads() {
         <NovoContato gatilho={<Button className="gap-1.5"><Plus className="size-4" />Novo contato</Button>} />
       </>}
     >
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
         <Kpi icone="fluent-color:person-add-24" tom="info" rotulo="Leads novos (30 dias)" valor={r?.novos_30d ?? "—"}
           detalhe={variacao === null ? "sem base no mês anterior" : `${variacao >= 0 ? "+" : ""}${variacao}% vs. mês anterior`} />
         <Kpi icone="flat-color-icons:high-priority" tom="err" rotulo="Quentes em aberto" valor={r?.quentes_abertos ?? "—"}
-          detalhe={r ? `${r.mornos_abertos} mornos · ${r.frios_abertos} frios` : undefined} />
+          detalhe={r ? `${r.mornos_abertos} ${r.mornos_abertos === 1 ? "morno" : "mornos"} · ${r.frios_abertos} ${r.frios_abertos === 1 ? "frio" : "frios"}` : undefined} />
         <Kpi icone="logos:meta-icon" tom="info" rotulo="Instagram + Facebook (30 dias)" valor={r ? r.instagram_30d + r.facebook_30d : "—"}
           detalhe={r ? `${r.instagram_30d} Instagram · ${r.facebook_30d} Facebook · ${r.site_30d} site` : undefined} />
         <Kpi icone="fluent-color:alert-24" tom={r?.sem_resposta_24h ? "war" : "ok"} rotulo="Sem resposta há 24 h" valor={r?.sem_resposta_24h ?? "—"}

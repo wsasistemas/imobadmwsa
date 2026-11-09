@@ -181,7 +181,7 @@ function Landing() {
                     </div>
                     {chaveNova?.fonte === atual.id ? (
                       <div className="mt-3 space-y-2">
-                        <p className="rounded-md bg-warning-soft p-2 text-xs text-warning">Copie agora: esta chave aparece só uma vez.</p>
+                        <p className="rounded-md bg-warning-soft p-2 text-xs text-warning-strong">Copie agora: esta chave aparece só uma vez.</p>
                         <div className="flex items-center gap-2">
                           <code className="flex-1 truncate rounded bg-muted px-2 py-1.5 text-xs">{chaveNova.chave}</code>
                           <Copiar texto={chaveNova.chave} />

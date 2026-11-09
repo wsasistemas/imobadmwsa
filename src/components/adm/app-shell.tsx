@@ -105,7 +105,10 @@ export function AppShell({ email }: { email: string | null }) {
             <small className="block text-[10.5px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">WSA Sistemas</small>
           </span>
         </Link>
-        <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-3">{nav}</div>
+        <div className="relative min-h-0 flex-1">
+          <div className="h-full overflow-y-auto px-3 pb-8">{nav}</div>
+          <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-sidebar to-transparent" />
+        </div>
         <div className="shrink-0 border-t border-sidebar-border px-3 py-2.5">{rodape}</div>
       </aside>
 

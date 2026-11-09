@@ -31,14 +31,14 @@ const TILE: Record<Tom, string> = {
 
 export function Kpi({ icone, tom, rotulo, valor, detalhe }: { icone: NomeIcone; tom: Tom; rotulo: string; valor: ReactNode; detalhe?: ReactNode }) {
   return (
-    <div className="flex items-center gap-3.5 rounded-xl border border-border bg-card p-4 shadow-sm">
-      <span className={cn("flex size-12 shrink-0 items-center justify-center rounded-xl", TILE[tom])}>
+    <div className="flex items-center gap-2.5 rounded-xl border border-border bg-card p-3 shadow-sm sm:gap-3.5 sm:p-4">
+      <span className={cn("flex size-9 shrink-0 items-center justify-center rounded-xl sm:size-12", TILE[tom])}>
         <IconeColorido nome={icone} tamanho={26} />
       </span>
       <div className="min-w-0">
         <small className="block truncate text-xs font-medium text-muted-foreground">{rotulo}</small>
-        <b className="block truncate text-xl font-extrabold tracking-tight">{valor}</b>
-        {detalhe ? <span className="block truncate text-xs text-muted-foreground">{detalhe}</span> : null}
+        <b className="block truncate text-lg font-extrabold tracking-tight sm:text-xl">{valor}</b>
+        {detalhe ? <span className="hidden truncate text-xs text-muted-foreground sm:block">{detalhe}</span> : null}
       </div>
     </div>
   );
@@ -65,7 +65,7 @@ export function Cartao({ icone, titulo, extra, children, className, semPadding }
 
 const SELO: Record<Tom, string> = {
   ok: "bg-success-soft text-success",
-  war: "bg-warning-soft text-warning",
+  war: "bg-warning-soft text-warning-strong",
   err: "bg-destructive/10 text-destructive",
   info: "bg-info-soft text-info",
   neu: "bg-muted text-muted-foreground",
@@ -97,7 +97,7 @@ export function Filtros<T extends string>({ opcoes, valor, onChange }: {
           type="button"
           onClick={() => onChange(o.valor)}
           className={cn(
-            "rounded-full border px-3 py-1.5 text-[13px] font-semibold transition-colors",
+            "rounded-full border px-3 py-1.5 text-[13px] font-semibold transition-colors max-md:min-h-11",
             o.valor === valor ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:bg-muted",
           )}
         >

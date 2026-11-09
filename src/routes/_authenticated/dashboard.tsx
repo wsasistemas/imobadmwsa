@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Plus } from "lucide-react";
+import { ChevronRight, Plus } from "lucide-react";
 
 import { NovaEmpresa } from "@/components/adm/dialogos";
 import { Carregando, Cartao, Chip, Erro, Kpi, Pagina, Selo, Tabela, Vazio } from "@/components/adm/ui";
@@ -46,26 +46,12 @@ function Painel() {
     >
       {q.isLoading ? <Carregando /> : q.error ? <Erro erro={q.error} /> : q.data ? (
         <>
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
             <Kpi icone="flat-color-icons:bullish" tom="info" rotulo="Receita mensal (MRR)" valor={brl(q.data.mrr)} detalhe={`${q.data.com_assinatura} empresas com assinatura`} />
             <Kpi icone="flat-color-icons:ok" tom="ok" rotulo="Empresas em dia" valor={q.data.em_dia} detalhe={`de ${q.data.com_assinatura} com assinatura`} />
             <Kpi icone="fluent-color:warning-24" tom="war" rotulo="Em atraso (1 a 10 dias)" valor={q.data.em_atraso} detalhe={`${brl(q.data.em_atraso_valor)} em aberto`} />
             <Kpi icone="flat-color-icons:cancel" tom="err" rotulo="Suspensas (+10 dias)" valor={q.data.suspensas} detalhe="sistema fora do ar" />
           </div>
-
-          <Cartao icone="flat-color-icons:timeline" titulo="Régua automática de cobrança" extra={<span className="text-xs text-muted-foreground">Roda todo dia às 00:05 · próxima em {proximaRodada()}</span>}>
-            <ol className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
-              {PASSOS_VISUAIS.map((p) => (
-                <li key={p.rotulo} className="flex flex-col items-center text-center">
-                  <span className={`flex size-12 items-center justify-center rounded-full border-2 ${p.fim ? "border-destructive/40 bg-destructive/5" : "border-primary/25 bg-primary-soft"}`}>
-                    <IconeColorido nome={p.icone} tamanho={24} />
-                  </span>
-                  <b className={`mt-2 text-[13px] ${p.fim ? "text-destructive" : ""}`}>{p.rotulo}</b>
-                  <span className="text-xs text-muted-foreground">{p.texto}</span>
-                </li>
-              ))}
-            </ol>
-          </Cartao>
 
           <div className="grid gap-4 xl:grid-cols-[1.4fr_1fr]">
             <Cartao icone="fluent-color:alert-24" titulo="Vão ser suspensas nos próximos dias" semPadding
@@ -115,6 +101,25 @@ function Painel() {
               )}
             </Cartao>
           </div>
+          <details className="group overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+            <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-2 px-4 py-3 max-md:min-h-11 [&::-webkit-details-marker]:hidden">
+              <span className="flex items-center gap-2 text-[15px] font-bold"><IconeColorido nome="flat-color-icons:timeline" tamanho={20} />Como funciona a régua de cobrança<ChevronRight className="size-4 transition-transform group-open:rotate-90" /></span>
+              <span className="text-xs text-muted-foreground">Roda todo dia às 00:05 · próxima em {proximaRodada()}</span>
+            </summary>
+            <div className="border-t border-border p-4">
+            <ol className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
+              {PASSOS_VISUAIS.map((p) => (
+                <li key={p.rotulo} className="flex flex-col items-center text-center">
+                  <span className={`flex size-12 items-center justify-center rounded-full border-2 ${p.fim ? "border-destructive/40 bg-destructive/5" : "border-primary/25 bg-primary-soft"}`}>
+                    <IconeColorido nome={p.icone} tamanho={24} />
+                  </span>
+                  <b className={`mt-2 text-[13px] ${p.fim ? "text-destructive" : ""}`}>{p.rotulo}</b>
+                  <span className="text-xs text-muted-foreground">{p.texto}</span>
+                </li>
+              ))}
+            </ol>
+            </div>
+          </details>
         </>
       ) : null}
     </Pagina>

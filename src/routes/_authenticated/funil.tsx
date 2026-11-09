@@ -58,7 +58,7 @@ function Funil() {
     <Pagina
       voltar="Gestão Comercial › Funil de Vendas"
       titulo="Funil de Vendas"
-      texto="Arraste os cards entre as etapas. Lead quente entra direto em Qualificação; em cada coluna, os quentes ficam no topo."
+      texto="Arraste os cards entre as etapas ou abra o card e mude a etapa na ficha. Lead quente entra direto em Qualificação; em cada coluna, os quentes ficam no topo."
       acoes={<>
         <Button variant="outline" className="gap-1.5" onClick={() => setRegras(true)}><SlidersHorizontal className="size-4" />Regras de classificação</Button>
         <NovoContato gatilho={<Button className="gap-1.5"><Plus className="size-4" />Novo contato</Button>} />
@@ -77,7 +77,23 @@ function Funil() {
         ))}
       </div>
 
-      {q.isLoading ? <Carregando /> : q.error ? <Erro erro={q.error} /> : (
+      {q.isLoading ? <Carregando /> : q.error ? <Erro erro={q.error} /> : (<>
+        <div className="space-y-2 md:hidden">
+          {(q.data ?? []).map((col) => (
+            <details key={col.chave} open={col.negocios.length > 0 && !col.final} className="rounded-xl border border-border bg-muted/40">
+              <summary className="flex min-h-11 cursor-pointer items-center justify-between gap-2 px-3 text-sm font-bold">
+                {col.nome}<span className="text-xs font-semibold text-muted-foreground">{col.total}{Number(col.valor) > 0 ? ` · ${brl(col.valor)}` : ""}</span>
+              </summary>
+              {col.negocios.length > 0 ? (
+                <div className="flex flex-col gap-2 p-2">
+                  {col.negocios.map((n) => <CardFunil key={n.negocio_id} n={n} onAbrir={() => abrir(n.negocio_id)} />)}
+                </div>
+              ) : null}
+            </details>
+          ))}
+        </div>
+        <p className="hidden text-xs text-muted-foreground md:block 2xl:hidden">Role para o lado para ver todas as etapas.</p>
+        <div className="relative hidden md:block">
         <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-3">
           {(q.data ?? []).map((col) => (
             <div
@@ -85,8 +101,8 @@ function Funil() {
               onDragOver={(e) => { e.preventDefault(); setSobre(col.chave); }}
               onDragLeave={() => setSobre((s) => (s === col.chave ? null : s))}
               onDrop={(e) => soltar(e, col.chave)}
-              className={cn("flex w-[268px] shrink-0 flex-col rounded-xl border border-border bg-muted/40 transition-colors",
-                sobre === col.chave && "border-primary bg-primary-soft")}
+              className={cn("flex shrink-0 flex-col rounded-xl border border-border bg-muted/40 transition-colors",
+                col.negocios.length === 0 ? "w-[190px]" : "w-[268px]", sobre === col.chave && "border-primary bg-primary-soft")}
             >
               <div className="border-b border-border px-3 py-2.5">
                 <div className={cn("mb-2 h-1 rounded-full", COR_ETAPA[col.cor]?.barra ?? "bg-primary")} />
@@ -107,7 +123,9 @@ function Funil() {
             </div>
           ))}
         </div>
-      )}
+        <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-background to-transparent 2xl:hidden" />
+        </div>
+      </>)}
 
       <div className="flex items-start gap-3 rounded-xl border border-success/30 bg-success-soft p-3 text-sm">
         <IconeColorido nome="fluent-color:trophy-24" tamanho={22} />
@@ -122,13 +140,13 @@ function Funil() {
   );
 }
 
-function CardFunil({ n, onAbrir, onArrastar }: { n: CardNegocio; onAbrir: () => void; onArrastar: (e: DragEvent) => void }) {
+function CardFunil({ n, onAbrir, onArrastar }: { n: CardNegocio; onAbrir: () => void; onArrastar?: (e: DragEvent) => void }) {
   const atrasado = n.prazo_em && new Date(n.prazo_em).getTime() < Date.now();
   const o = ORIGEM[n.origem];
   return (
     <button
       type="button"
-      draggable
+      draggable={!!onArrastar}
       onDragStart={onArrastar}
       onClick={onAbrir}
       className={cn("w-full cursor-grab rounded-lg border bg-card p-2.5 text-left shadow-sm transition hover:shadow-md active:cursor-grabbing",

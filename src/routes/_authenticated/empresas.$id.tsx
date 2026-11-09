@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ExternalLink, Loader2, Pencil, RefreshCw } from "lucide-react";
+import { Check, ExternalLink, Loader2, MoreHorizontal, Pencil, RefreshCw } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 
 import { CobrancaAvulsa, ConcederPrazo, NovaEmpresa, RegistrarPagamento, SuspenderManual, VincularSistema } from "@/components/adm/dialogos";
@@ -89,9 +90,14 @@ function LinhaVinculo({ v }: { v: Vinculo }) {
         </div>
       </td>
       <td className="px-4 py-3 text-right">
-        <button type="button" className="text-xs font-semibold text-muted-foreground hover:text-foreground" onClick={() => m.mutate({ ativo: !v.ativo })}>
-          {v.ativo ? "Desligar" : "Religar"}
-        </button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="size-8 max-md:size-11" aria-label={`Mais ações de ${v.sistema}`}><MoreHorizontal className="size-4" /></Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onSelect={() => m.mutate({ ativo: !v.ativo })}>{v.ativo ? "Desligar vínculo" : "Religar vínculo"}</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </td>
     </tr>
   );
@@ -192,7 +198,7 @@ function Conteudo({ f }: { f: FichaEmpresa }) {
                         {x.invoice_url ? <a href={x.invoice_url} target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-primary" title="Abrir fatura no Asaas"><ExternalLink className="size-4" /></a> : null}
                         {x.situacao === "a_vencer" || x.situacao === "vencida" ? (
                           <RegistrarPagamento faturaId={x.id} valor={x.valor} empresa={e.nome_fantasia || e.razao_social}
-                            gatilho={<Button size="sm" variant="outline" className="h-7 text-xs">Pago</Button>} />
+                            gatilho={<Button size="sm" variant="outline" className="h-7 gap-1 text-xs"><Check className="size-3.5" />Dar baixa</Button>} />
                         ) : null}
                       </div>
                     </td>

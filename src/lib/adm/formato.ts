@@ -117,6 +117,17 @@ export const pergunta = (k: string) => {
 /** Etiqueta do sistema = nome do schema no Supabase (o mesmo que aparece em Database → Schemas). */
 export const nomeSistema = (app: string) => app;
 
+const EVENTO_ASAAS: Record<string, string> = {
+  CREATED: "cobrança criada", UPDATED: "cobrança atualizada", CONFIRMED: "pagamento confirmado", RECEIVED: "pagamento recebido",
+  RECEIVED_IN_CASH: "recebido em dinheiro", OVERDUE: "cobrança vencida", DELETED: "cobrança removida", RESTORED: "cobrança restaurada",
+  REFUNDED: "pagamento estornado", PARTIALLY_REFUNDED: "estorno parcial", REFUND_IN_PROGRESS: "estorno em andamento", CHARGEBACK_REQUESTED: "contestação aberta",
+};
+
+function eventoAsaas(e: string): string {
+  const chave = e.replace("PAYMENT_", "");
+  return EVENTO_ASAAS[chave] ?? chave.toLowerCase().replace(/_/g, " ");
+}
+
 /** Texto do histórico (adm.eventos) em português simples. */
 export function textoEvento(tipo: string, d: Record<string, unknown>): string {
   switch (tipo) {
@@ -128,7 +139,7 @@ export function textoEvento(tipo: string, d: Record<string, unknown>): string {
     case "prazo": return d.ate ? `Prazo extra até ${data(String(d.ate))}${d.motivo ? ` · ${d.motivo}` : ""}` : "Prazo extra retirado";
     case "suspensao_manual": return `Suspensa à mão${d.motivo ? ` · ${d.motivo}` : ""}`;
     case "suspensao_manual_removida": return "Suspensão manual retirada";
-    case "asaas": return `Asaas: ${String(d.evento ?? "").replace("PAYMENT_", "").toLowerCase().replace(/_/g, " ")}`;
+    case "asaas": return `Asaas: ${eventoAsaas(String(d.evento ?? ""))}`;
     case "aviso": return `Aviso ${String(d.passo ?? "").toUpperCase()} por ${d.canal === "email" ? "e-mail" : "WhatsApp"}${d.ok ? "" : ` (falhou: ${d.erro ?? "erro"})`}`;
     case "asaas_assinatura": return "Assinatura do Asaas criada/atualizada";
     default: return tipo.replace(/_/g, " ");
