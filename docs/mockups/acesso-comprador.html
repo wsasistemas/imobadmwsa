@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Acesso do comprador · Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/iconify-icon@2.1.0/dist/iconify-icon.min.js"></script>
+<style>
+:root{
+  --background:oklch(0.972 0.016 40);--foreground:oklch(0.24 0.03 255);--card:oklch(1 0 0);
+  --primary:oklch(0.55 0.11 250);--primary-dark:oklch(0.46 0.1 252);--primary-soft:oklch(0.95 0.022 250);
+  --abobora:oklch(0.8 0.11 62);--abobora-soft:oklch(0.965 0.032 68);--abobora-dark:oklch(0.5 0.11 50);
+  --muted:oklch(0.955 0.016 40);--muted-fg:oklch(0.5 0.025 255);
+  --destructive:oklch(0.577 0.245 27.325);--destructive-soft:oklch(0.95 0.04 25);
+  --success:oklch(0.52 0.12 150);--success-soft:oklch(0.95 0.04 150);
+  --warning-strong:oklch(0.47 0.11 62);--warning-soft:oklch(0.96 0.05 80);
+  --info:oklch(0.52 0.09 225);--info-soft:oklch(0.95 0.025 225);
+  --border:oklch(0.905 0.02 40);--input:oklch(0.85 0.022 40);
+  --sidebar:oklch(0.958 0.022 40);--sidebar-border:oklch(0.9 0.022 40);
+  --shadow:0 1px 3px oklch(0.2 0.03 240/.08),0 1px 2px oklch(0.2 0.03 240/.04);
+}
+*{box-sizing:border-box;margin:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--background);color:var(--foreground);font-family:"Plus Jakarta Sans",system-ui,sans-serif;font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+.fd{font-family:Fraunces,Georgia,serif;font-weight:600;letter-spacing:-.01em}
+button{font:inherit;color:inherit;cursor:pointer}
+code{background:var(--muted);border-radius:6px;padding:2px 6px;font-size:12px}
+.topo{position:sticky;top:0;z-index:20;background:oklch(1 0 0/.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+.topo-in{max-width:1240px;margin:auto;padding:12px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.marca{display:flex;align-items:center;gap:10px}.marca i{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--abobora));color:#fff;display:grid;place-items:center;font:800 12px "Plus Jakarta Sans";font-style:normal}
+.marca b{display:block;font-size:15px;font-weight:800}.marca small{font-size:11px;color:var(--muted-fg);font-weight:600}
+.abas{display:flex;gap:4px;overflow-x:auto;flex:1;scrollbar-width:none;margin:0 -4px;padding:0 4px}
+.aba{border:0;background:none;border-radius:10px;padding:9px 12px;font-weight:600;font-size:13px;color:var(--muted-fg);white-space:nowrap;min-height:40px}
+.aba:hover{background:var(--muted)}.aba.on{background:var(--primary);color:#fff}
+.pg{max-width:1240px;margin:auto;padding:26px 24px 60px}
+.tela{display:none}.tela.on{display:block}
+.cab{margin-bottom:18px;display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.cab .rota{font-size:12px;color:var(--muted-fg);margin-bottom:3px}.cab h1{font-size:27px}.cab p{color:var(--muted-fg);margin-top:3px;max-width:760px}
+.cartao{background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.ct{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--border)}
+.ct h3{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+.cc{padding:16px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--input);background:var(--card);border-radius:10px;padding:8px 14px;font-weight:600;font-size:13px;min-height:38px;white-space:nowrap}
+.btn:hover{background:var(--muted)}
+.btn.pri{background:var(--primary);border-color:var(--primary);color:#fff}.btn.pri:hover{background:var(--primary-dark)}
+.btn.ok{background:var(--success);border-color:var(--success);color:#fff}.btn.ok:hover{background:oklch(0.46 0.12 150)}
+.btn.sm{min-height:32px;padding:5px 11px;font-size:12px}.btn[disabled]{opacity:.5;cursor:not-allowed}
+.selo{display:inline-flex;align-items:center;gap:4px;border-radius:99px;padding:3px 10px;font-size:12px;font-weight:600;white-space:nowrap}
+.s-ok{background:var(--success-soft);color:var(--success)}.s-war{background:var(--warning-soft);color:var(--warning-strong)}.s-info{background:var(--info-soft);color:var(--info)}.s-neu{background:var(--muted);color:var(--muted-fg)}.s-err{background:var(--destructive-soft);color:var(--destructive)}
+.sub{font-size:12px;color:var(--muted-fg)}
+.tabw{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:760px}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted-fg);text-align:left;padding:10px 16px;border-bottom:1px solid var(--border);font-weight:600}
+td{padding:13px 16px;border-bottom:1px solid var(--border);vertical-align:middle}tr:last-child td{border-bottom:0}
+.campos{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.campo label{display:block;font-size:13px;font-weight:600;margin-bottom:5px}
+.inp{width:100%;min-height:40px;border:1px solid var(--input);border-radius:9px;padding:8px 11px;background:var(--card);font:inherit}
+.dica{font-size:12px;color:var(--muted-fg);margin-top:4px}
+.novo{outline:2px solid var(--abobora);outline-offset:3px;border-radius:10px}
+.tag-novo{background:var(--abobora-soft);color:var(--abobora-dark);font-size:10.5px;font-weight:700;border-radius:99px;padding:2px 8px;margin-left:6px}
+.g2{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;align-items:start}.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.g2>*,.g3>*{min-width:0}
+.fluxo{display:grid;grid-template-columns:repeat(5,1fr);gap:0;list-style:none;padding:0}
+.fluxo li{position:relative;padding:0 10px;text-align:center}
+.fluxo li:not(:last-child)::after{content:"";position:absolute;top:24px;left:calc(50% + 30px);right:calc(-50% + 30px);height:2px;background:var(--border)}
+.fluxo .b{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;margin:0 auto 8px;background:var(--primary-soft);border:2px solid oklch(0.55 0.11 250/.25)}
+.fluxo b{display:block;font-size:13px}.fluxo span{font-size:12px;color:var(--muted-fg)}
+.lista{list-style:none;padding:0}.lista li{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}.lista li:last-child{border:0}.lista iconify-icon{flex-shrink:0;margin-top:1px}
+.dec{border:1px solid var(--border);border-radius:10px;padding:13px;margin-bottom:10px}.dec b{display:block;margin-bottom:3px}
+.rec{color:var(--success);font-weight:700;font-size:12px}
+.etapas{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.nota{display:flex;gap:9px;border-radius:10px;padding:11px 13px;font-size:13px}
+.n-info{background:var(--info-soft);color:var(--info)}.n-war{background:var(--warning-soft);color:var(--warning-strong)}.n-ok{background:var(--success-soft);color:var(--success)}
+.fundo{position:fixed;inset:0;background:oklch(0.2 0.03 255/.45);display:none;align-items:flex-start;justify-content:center;padding:32px 16px;z-index:40;overflow:auto}
+.fundo.on{display:flex}
+.jan{background:var(--card);border-radius:14px;width:100%;max-width:540px;box-shadow:0 20px 60px oklch(0.2 0.03 255/.3)}
+.jan header{padding:18px 20px 0;display:flex;justify-content:space-between;gap:12px}.jan h2{font-size:21px}
+.fechar{border:0;background:none;width:40px;height:40px;border-radius:9px;margin:-8px -8px 0 0;font-size:20px;color:var(--muted-fg)}.fechar:hover{background:var(--muted)}
+.jan .corpo{padding:14px 20px 20px}
+.linha{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13.5px}.linha span:first-child{color:var(--muted-fg)}.linha b,.linha span:last-child{text-align:right;min-width:0;overflow-wrap:anywhere}
+.acoes{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+.check{display:flex;gap:9px;margin-top:13px;font-size:13px;align-items:flex-start}.check input{width:18px;height:18px;margin-top:1px;flex-shrink:0}
+.seg{display:inline-flex;background:var(--muted);border-radius:10px;padding:3px;margin-bottom:14px;flex-wrap:wrap}.seg button{border:0;background:none;padding:7px 12px;border-radius:8px;font-weight:600;font-size:13px;color:var(--muted-fg);min-height:36px}.seg button.on{background:var(--card);color:var(--foreground);box-shadow:var(--shadow)}
+/* e-mail */
+.caixa{background:oklch(0.94 0.01 250);border-radius:14px;padding:22px 14px}
+.cabmail{max-width:600px;margin:0 auto 10px;font-size:12.5px;color:var(--muted-fg);overflow-wrap:anywhere}.cabmail b{color:var(--foreground)}
+.mail{max-width:600px;margin:auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+.mail .hero{background:linear-gradient(120deg,var(--primary-dark),var(--primary) 60%,var(--abobora));color:#fff;padding:30px 30px 26px}
+.mail .hero small{font-weight:700;letter-spacing:.06em;font-size:12px;opacity:.9}.mail .hero h2{font-size:29px;line-height:1.15;margin-top:12px}
+.mail .bd{padding:26px 30px}.mail p{margin-bottom:13px;font-size:15px;line-height:1.55}
+.cred{background:var(--primary-soft);border-radius:12px;padding:17px;margin:17px 0}.cred div{display:flex;justify-content:space-between;gap:12px;padding:7px 0;flex-wrap:wrap}.cred div span{color:var(--muted-fg);font-size:13.5px}.cred code{background:#fff;font-size:15px;font-weight:700;padding:5px 9px;overflow-wrap:anywhere}
+.cta{display:block;text-align:center;background:var(--primary);color:#fff;font-weight:700;font-size:16px;padding:15px;border-radius:11px;text-decoration:none;margin:19px 0 14px}
+.mail .aviso{font-size:13px;color:var(--muted-fg)}.mail footer{background:var(--muted);padding:17px 30px;font-size:12px;color:var(--muted-fg)}
+/* login */
+.loginw{display:grid;place-items:center;padding:30px 0}.login{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:28px;width:100%;max-width:400px}
+.login .lg{display:flex;gap:10px;align-items:center;margin-bottom:17px}.login h2{font-size:23px;margin-bottom:4px}.login .campo{margin-top:13px}.login .btn{width:100%;margin-top:17px;min-height:44px}
+.forca{height:6px;background:var(--muted);border-radius:9px;margin-top:7px;overflow:hidden}.forca i{display:block;height:100%;width:75%;background:var(--success)}
+.lado{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:860px){.g2,.g3,.lado{grid-template-columns:1fr}.fluxo{grid-template-columns:1fr;gap:14px}.fluxo li{display:grid;grid-template-columns:48px 1fr;column-gap:12px;text-align:left;padding:0}.fluxo li::after{display:none}.fluxo .b{margin:0;grid-row:span 2}}
+@media(max-width:600px){.topo-in,.pg{padding-left:16px;padding-right:16px}.campos{grid-template-columns:1fr}.cab h1{font-size:23px}.mail .bd,.mail .hero{padding-left:20px;padding-right:20px}.acoes .btn{width:100%}.btn{min-height:44px}.btn.sm{min-height:44px}}
+</style>
+</head>
+<body>
+<div class="topo"><div class="topo-in">
+  <div class="marca"><i>WSA</i><span><b>ImobAdm</b><small>Mockup para aprovação</small></span></div>
+  <div class="abas" role="tablist" id="abas"></div>
+</div></div>
+
+<div class="pg">
+  <!-- ANÁLISE -->
+  <section class="tela on" data-t="Análise">
+    <div class="cab"><div><h1 class="fd">Liberar o acesso de quem comprou</h1><p>Regra para todas as plataformas de www.imobsystems.com.br: depois do pagamento, o administrador libera a plataforma e o comprador recebe o e-mail de parabéns com login, senha e botão de acesso.</p></div></div>
+    <div class="cartao"><div class="ct"><h3><iconify-icon icon="flat-color-icons:timeline" width="20"></iconify-icon>Como vai funcionar</h3></div><div class="cc">
+      <ol class="fluxo">
+        <li><div class="b"><iconify-icon icon="flat-color-icons:department" width="24"></iconify-icon></div><b>Cadastro da empresa</b><span>Com o nome e o e-mail do comprador</span></li>
+        <li><div class="b"><iconify-icon icon="flat-color-icons:money-transfer" width="24"></iconify-icon></div><b>Pagamento confirmado</b><span>O Asaas baixa a fatura sozinho</span></li>
+        <li><div class="b"><iconify-icon icon="flat-color-icons:data-configuration" width="24"></iconify-icon></div><b>Administrador libera</b><span>Na ficha da empresa ou em Sistemas e schemas</span></li>
+        <li><div class="b"><iconify-icon icon="flat-color-icons:key" width="24"></iconify-icon></div><b>Login criado</b><span>Com a senha gerada e o acesso ao sistema comprado</span></li>
+        <li><div class="b"><iconify-icon icon="flat-color-icons:feedback" width="24"></iconify-icon></div><b>E-mail de parabéns</b><span>Com login, senha e botão direto</span></li>
+      </ol>
+    </div></div>
+    <div class="g2">
+      <div class="cartao"><div class="ct"><h3><iconify-icon icon="fluent-color:alert-24" width="20"></iconify-icon>Decisões para você aprovar</h3></div><div class="cc">
+        <div class="dec"><b>1. Senha no e-mail é provisória</b>O comprador recebe a senha pronta, como você pediu, e cria uma nova logo no primeiro acesso. Vale por 7 dias; depois disso, o administrador reenvia. <div class="rec">Recomendado: e-mail pode ser lido por outras pessoas e a senha não pode ficar valendo.</div></div>
+        <div class="dec"><b>2. E-mail que já tem login na WSA</b>O login é compartilhado entre os sistemas. Se o comprador já tem conta, a senha dele não muda: o e-mail diz para entrar com a senha atual e traz "Esqueci minha senha". <div class="rec">Recomendado: trocar a senha derrubaria o acesso dele nos outros sistemas.</div></div>
+        <div class="dec"><b>3. Liberar só depois do pagamento</b>O botão só fica ativo com fatura paga, ou com empresa em cortesia. Para exceções, o administrador marca "Liberar sem pagamento confirmado" e isso fica no histórico. <div class="rec">Recomendado.</div></div>
+        <div class="dec"><b>4. Regra única para todo o ecossistema</b>A mesma tela, o mesmo botão e o mesmo e-mail valem para todas as plataformas de www.imobsystems.com.br; muda só o nome e o link de login de cada uma. Sistema novo entra na regra ao ser cadastrado em Sistemas e schemas. Como cada plataforma guarda os usuários de um jeito, cada uma recebe sua ligação e seu teste, e o botão só aparece nela depois disso. <div class="rec">Recomendado: começar pelo Suprimentos, que já tem o piloto da trava de acesso, e seguir uma plataforma por vez.</div></div>
+      </div></div>
+      <div>
+        <div class="cartao"><div class="ct"><h3><iconify-icon icon="flat-color-icons:ok" width="20"></iconify-icon>O que já existe</h3></div><div class="cc"><ul class="lista">
+          <li><iconify-icon icon="flat-color-icons:ok" width="18"></iconify-icon>Empresa, sistemas vinculados, schema e valor</li>
+          <li><iconify-icon icon="flat-color-icons:ok" width="18"></iconify-icon>Baixa automática do pagamento pelo Asaas</li>
+          <li><iconify-icon icon="flat-color-icons:ok" width="18"></iconify-icon>Login compartilhado e Central de Acessos</li>
+          <li><iconify-icon icon="flat-color-icons:ok" width="18"></iconify-icon>Envio de e-mail pelo Resend, já usado na régua</li>
+        </ul></div></div>
+        <div class="cartao"><div class="ct"><h3><iconify-icon icon="fluent-color:warning-24" width="20"></iconify-icon>O que falta construir</h3></div><div class="cc"><ul class="lista">
+          <li><iconify-icon icon="flat-color-icons:cancel" width="18"></iconify-icon>Dados do comprador no cadastro</li>
+          <li><iconify-icon icon="flat-color-icons:cancel" width="18"></iconify-icon>Criar o login e colocar a pessoa como dona do schema, em cada plataforma do ecossistema</li>
+          <li><iconify-icon icon="flat-color-icons:cancel" width="18"></iconify-icon>E-mail de parabéns, reenvio e situação do acesso</li>
+          <li><iconify-icon icon="flat-color-icons:cancel" width="18"></iconify-icon>Troca obrigatória de senha na tela de login de cada plataforma</li>
+        </ul></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CADASTRO -->
+  <section class="tela" data-t="1. Cadastro">
+    <div class="cab"><div><div class="rota">Empresas › Editar empresa</div><h1 class="fd">Imobiliária Horizonte</h1><p>O campo novo está destacado. Os demais já existem.</p></div><button class="btn pri">Salvar</button></div>
+    <div class="cartao"><div class="ct"><h3><iconify-icon icon="flat-color-icons:department" width="20"></iconify-icon>Dados da empresa</h3></div><div class="cc campos">
+      <div class="campo"><label>Razão social</label><input class="inp" value="Horizonte Negócios Imobiliários Ltda"></div>
+      <div class="campo"><label>CNPJ</label><input class="inp" value="12.345.678/0001-90"></div>
+      <div class="campo"><label>E-mail financeiro</label><input class="inp" value="financeiro@horizonte.com.br"></div>
+      <div class="campo"><label>Dia de vencimento</label><input class="inp" value="10"></div>
+    </div></div>
+    <div class="cartao novo"><div class="ct"><h3><iconify-icon icon="flat-color-icons:businesswoman" width="20"></iconify-icon>Comprador: quem vai acessar <span class="tag-novo">NOVO</span></h3></div><div class="cc campos">
+      <div class="campo"><label for="c1">Nome completo *</label><input id="c1" class="inp" value="Carla Mendes"></div>
+      <div class="campo"><label for="c2">E-mail de login *</label><input id="c2" class="inp" value="carla@horizonte.com.br"><div class="dica">É para este e-mail que vão o login e a senha.</div></div>
+      <div class="campo"><label for="c3">WhatsApp</label><input id="c3" class="inp" value="(11) 98888-7777"></div>
+      <div class="campo"><label for="c4">Cargo</label><input id="c4" class="inp" value="Sócia-diretora"></div>
+    </div></div>
+  </section>
+
+  <!-- FICHA -->
+  <section class="tela" data-t="2. Ficha da empresa">
+    <div class="cab"><div><div class="rota">Empresas › Imobiliária Horizonte</div><h1 class="fd">Imobiliária Horizonte</h1><p><span class="selo s-ok">Em dia</span> &nbsp;CNPJ 12.345.678/0001-90 · Carla Mendes (compradora)</p></div></div>
+    <div class="cartao novo"><div class="ct"><h3><iconify-icon icon="fluent-color:link-24" width="20"></iconify-icon>Sistemas e acesso do comprador <span class="tag-novo">NOVA COLUNA</span></h3><button class="btn sm">+ Vincular sistema</button></div>
+      <div class="tabw"><table><thead><tr><th>Sistema</th><th>Onde estão os dados</th><th>Mensalidade</th><th>Pagamento</th><th>Acesso do comprador</th><th></th></tr></thead><tbody>
+        <tr><td><b>ImobDoces</b><div class="sub">Profissional</div></td><td><code>schema loja_horizonte</code></td><td><b>R$ 290,00</b></td><td><span class="selo s-ok">Pago 08/11</span></td><td data-estado></td><td style="text-align:right" data-acao></td></tr>
+        <tr><td><b>Suprimentos</b><div class="sub">Essencial</div></td><td><code>tenant horizonte</code></td><td><b>R$ 190,00</b></td><td><span class="selo s-ok">Pago 08/11</span></td><td><span class="selo s-ok">1º acesso feito</span><div class="sub">entrou em 08/11, 14:20</div></td><td style="text-align:right"><button class="btn sm" onclick="abrir()">Reenviar</button></td></tr>
+        <tr><td><b>ImobDesk</b><div class="sub">Essencial</div></td><td><code>tenant horizonte</code></td><td><b>R$ 150,00</b></td><td><span class="selo s-war">Aguardando</span></td><td><span class="selo s-neu">Não liberado</span></td><td style="text-align:right"><button class="btn sm" disabled title="Aguardando o pagamento">Liberar acesso</button></td></tr>
+      </tbody></table></div>
+    </div>
+    <div class="nota n-info"><iconify-icon icon="flat-color-icons:info" width="18"></iconify-icon><span>Se a mensalidade atrasar e a empresa for suspensa, o acesso cai normalmente pela régua. O login continua existindo e volta a funcionar quando pagar, sem enviar outro e-mail.</span></div>
+  </section>
+
+  <!-- SISTEMAS -->
+  <section class="tela" data-t="3. Sistemas e schemas">
+    <div class="cab"><div><div class="rota">Administração › Sistemas e schemas</div><h1 class="fd">Sistemas e schemas</h1><p>O mesmo botão vale para todas as plataformas. O exemplo mostra o ImobDoces.</p></div></div>
+    <div class="g2" style="grid-template-columns:260px 1fr">
+      <div class="cartao"><div class="ct"><h3>Sistemas</h3></div><div class="cc" style="padding:8px">
+        <div class="btn pri" style="width:100%;justify-content:space-between"><span>imobdoces</span><span>12</span></div>
+        <div class="btn" style="width:100%;justify-content:space-between;border:0;margin-top:3px"><span>imobsystem</span><span>8</span></div>
+        <div class="btn" style="width:100%;justify-content:space-between;border:0;margin-top:3px"><span>suprimentos</span><span>5</span></div>
+      </div></div>
+      <div class="cartao novo"><div class="ct"><h3>imobdoces · ImobDoces</h3><span class="sub">Link de login: <code>imobdoces.imobsystems.com.br/auth</code></span></div>
+        <div class="tabw"><table><thead><tr><th>Empresa</th><th>Schema</th><th>Situação</th><th>Pode entrar</th><th>Acesso do comprador</th><th></th></tr></thead><tbody>
+          <tr><td><b>Imobiliária Horizonte</b><div class="sub">carla@horizonte.com.br</div></td><td><code>loja_horizonte</code></td><td><span class="selo s-ok">Em dia</span></td><td><span class="sub">automático</span></td><td data-estado></td><td style="text-align:right" data-acao></td></tr>
+          <tr><td><b>Doce Sabor</b><div class="sub">joao@docesabor.com.br</div></td><td><code>loja_docesabor</code></td><td><span class="selo s-ok">Em dia</span></td><td><span class="sub">automático</span></td><td><span class="selo s-info">E-mail enviado</span><div class="sub">aguardando 1º acesso</div></td><td style="text-align:right"><button class="btn sm" onclick="abrir()">Reenviar</button></td></tr>
+          <tr><td><b>Casa do Bolo</b><div class="sub"><span style="color:var(--destructive)">sem e-mail do comprador</span></div></td><td><code>loja_casadobolo</code></td><td><span class="selo s-ok">Em dia</span></td><td><span class="sub">automático</span></td><td><span class="selo s-war">Falta cadastro</span></td><td style="text-align:right"><button class="btn sm">Completar</button></td></tr>
+        </tbody></table></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EMAIL -->
+  <section class="tela" data-t="4. E-mail">
+    <div class="cab"><div><h1 class="fd">E-mail de parabéns</h1><p>Modelo único para todas as plataformas: o nome e o link mudam sozinhos. Escolha o caso para ver as duas versões.</p></div></div>
+    <div class="seg" id="segMail"><button class="on" data-v="novo">Login novo</button><button data-v="existe">Já tem login WSA</button></div>
+    <div class="caixa">
+      <div class="cabmail"><b>De:</b> WSA Sistemas &lt;acesso@imobsystems.com.br&gt;<br><b>Para:</b> carla@horizonte.com.br<br><b>Assunto:</b> Parabéns pela compra do ImobDoces! Seu acesso está pronto</div>
+      <div class="mail">
+        <div class="hero"><small>WSA SISTEMAS</small><h2 class="fd">Parabéns pela compra do ImobDoces!</h2></div>
+        <div class="bd">
+          <p>Olá, <b>Carla</b>!</p>
+          <p>Seu pagamento foi confirmado e o <b>ImobDoces</b> da <b>Imobiliária Horizonte</b> já está pronto para uso.</p>
+          <div id="mNovo">
+            <p>Estes são os seus dados de acesso:</p>
+            <div class="cred"><div><span>Login</span><code>carla@horizonte.com.br</code></div><div><span>Senha provisória</span><code>Kv7#mQ2p-Xt9</code></div></div>
+          </div>
+          <div id="mExiste" hidden>
+            <div class="cred"><div><span>Login</span><code>carla@horizonte.com.br</code></div></div>
+            <p>Use a mesma senha que você já tem nos sistemas WSA. Se não lembrar, clique em "Esqueci minha senha" na tela de login.</p>
+          </div>
+          <a class="cta" href="#" onclick="ir('5. Primeiro acesso');return false">Acessar o ImobDoces</a>
+          <p class="aviso" id="mAviso">Por segurança, você vai criar uma senha só sua no primeiro acesso. Esta senha provisória vale por 7 dias.</p>
+          <p class="aviso">Precisa de ajuda? Fale com a gente pelo WhatsApp (21) 0000-0000.</p>
+        </div>
+        <footer>WSA Sistemas · Você recebeu este e-mail porque sua empresa contratou o ImobDoces.</footer>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOGIN -->
+  <section class="tela" data-t="5. Primeiro acesso">
+    <div class="cab"><div><h1 class="fd">Primeiro acesso do comprador</h1><p>O botão do e-mail abre a tela de login do sistema comprado, com o e-mail já preenchido.</p></div></div>
+    <div class="lado">
+      <div class="cartao" style="background:var(--muted)"><div class="loginw"><div class="login">
+        <div class="lg"><iconify-icon icon="fluent-color:apps-24" width="34"></iconify-icon><b>ImobDoces</b></div>
+        <h2 class="fd">Entrar</h2><p class="sub">Use os dados que chegaram no seu e-mail.</p>
+        <div class="campo"><label>E-mail</label><input class="inp" value="carla@horizonte.com.br"></div>
+        <div class="campo"><label>Senha</label><input class="inp" type="password" value="Kv7#mQ2p-Xt9"></div>
+        <button class="btn pri">Entrar</button>
+      </div></div></div>
+      <div class="cartao" style="background:var(--muted)"><div class="loginw"><div class="login">
+        <div class="lg"><iconify-icon icon="flat-color-icons:lock" width="34"></iconify-icon><b>Crie sua senha</b></div>
+        <h2 class="fd">Falta só um passo</h2><p class="sub">A senha provisória vale apenas para este primeiro acesso.</p>
+        <div class="campo"><label>Nova senha</label><input class="inp" type="password" value="minhasenha123"><div class="forca"><i></i></div><div class="dica">Mínimo de 10 caracteres.</div></div>
+        <div class="campo"><label>Repita a nova senha</label><input class="inp" type="password" value="minhasenha123"></div>
+        <button class="btn pri">Salvar e entrar no sistema</button>
+      </div></div></div>
+    </div>
+  </section>
+</div>
+
+<!-- JANELA -->
+<div class="fundo" id="fundo" role="dialog" aria-modal="true" aria-labelledby="jt">
+  <div class="jan">
+    <header><h2 class="fd" id="jt">Liberar acesso ao ImobDoces</h2><button class="fechar" aria-label="Fechar" onclick="fechar()">×</button></header>
+    <div class="corpo" id="jPasso1">
+      <div class="linha"><span>Empresa</span><b>Imobiliária Horizonte</b></div>
+      <div class="linha"><span>Pagamento</span><span class="selo s-ok">Pago em 08/11 · R$ 290,00</span></div>
+      <div class="linha"><span>Schema</span><code>loja_horizonte</code></div>
+      <div class="linha"><span>Comprador</span><b>Carla Mendes</b></div>
+      <div class="linha"><span>E-mail de login</span><b>carla@horizonte.com.br</b></div>
+      <div class="linha"><span>Link de acesso</span><span>imobdoces.imobsystems.com.br/auth</span></div>
+      <div class="nota n-info" style="margin-top:13px"><iconify-icon icon="flat-color-icons:key" width="18"></iconify-icon><span>A senha é gerada automaticamente e vai só no e-mail. Ninguém da WSA vê a senha.</span></div>
+      <label class="check"><input type="checkbox">Liberar sem pagamento confirmado (fica registrado no histórico)</label>
+      <div class="acoes"><button class="btn sm" onclick="ir('4. E-mail');fechar()">Ver e-mail</button><button class="btn" onclick="fechar()">Cancelar</button><button class="btn ok" onclick="liberar()">Liberar e enviar e-mail</button></div>
+    </div>
+    <div class="corpo" id="jPasso2" hidden>
+      <div class="nota n-ok"><iconify-icon icon="flat-color-icons:ok" width="18"></iconify-icon><span><b>Acesso liberado.</b> E-mail enviado para carla@horizonte.com.br.</span></div>
+      <ul class="lista" style="margin-top:7px">
+        <li><iconify-icon icon="flat-color-icons:ok" width="18"></iconify-icon>Login criado</li>
+        <li><iconify-icon icon="flat-color-icons:ok" width="18"></iconify-icon>Carla como dona do schema <code>loja_horizonte</code></li>
+        <li><iconify-icon icon="flat-color-icons:ok" width="18"></iconify-icon>Permissão no ImobDoces</li>
+        <li><iconify-icon icon="flat-color-icons:ok" width="18"></iconify-icon>E-mail de parabéns enviado</li>
+      </ul>
+      <div class="acoes"><button class="btn pri" onclick="fechar()">Concluir</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const telas=[...document.querySelectorAll('.tela')],abas=document.getElementById('abas');
+telas.forEach(t=>{const b=document.createElement('button');b.className='aba';b.role='tab';b.textContent=t.dataset.t;b.onclick=()=>ir(t.dataset.t);abas.append(b)});
+function ir(n){telas.forEach(t=>t.classList.toggle('on',t.dataset.t===n));[...abas.children].forEach(b=>{const on=b.textContent===n;b.classList.toggle('on',on);if(on)b.scrollIntoView({block:'nearest',inline:'center'})});scrollTo(0,0)}
+ir('Análise');
+let liberado=false;
+function pintar(){
+  document.querySelectorAll('[data-estado]').forEach(e=>e.innerHTML=liberado?'<span class="selo s-info">E-mail enviado</span><div class="sub">aguardando 1º acesso</div>':'<span class="selo s-war">Pronto para liberar</span>');
+  document.querySelectorAll('[data-acao]').forEach(e=>e.innerHTML=liberado?'<button class="btn sm" onclick="abrir()">Reenviar</button>':'<button class="btn sm ok" onclick="abrir()">Liberar acesso</button>');
+}
+pintar();
+const fundo=document.getElementById('fundo'),p1=document.getElementById('jPasso1'),p2=document.getElementById('jPasso2');
+function abrir(){p1.hidden=false;p2.hidden=true;fundo.classList.add('on')}
+function fechar(){fundo.classList.remove('on')}
+function liberar(){liberado=true;pintar();p1.hidden=true;p2.hidden=false}
+fundo.addEventListener('click',e=>{if(e.target===fundo)fechar()});
+addEventListener('keydown',e=>{if(e.key==='Escape')fechar()});
+document.querySelectorAll('#segMail button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#segMail button').forEach(x=>x.classList.toggle('on',x===b));
+  const novo=b.dataset.v==='novo';document.getElementById('mNovo').hidden=!novo;document.getElementById('mExiste').hidden=novo;document.getElementById('mAviso').hidden=!novo;
+});
+</script>
+</body>
+</html>

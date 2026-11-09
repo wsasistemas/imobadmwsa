@@ -141,6 +141,7 @@ export function textoEvento(tipo: string, d: Record<string, unknown>): string {
     case "suspensao_manual_removida": return "Suspensão manual retirada";
     case "asaas": return `Asaas: ${eventoAsaas(String(d.evento ?? ""))}`;
     case "aviso": return `Aviso ${String(d.passo ?? "").toUpperCase()} por ${d.canal === "email" ? "e-mail" : "WhatsApp"}${d.ok ? "" : ` (falhou: ${d.erro ?? "erro"})`}`;
+    case "acesso_liberado": return `Acesso liberado para ${d.email}${d.sem_pagamento ? " (sem pagamento confirmado)" : ""}`;
     case "asaas_assinatura": return "Assinatura do Asaas criada/atualizada";
     default: return tipo.replace(/_/g, " ");
   }

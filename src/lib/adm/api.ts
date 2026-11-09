@@ -22,6 +22,7 @@ export interface Empresa {
   whatsapp: string | null; email_financeiro: string | null; modalidade: "pagante" | "cortesia" | "cancelada";
   situacao: Situacao; suspensa_manual: boolean; prazo_extra_ate: string | null; dia_vencimento: number | null;
   asaas_customer_id: string | null; asaas_subscription_id: string | null; observacoes: string | null; criado_em: string;
+  comprador_nome: string | null; comprador_email: string | null; comprador_whatsapp: string | null; comprador_cargo: string | null;
 }
 
 export interface Vinculo {
@@ -144,6 +145,13 @@ export interface Relatorio {
 
 export interface Previa { pontos: number; temperatura: Temperatura; motivos: Motivo[]; sistemas: string[]; proxima_acao: string }
 
+export interface AcessoComprador {
+  vinculo_id: string; empresa_id: string; empresa: string; app: string; sistema: string; ref: string;
+  comprador_nome: string | null; comprador_email: string | null; pago: boolean; ativo: boolean; disponivel: boolean; url_login: string | null;
+  situacao: "enviando" | "enviado" | "falhou" | "primeiro_acesso" | null; login_novo: boolean | null;
+  enviado_em: string | null; primeiro_acesso_em: string | null; erro: string | null;
+}
+
 export interface EtapaConfig { id: string; chave: string; nome: string; ordem: number; cor: string; final: boolean; de_fabrica: boolean; negocios: number }
 
 export interface ConfigAgenda {
@@ -251,6 +259,10 @@ export const api = {
   agendaHorarios: (token: string) => edge<PaginaAgenda>("agenda-horarios", { token }),
   agendaMarcar: (token: string, acao: "marcar" | "remarcar" | "cancelar", inicio?: string) =>
     edge<{ ok: boolean }>("agenda-marcar", { token, acao, inicio }),
+  // Acesso do comprador
+  salvarComprador: (empresa: string, p: Record<string, string>) => rpc<void>("adm_salvar_comprador", { p_empresa: empresa, p }),
+  acessosComprador: (empresa?: string | null, app?: string | null) => rpc<AcessoComprador[]>("adm_acessos_comprador", { p_empresa: empresa ?? null, p_app: app ?? null }),
+  liberarAcesso: (vinculoId: string, semPagamento: boolean) => edge<{ email: string; login_novo: boolean }>("adm-liberar-acesso", { vinculoId, semPagamento }),
   // Comercial: etapas do funil
   etapas: () => rpc<EtapaConfig[]>("com_etapas"),
   etapaSalvar: (p: { id?: string; nome: string; cor: string }) => rpc<string>("com_etapa_salvar", { p }),

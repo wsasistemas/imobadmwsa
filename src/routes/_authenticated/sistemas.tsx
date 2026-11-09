@@ -4,6 +4,7 @@ import { Plus, Search } from "lucide-react";
 import { useDeferredValue, useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { BotaoAcesso, SituacaoAcesso } from "@/components/adm/acesso";
 import { AdicionarSistema } from "@/components/adm/dialogos";
 import { Carregando, Cartao, Erro, Pagina, Selo, SeloSituacao, Tabela, Vazio } from "@/components/adm/ui";
 import { IconeColorido } from "@/components/icones/icone-colorido";
@@ -36,6 +37,7 @@ function Sistemas() {
     enabled: !!app,
   });
   const atual = sistemas.data?.find((s) => s.app === app);
+  const acessos = useQuery({ queryKey: ["acessos-comprador", "app", app], queryFn: () => api.acessosComprador(null, app), enabled: !!app });
 
   const acesso = useMutation({
     mutationFn: (p: { id: string; acesso_manual?: string; ativo?: boolean }) => api.salvarVinculo(p),
@@ -92,7 +94,7 @@ function Sistemas() {
                   texto={buscaAdiada ? "Tente outra busca." : "Abra a ficha de uma empresa e use Vincular sistema para ligá-la a este schema."}
                   acao={buscaAdiada ? undefined : <Button asChild variant="outline"><Link to="/empresas">Ir para Empresas</Link></Button>} />
               ) : (
-                <Tabela cabecalho={["Empresa", "Onde estão os dados", "Mensalidade", "Situação", "Pode entrar"]}>
+                <Tabela cabecalho={["Empresa", "Onde estão os dados", "Mensalidade", "Situação", "Pode entrar", "Comprador", ""]}>
                   {empresas.data!.map((v) => (
                     <tr key={v.vinculo_id} className={v.ativo ? "" : "opacity-55"}>
                       <td className="px-4 py-3">
@@ -115,6 +117,8 @@ function Sistemas() {
                           ) : <span className="text-[11px] text-muted-foreground">automático</span>}
                         </div>
                       </td>
+                      <td className="px-4 py-3"><SituacaoAcesso a={acessos.data?.find((a) => a.vinculo_id === v.vinculo_id)} /></td>
+                      <td className="px-4 py-3 text-right"><BotaoAcesso a={acessos.data?.find((a) => a.vinculo_id === v.vinculo_id)} /></td>
                     </tr>
                   ))}
                 </Tabela>

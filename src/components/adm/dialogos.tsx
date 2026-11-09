@@ -68,16 +68,23 @@ export function NovaEmpresa({ gatilho, empresa }: { gatilho: ReactNode; empresa?
     modalidade: empresa?.modalidade ?? "pagante", dia_vencimento: empresa?.dia_vencimento ? String(empresa.dia_vencimento) : "10",
     observacoes: empresa?.observacoes ?? "",
   }));
+  const [comprador, setComprador] = useState(() => ({
+    comprador_nome: empresa?.comprador_nome ?? "", comprador_email: empresa?.comprador_email ?? "",
+    comprador_whatsapp: empresa?.comprador_whatsapp ?? "", comprador_cargo: empresa?.comprador_cargo ?? "",
+  }));
+  const setC = (k: keyof typeof comprador) => (e: { target: { value: string } }) => setComprador((x) => ({ ...x, [k]: e.target.value }));
   const set = (k: keyof typeof f) => (e: { target: { value: string } }) => setF((x) => ({ ...x, [k]: e.target.value }));
 
   const m = useMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
       const whats = f.whatsapp.replace(/\D/g, "");
-      return api.salvarEmpresa({
+      const id = await api.salvarEmpresa({
         ...(empresa ? { id: empresa.id } : {}), ...f,
         whatsapp: whats && whats.length <= 11 ? `55${whats}` : whats,
         dia_vencimento: f.dia_vencimento ? Number(f.dia_vencimento) : null,
       } as never);
+      await api.salvarComprador(id, comprador);
+      return id;
     },
     onSuccess: (id) => {
       toast.success(empresa ? "Empresa atualizada." : "Empresa cadastrada.");
@@ -99,6 +106,13 @@ export function NovaEmpresa({ gatilho, empresa }: { gatilho: ReactNode; empresa?
         <Campo rotulo="CPF ou CNPJ" dica="Obrigatório para gerar a cobrança no Asaas."><Input value={f.cnpj} onChange={set("cnpj")} inputMode="numeric" /></Campo>
         <Campo rotulo="Responsável (dono)"><Input value={f.dono_nome} onChange={set("dono_nome")} /></Campo>
         <Campo rotulo="WhatsApp" dica="Com DDD. Recebe os avisos da régua."><Input value={f.whatsapp} onChange={set("whatsapp")} inputMode="tel" placeholder="(11) 9 8765-4321" /></Campo>
+        <fieldset className="grid gap-3 rounded-lg border border-border p-3 sm:col-span-2 sm:grid-cols-2">
+          <legend className="px-1 text-sm font-bold">Comprador: quem vai acessar</legend>
+          <Campo rotulo="Nome completo"><Input value={comprador.comprador_nome} onChange={setC("comprador_nome")} /></Campo>
+          <Campo rotulo="E-mail de login" dica="Para este e-mail vão o login e a senha."><Input type="email" value={comprador.comprador_email} onChange={setC("comprador_email")} /></Campo>
+          <Campo rotulo="WhatsApp"><Input value={comprador.comprador_whatsapp} onChange={setC("comprador_whatsapp")} inputMode="tel" /></Campo>
+          <Campo rotulo="Cargo"><Input value={comprador.comprador_cargo} onChange={setC("comprador_cargo")} /></Campo>
+        </fieldset>
         <div className="sm:col-span-2"><Campo rotulo="E-mail financeiro"><Input type="email" value={f.email_financeiro} onChange={set("email_financeiro")} /></Campo></div>
         <Campo rotulo="Modalidade">
           <select className={SELECT} value={f.modalidade} onChange={set("modalidade")}>

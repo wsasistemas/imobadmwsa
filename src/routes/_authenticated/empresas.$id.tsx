@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check, ExternalLink, Loader2, MoreHorizontal, Pencil, RefreshCw } from "lucide-react";
+import { BotaoAcesso, SituacaoAcesso } from "@/components/adm/acesso";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 
@@ -9,7 +10,7 @@ import { Carregando, Cartao, Erro, Pagina, Selo, SeloSituacao, Tabela, Vazio } f
 import { IconeColorido } from "@/components/icones/icone-colorido";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { api, mensagemErro, type FichaEmpresa, type Vinculo } from "@/lib/adm/api";
+import { api, mensagemErro, type FichaEmpresa, type Vinculo, type AcessoComprador } from "@/lib/adm/api";
 import { brl, cnpj, competencia, data, dataHora, diasAte, SITUACAO_FATURA, telefone, textoEvento } from "@/lib/adm/formato";
 
 export const Route = createFileRoute("/_authenticated/empresas/$id")({
@@ -60,7 +61,7 @@ function Faixa({ f }: { f: FichaEmpresa }) {
   return null;
 }
 
-function LinhaVinculo({ v }: { v: Vinculo }) {
+function LinhaVinculo({ v, acesso }: { v: Vinculo; acesso?: AcessoComprador }) {
   const qc = useQueryClient();
   const m = useMutation({
     mutationFn: (p: Record<string, unknown>) => api.salvarVinculo({ id: v.id, ...p }),
@@ -89,7 +90,9 @@ function LinhaVinculo({ v }: { v: Vinculo }) {
           ) : <span className="text-[11px] text-muted-foreground">automático</span>}
         </div>
       </td>
+      <td className="px-4 py-3"><SituacaoAcesso a={acesso} /></td>
       <td className="px-4 py-3 text-right">
+        <div className="flex items-center justify-end gap-1"><BotaoAcesso a={acesso} />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="size-8 max-md:size-11" aria-label={`Mais ações de ${v.sistema}`}><MoreHorizontal className="size-4" /></Button>
@@ -97,7 +100,7 @@ function LinhaVinculo({ v }: { v: Vinculo }) {
           <DropdownMenuContent align="end">
             <DropdownMenuItem onSelect={() => m.mutate({ ativo: !v.ativo })}>{v.ativo ? "Desligar vínculo" : "Religar vínculo"}</DropdownMenuItem>
           </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenu></div>
       </td>
     </tr>
   );
@@ -106,6 +109,7 @@ function LinhaVinculo({ v }: { v: Vinculo }) {
 function Conteudo({ f }: { f: FichaEmpresa }) {
   const e = f.empresa;
   const qc = useQueryClient();
+  const acessos = useQuery({ queryKey: ["acessos-comprador", "empresa", e.id], queryFn: () => api.acessosComprador(e.id) });
   const total = f.vinculos.filter((v) => v.ativo).reduce((s, v) => s + Number(v.valor_mensal), 0);
   const asaas = useMutation({
     mutationFn: () => api.sincronizarAsaas(e.id),
@@ -145,8 +149,8 @@ function Conteudo({ f }: { f: FichaEmpresa }) {
             <Vazio icone="fluent-color:link-24" titulo="Nenhum sistema vinculado" texto="Vincule o schema ou o tenant da empresa em cada sistema que ela usa. O valor da mensalidade é a soma dos vínculos." />
           ) : (
             <>
-              <Tabela cabecalho={["Sistema", "Onde estão os dados", "Plano", "Valor", "Acesso", ""]}>
-                {f.vinculos.map((v) => <LinhaVinculo key={v.id} v={v} />)}
+              <Tabela cabecalho={["Sistema", "Onde estão os dados", "Plano", "Valor", "Acesso", "Comprador", ""]}>
+                {f.vinculos.map((v) => <LinhaVinculo key={v.id} v={v} acesso={acessos.data?.find((a) => a.vinculo_id === v.id)} />)}
               </Tabela>
               <p className="border-t border-border px-4 py-3 text-xs text-muted-foreground">
                 O normal é o acesso seguir a situação financeira: em dia ou até 10 dias de atraso, liga; suspensa, desliga todos. O switch é exceção (fica marcado como manual).
