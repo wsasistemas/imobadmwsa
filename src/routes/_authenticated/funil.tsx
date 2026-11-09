@@ -21,7 +21,8 @@ export const Route = createFileRoute("/_authenticated/funil")({
   component: Funil,
 });
 
-const SISTEMAS = ["imobsystem", "imobdoces", "imobenviomassa", "imobdesk", "imobpesagens", "imobeducacional", "suprimentos"];
+// O ImobSystem não é do ramo imobiliário e não entra no funil comercial.
+const FORA_DO_FUNIL = new Set(["imobsystem"]);
 
 function Funil() {
   const { negocio } = Route.useSearch();
@@ -35,6 +36,7 @@ function Funil() {
   const [etapas, setEtapas] = useState(false);
   const recarregar = useRecarregarComercial();
 
+  const sistemas = useQuery({ queryKey: ["sistemas"], queryFn: api.listarSistemas });
   const q = useQuery({ queryKey: ["funil", sistema], queryFn: () => api.funil(sistema === "todos" ? null : sistema) });
   const mover = useMutation({
     mutationFn: ({ id, etapa }: { id: string; etapa: string }) => api.moverEtapa(id, etapa),
@@ -70,7 +72,7 @@ function Funil() {
       <Filtros<string>
         valor={sistema}
         onChange={setSistema}
-        opcoes={[{ valor: "todos", rotulo: "Todos os sistemas" }, ...SISTEMAS.map((s) => ({ valor: s, rotulo: s }))]}
+        opcoes={[{ valor: "todos", rotulo: "Todos os sistemas" }, ...(sistemas.data ?? []).filter((s) => !FORA_DO_FUNIL.has(s.app)).map((s) => ({ valor: s.app, rotulo: s.nome }))]}
       />
 
       <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">

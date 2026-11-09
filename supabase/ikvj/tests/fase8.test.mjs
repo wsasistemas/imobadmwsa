@@ -56,7 +56,7 @@ const nq = await neg(quente.negocio_id);
 check("classificado como quente", nq.temperatura === "quente", JSON.stringify(nq));
 check("pontuação ≥ 60", nq.pontuacao >= 60, String(nq.pontuacao));
 check("foi sozinho para Qualificação", nq.etapa === "qualificacao", nq.etapa);
-check("sistema de interesse = imobsystem", nq.sistemas.includes("imobsystem"), JSON.stringify(nq.sistemas));
+check("sistema de interesse = imobimoveis (ImobVendas)", nq.sistemas.includes("imobimoveis"), JSON.stringify(nq.sistemas));
 check("motivos guardados (cargo, pressa, e-mail da empresa)", ["Quem decide", "Tem pressa", "E-mail da empresa"].every((m) => nq.classificacao.motivos.some((x) => x.motivo.startsWith(m))), JSON.stringify(nq.classificacao.motivos));
 check("próxima ação de lead quente", nq.classificacao.proxima_acao.includes("1 hora"));
 check("atividade de classificação + mudança de etapa automática",
