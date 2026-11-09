@@ -235,6 +235,8 @@ Cada sistema ──► public.empresa_liberada(p_app, p_ref) ──► true/fals
 
 ## Fase 7: Google Agenda e agendamento automático
 
+> **Situação (10/11):** código pronto na branch; telas, Edges e migration `comercial_06_agenda` ainda NÃO estão no ar. Os itens seguem não feitos até aplicar a migration, publicar as Edges (`adm-google`, `agenda-horarios`, `agenda-marcar`, `agenda-lembretes`, todas com verify_jwt = false), cadastrar os secrets do Google, criar os templates `reuniao_confirmada` e `lembrete_reuniao` na Meta e testar com uma agenda real.
+
 - [ ] Tela Configurações › Google Agenda: conectar e desconectar a agenda por vendedor (OAuth, refresh token no Vault) e regras da `config_agenda`
 - [ ] Edge `agenda-horarios`: token de agenda válido → horários livres (freeBusy + regras + reuniões marcadas)
 - [ ] Edge `agenda-marcar`:
@@ -245,8 +247,8 @@ Cada sistema ──► public.empresa_liberada(p_app, p_ref) ──► true/fals
 - [ ] Página pública `/agendar/$token` (sem login), no layout do mockup, com remarcar e cancelar
 - [ ] pg_cron de lembretes (24 h e 1 h) a cada 5 min, sem repetir
 - [ ] Distribuição rodízio / primeiro livre
-- [ ] Teste: dois leads escolhendo o mesmo horário ao mesmo tempo → só um marca, o outro recebe novas opções
-- [ ] Teste: horário ocupado direto no Google some da página
+- [x] Teste: dois leads escolhendo o mesmo horário ao mesmo tempo → só um marca, o outro recebe novas opções (local: fase7.test.mjs, 48 cenários; falta repetir no ikvj)
+- [x] Teste: horário ocupado direto no Google some da página (local, com o retorno do Google simulado; falta repetir com agenda real)
 
 ## Fase 8: Gestão Comercial (telas) e Ganho → cliente
 
@@ -256,7 +258,7 @@ Cada sistema ──► public.empresa_liberada(p_app, p_ref) ──► true/fals
 - [x] Leads & Contatos: lista com KPIs, filtros por origem e temperatura, busca, ficha do lead (motivos da nota, respostas do formulário, histórico, anotar, etapa, valor, temperatura) e novo contato
 - [x] Importar CSV (Leads & Contatos): vírgula ou ponto e vírgula, prévia, entra como importado, sem boas-vindas e sem duplicar
 - [x] Funil de Vendas: Kanban arrastável, filtro por sistema, quentes no topo, motivo da perda obrigatório em "Perdido"
-- [ ] Configurar etapas pela tela (NÃO FEITO: as 8 etapas do funil B2B estão fixas no banco)
+- [ ] Configurar etapas pela tela (NÃO FEITO: código e testes prontos; falta aplicar a migration `comercial_07_etapas` no ikvj)
 - [x] Teste: fase8b.test.mjs (23 cenários)
 - [x] Migration `comercial_05_fechamento_relatorios` aplicada no ikvj (SQL Editor, 09/11): 3 RPCs e cron com-follow-up ativos
 - [ ] Agendamentos: semana e mês com as reuniões e os horários ocupados do Google, cores lead / equipe / ocupado, nova reunião pela equipe (cria no Google)

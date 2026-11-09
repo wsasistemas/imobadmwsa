@@ -144,6 +144,32 @@ export interface Relatorio {
 
 export interface Previa { pontos: number; temperatura: Temperatura; motivos: Motivo[]; sistemas: string[]; proxima_acao: string }
 
+export interface EtapaConfig { id: string; chave: string; nome: string; ordem: number; cor: string; final: boolean; de_fabrica: boolean; negocios: number }
+
+export interface ConfigAgenda {
+  duracao_min: number; intervalo_min: number; antecedencia_min: number; criar_meet: boolean; mover_card: boolean;
+  horario: { dias: number[]; inicio: string; fim: string };
+  lembretes: { h24: boolean; h1: boolean };
+  distribuicao: "rodizio" | "primeiro_livre";
+}
+
+export interface AgendaPainel {
+  config: ConfigAgenda;
+  agendas: { id: string; email: string; ativo: boolean; token_valido: boolean; detalhe: string | null; vendedor: string | null }[];
+  vendedores: { id: string; nome: string; email: string | null }[];
+}
+
+export interface Reuniao {
+  id: string; negocio_id: string; inicio: string; fim: string; situacao: string; origem: "lead" | "equipe";
+  meet_url: string | null; lead: string | null; empresa: string | null; vendedor: string | null;
+}
+
+export interface PaginaAgenda {
+  nome: string; duracao_min: number;
+  minha: { id: string; inicio: string; fim: string; meet_url: string | null } | null;
+  horarios: { inicio: string; fim: string }[];
+}
+
 async function rpc<T>(fn: string, args: Record<string, unknown> = {}): Promise<T> {
   const { data, error } = await sb.rpc(fn, args);
   if (error) throw error;
@@ -210,6 +236,26 @@ export const api = {
   metaFormularios: (conexaoId: string) => edge<{ formularios: number }>("adm-meta", { acao: "formularios", conexaoId }),
   metaVerificar: (conexaoId: string) => edge<{ valido: boolean; detalhe: string | null }>("adm-meta", { acao: "verificar", conexaoId }),
   metaDesconectar: (conexaoId: string) => edge<{ ok: boolean }>("adm-meta", { acao: "desconectar", conexaoId }),
+  // Comercial: Google Agenda e agendamentos (Fase 7)
+  agendaPainel: () => rpc<AgendaPainel>("com_agenda_painel"),
+  agendaConfigSalvar: (p: ConfigAgenda) => rpc<void>("com_agenda_config_salvar", { p }),
+  reunioes: (de: string, ate: string) => rpc<Reuniao[]>("com_reunioes", { p_de: de, p_ate: ate }),
+  reuniaoSituacao: (id: string, situacao: string) => rpc<void>("com_reuniao_situacao", { p_reuniao: id, p_situacao: situacao }),
+  googleSituacao: () => edge<{ configurado: boolean; retorno_url: string }>("adm-google", { acao: "situacao" }),
+  googleInicio: (retorno: string, vendedor: string | null) => edge<{ url: string }>("adm-google", { acao: "inicio", retorno, vendedor }),
+  googleDesconectar: (agendaId: string) => edge<{ ok: boolean }>("adm-google", { acao: "desconectar", agendaId }),
+  googleOcupados: (de: string, ate: string) =>
+    edge<{ ocupados: { inicio: string; fim: string; agenda: string }[] }>("adm-google", { acao: "ocupados", de, ate }),
+  googleNovaReuniao: (negocioId: string, inicio: string, titulo: string, email: string | null) =>
+    edge<{ reuniao_id: string; meet_url: string | null }>("adm-google", { acao: "nova_reuniao", negocioId, inicio, titulo, email }),
+  agendaHorarios: (token: string) => edge<PaginaAgenda>("agenda-horarios", { token }),
+  agendaMarcar: (token: string, acao: "marcar" | "remarcar" | "cancelar", inicio?: string) =>
+    edge<{ ok: boolean }>("agenda-marcar", { token, acao, inicio }),
+  // Comercial: etapas do funil
+  etapas: () => rpc<EtapaConfig[]>("com_etapas"),
+  etapaSalvar: (p: { id?: string; nome: string; cor: string }) => rpc<string>("com_etapa_salvar", { p }),
+  etapaMover: (id: string, direcao: number) => rpc<void>("com_etapa_mover", { p_etapa: id, p_direcao: direcao }),
+  etapaExcluir: (id: string) => rpc<void>("com_etapa_excluir", { p_etapa: id }),
   // Comercial: leads, funil e classificação (Fase 8)
   leads: (origem?: string | null, temperatura?: string | null, busca?: string | null) =>
     rpc<CardNegocio[]>("com_leads", { p_origem: origem ?? null, p_temperatura: temperatura ?? null, p_busca: busca || null, p_limite: 500 }),

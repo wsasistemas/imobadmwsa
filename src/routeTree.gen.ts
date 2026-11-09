@@ -16,15 +16,18 @@ import { Route as McpRouteImport } from './routes/mcp'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as AuthenticatedAgendamentosRouteImport } from './routes/_authenticated/agendamentos'
 import { Route as AuthenticatedComoFuncionaRouteImport } from './routes/_authenticated/como-funciona'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedFunilRouteImport } from './routes/_authenticated/funil'
+import { Route as AuthenticatedGoogleAgendaRouteImport } from './routes/_authenticated/google-agenda'
 import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated/leads'
 import { Route as AuthenticatedMensalidadesRouteImport } from './routes/_authenticated/mensalidades'
 import { Route as AuthenticatedPermissoesRouteImport } from './routes/_authenticated/permissoes'
 import { Route as AuthenticatedReguaRouteImport } from './routes/_authenticated/regua'
 import { Route as AuthenticatedRelatoriosComerciaisRouteImport } from './routes/_authenticated/relatorios-comerciais'
 import { Route as AuthenticatedSistemasRouteImport } from './routes/_authenticated/sistemas'
+import { Route as AgendarTokenRouteImport } from './routes/agendar.$token'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as AuthenticatedEmpresasIndexRouteImport } from './routes/_authenticated/empresas.index'
@@ -69,6 +72,12 @@ const Char91DotwellKnownChar93OauthProtectedResourceRoute =
     path: '/.well-known/oauth-protected-resource',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedAgendamentosRoute =
+  AuthenticatedAgendamentosRouteImport.update({
+    id: '/agendamentos',
+    path: '/agendamentos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedComoFuncionaRoute =
   AuthenticatedComoFuncionaRouteImport.update({
     id: '/como-funciona',
@@ -85,6 +94,12 @@ const AuthenticatedFunilRoute = AuthenticatedFunilRouteImport.update({
   path: '/funil',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedGoogleAgendaRoute =
+  AuthenticatedGoogleAgendaRouteImport.update({
+    id: '/google-agenda',
+    path: '/google-agenda',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLeadsRoute = AuthenticatedLeadsRouteImport.update({
   id: '/leads',
   path: '/leads',
@@ -116,6 +131,11 @@ const AuthenticatedSistemasRoute = AuthenticatedSistemasRouteImport.update({
   id: '/sistemas',
   path: '/sistemas',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AgendarTokenRoute = AgendarTokenRouteImport.update({
+  id: '/agendar/$token',
+  path: '/agendar/$token',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   id: '/.lovable/oauth/consent',
@@ -164,15 +184,18 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/agendamentos': typeof AuthenticatedAgendamentosRoute
   '/como-funciona': typeof AuthenticatedComoFuncionaRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/funil': typeof AuthenticatedFunilRoute
+  '/google-agenda': typeof AuthenticatedGoogleAgendaRoute
   '/leads': typeof AuthenticatedLeadsRoute
   '/mensalidades': typeof AuthenticatedMensalidadesRoute
   '/permissoes': typeof AuthenticatedPermissoesRoute
   '/regua': typeof AuthenticatedReguaRoute
   '/relatorios-comerciais': typeof AuthenticatedRelatoriosComerciaisRoute
   '/sistemas': typeof AuthenticatedSistemasRoute
+  '/agendar/$token': typeof AgendarTokenRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/empresas/$id': typeof AuthenticatedEmpresasIdRoute
@@ -188,15 +211,18 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/agendamentos': typeof AuthenticatedAgendamentosRoute
   '/como-funciona': typeof AuthenticatedComoFuncionaRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/funil': typeof AuthenticatedFunilRoute
+  '/google-agenda': typeof AuthenticatedGoogleAgendaRoute
   '/leads': typeof AuthenticatedLeadsRoute
   '/mensalidades': typeof AuthenticatedMensalidadesRoute
   '/permissoes': typeof AuthenticatedPermissoesRoute
   '/regua': typeof AuthenticatedReguaRoute
   '/relatorios-comerciais': typeof AuthenticatedRelatoriosComerciaisRoute
   '/sistemas': typeof AuthenticatedSistemasRoute
+  '/agendar/$token': typeof AgendarTokenRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/empresas/$id': typeof AuthenticatedEmpresasIdRoute
@@ -214,15 +240,18 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/_authenticated/agendamentos': typeof AuthenticatedAgendamentosRoute
   '/_authenticated/como-funciona': typeof AuthenticatedComoFuncionaRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/funil': typeof AuthenticatedFunilRoute
+  '/_authenticated/google-agenda': typeof AuthenticatedGoogleAgendaRoute
   '/_authenticated/leads': typeof AuthenticatedLeadsRoute
   '/_authenticated/mensalidades': typeof AuthenticatedMensalidadesRoute
   '/_authenticated/permissoes': typeof AuthenticatedPermissoesRoute
   '/_authenticated/regua': typeof AuthenticatedReguaRoute
   '/_authenticated/relatorios-comerciais': typeof AuthenticatedRelatoriosComerciaisRoute
   '/_authenticated/sistemas': typeof AuthenticatedSistemasRoute
+  '/agendar/$token': typeof AgendarTokenRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/empresas/$id': typeof AuthenticatedEmpresasIdRoute
@@ -240,15 +269,18 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/agendamentos'
     | '/como-funciona'
     | '/dashboard'
     | '/funil'
+    | '/google-agenda'
     | '/leads'
     | '/mensalidades'
     | '/permissoes'
     | '/regua'
     | '/relatorios-comerciais'
     | '/sistemas'
+    | '/agendar/$token'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/empresas/$id'
@@ -264,15 +296,18 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/agendamentos'
     | '/como-funciona'
     | '/dashboard'
     | '/funil'
+    | '/google-agenda'
     | '/leads'
     | '/mensalidades'
     | '/permissoes'
     | '/regua'
     | '/relatorios-comerciais'
     | '/sistemas'
+    | '/agendar/$token'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/empresas/$id'
@@ -289,15 +324,18 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/_authenticated/agendamentos'
     | '/_authenticated/como-funciona'
     | '/_authenticated/dashboard'
     | '/_authenticated/funil'
+    | '/_authenticated/google-agenda'
     | '/_authenticated/leads'
     | '/_authenticated/mensalidades'
     | '/_authenticated/permissoes'
     | '/_authenticated/regua'
     | '/_authenticated/relatorios-comerciais'
     | '/_authenticated/sistemas'
+    | '/agendar/$token'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/empresas/$id'
@@ -315,6 +353,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  AgendarTokenRoute: typeof AgendarTokenRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicWebhooksWhatsappRoute: typeof ApiPublicWebhooksWhatsappRoute
@@ -371,6 +410,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/agendamentos': {
+      id: '/_authenticated/agendamentos'
+      path: '/agendamentos'
+      fullPath: '/agendamentos'
+      preLoaderRoute: typeof AuthenticatedAgendamentosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/como-funciona': {
       id: '/_authenticated/como-funciona'
       path: '/como-funciona'
@@ -390,6 +436,13 @@ declare module '@tanstack/react-router' {
       path: '/funil'
       fullPath: '/funil'
       preLoaderRoute: typeof AuthenticatedFunilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/google-agenda': {
+      id: '/_authenticated/google-agenda'
+      path: '/google-agenda'
+      fullPath: '/google-agenda'
+      preLoaderRoute: typeof AuthenticatedGoogleAgendaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/leads': {
@@ -433,6 +486,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/sistemas'
       preLoaderRoute: typeof AuthenticatedSistemasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/agendar/$token': {
+      id: '/agendar/$token'
+      path: '/agendar/$token'
+      fullPath: '/agendar/$token'
+      preLoaderRoute: typeof AgendarTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/.lovable/oauth/consent': {
       id: '/.lovable/oauth/consent'
@@ -487,9 +547,11 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAgendamentosRoute: typeof AuthenticatedAgendamentosRoute
   AuthenticatedComoFuncionaRoute: typeof AuthenticatedComoFuncionaRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFunilRoute: typeof AuthenticatedFunilRoute
+  AuthenticatedGoogleAgendaRoute: typeof AuthenticatedGoogleAgendaRoute
   AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRoute
   AuthenticatedMensalidadesRoute: typeof AuthenticatedMensalidadesRoute
   AuthenticatedPermissoesRoute: typeof AuthenticatedPermissoesRoute
@@ -503,9 +565,11 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAgendamentosRoute: AuthenticatedAgendamentosRoute,
   AuthenticatedComoFuncionaRoute: AuthenticatedComoFuncionaRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFunilRoute: AuthenticatedFunilRoute,
+  AuthenticatedGoogleAgendaRoute: AuthenticatedGoogleAgendaRoute,
   AuthenticatedLeadsRoute: AuthenticatedLeadsRoute,
   AuthenticatedMensalidadesRoute: AuthenticatedMensalidadesRoute,
   AuthenticatedPermissoesRoute: AuthenticatedPermissoesRoute,
@@ -531,6 +595,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  AgendarTokenRoute: AgendarTokenRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicWebhooksWhatsappRoute: ApiPublicWebhooksWhatsappRoute,

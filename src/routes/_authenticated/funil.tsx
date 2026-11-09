@@ -5,6 +5,7 @@ import { useState, type DragEvent } from "react";
 import { toast } from "sonner";
 
 import { FichaLead, GanharNegocio, NovoContato, PerderNegocio, RegrasClassificacao, SeloTemperatura, useRecarregarComercial } from "@/components/adm/comercial";
+import { ConfigurarEtapas } from "@/components/adm/etapas";
 import { Carregando, Erro, Filtros, Pagina } from "@/components/adm/ui";
 import { IconeColorido } from "@/components/icones/icone-colorido";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ function Funil() {
   const [perder, setPerder] = useState<string | null>(null);
   const [ganhar, setGanhar] = useState<CardNegocio | null>(null);
   const [regras, setRegras] = useState(false);
+  const [etapas, setEtapas] = useState(false);
   const recarregar = useRecarregarComercial();
 
   const q = useQuery({ queryKey: ["funil", sistema], queryFn: () => api.funil(sistema === "todos" ? null : sistema) });
@@ -60,6 +62,7 @@ function Funil() {
       titulo="Funil de Vendas"
       texto="Arraste os cards entre as etapas ou abra o card e mude a etapa na ficha. Lead quente entra direto em Qualificação; em cada coluna, os quentes ficam no topo."
       acoes={<>
+        <Button variant="outline" onClick={() => setEtapas(true)}>Configurar etapas</Button>
         <Button variant="outline" className="gap-1.5" onClick={() => setRegras(true)}><SlidersHorizontal className="size-4" />Regras de classificação</Button>
         <NovoContato gatilho={<Button className="gap-1.5"><Plus className="size-4" />Novo contato</Button>} />
       </>}
@@ -135,6 +138,7 @@ function Funil() {
       <PerderNegocio negocioId={perder} aberto={!!perder} setAberto={(v) => { if (!v) setPerder(null); }} />
       <GanharNegocio negocio={ganhar} aberto={!!ganhar} setAberto={(v) => { if (!v) setGanhar(null); }} />
       <RegrasClassificacao aberto={regras} setAberto={setRegras} />
+      <ConfigurarEtapas aberto={etapas} setAberto={setEtapas} />
       <FichaLead negocioId={negocio ?? null} onFechar={() => abrir(undefined)} />
     </Pagina>
   );

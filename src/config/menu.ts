@@ -32,7 +32,7 @@ export const MENU: GrupoMenu[] = [
     itens: [
       { to: "/leads", label: "Leads & Contatos", icone: "fluent-color:people-list-24" },
       { to: "/funil", label: "Funil de Vendas", icone: "fluent-color:board-24" },
-      { to: "/agendamentos", label: "Agendamentos", icone: "fluent-color:calendar-24", fase: 7 },
+      { to: "/agendamentos", label: "Agendamentos", icone: "fluent-color:calendar-24" },
       { to: "/relatorios-comerciais", label: "Relatórios Comerciais", icone: "fluent-color:chart-multiple-24" },
     ],
   },
@@ -56,7 +56,7 @@ export const MENU: GrupoMenu[] = [
     titulo: "Configurações",
     itens: [
       { to: "/regua", label: "Régua de cobrança", icone: "fluent-color:clock-24" },
-      { to: "/google-agenda", label: "Google Agenda", icone: "fluent-color:calendar-sync-24", fase: 7 },
+      { to: "/google-agenda", label: "Google Agenda", icone: "fluent-color:calendar-sync-24" },
       { to: "/permissoes", label: "Permissões por aplicativo", icone: "fluent-color:lock-shield-24" },
       { to: "/como-funciona", label: "Como funciona", icone: "flat-color-icons:database" },
     ],
