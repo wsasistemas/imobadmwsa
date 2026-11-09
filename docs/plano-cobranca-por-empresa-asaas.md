@@ -267,7 +267,10 @@ Cada sistema ──► public.empresa_liberada(p_app, p_ref) ──► true/fals
 
 ## Fase 9: bloqueio nos sistemas
 
-Para cada sistema: ImobDoces, ImobSystem, Imobenviomassa e ImobDesk.
+Para cada sistema: ImobDoces, ImobSystem, Imobenviomassa, ImobDesk, Suprimentos, ImobPesagens, ImobEducacional e ImobImóveis.
+
+- [x] Piloto no **Suprimentos** (repo Imobsuprimentos, commit b7b56cc, sem push): `src/lib/empresa-liberada.ts` + `AvisoMensalidade` (faixa amarela + pop-up "Sistema suspenso" com "Pagar agora"), chamado no login, na sessão restaurada e ao voltar para a aba. Build e testes ok
+- [ ] Demais sistemas (NÃO FEITO: copiar os 2 arquivos do piloto e chamar com a referência certa de cada um)
 
 - [ ] Módulo `empresaLiberada.ts` chamando `public.empresa_liberada` nos 4 momentos. **Só `liberada === false` bloqueia**
 - [ ] Faixa amarela de atraso (dono e gestores) com "Pagar agora"
@@ -278,6 +281,8 @@ Para cada sistema: ImobDoces, ImobSystem, Imobenviomassa e ImobDesk.
 - [ ] Teste por sistema: suspensa → pop-up e API negada; paga → volta sem novo login
 
 ## Fase 10: carga inicial
+
+- [x] Levantamento (09/11): os sistemas só têm dados de demonstração, modelo ou internos da WSA. Exceções: imobeducacional (12 unidades de um mesmo grupo) e imobpesagens (schema inteiro de um cliente). Não há carga automática a fazer; os clientes reais entram pelo painel (Nova empresa + Vincular sistema) ou pelo Ganho do funil
 
 - [ ] Empresas a partir de `imobdoces.lojas`, `public.imobiliarias` e dos demais apps (CNPJ à mão onde faltar)
 - [ ] Vínculos (app + schema_ref ou tenant_ref) com plano e valor
