@@ -258,7 +258,7 @@ Cada sistema ──► public.empresa_liberada(p_app, p_ref) ──► true/fals
 - [x] Funil de Vendas: Kanban arrastável, filtro por sistema, quentes no topo, motivo da perda obrigatório em "Perdido"
 - [ ] Configurar etapas pela tela (NÃO FEITO: as 8 etapas do funil B2B estão fixas no banco)
 - [x] Teste: fase8b.test.mjs (23 cenários)
-- [ ] Migration `comercial_05_fechamento_relatorios` aplicada no ikvj (NÃO FEITO: colar no SQL Editor)
+- [x] Migration `comercial_05_fechamento_relatorios` aplicada no ikvj (SQL Editor, 09/11): 3 RPCs e cron com-follow-up ativos
 - [ ] Agendamentos: semana e mês com as reuniões e os horários ocupados do Google, cores lead / equipe / ocupado, nova reunião pela equipe (cria no Google)
 - [x] Relatórios Comerciais: conversão por fonte (leads → qualificado → reunião → ganho → receita nova), funil do período, temperatura × ganho, interesse por sistema, motivos de perda, leads por semana e exportação CSV
 - [x] "Ganho" → janela Fechar negócio: CNPJ, razão social, vencimento e sistemas (ref + plano + valor) → `com_ganhar` (empresa + vínculos) + assinatura no Asaas (`adm-asaas-assinatura`). Sistema sem schema/tenant fica para vincular na ficha da empresa
