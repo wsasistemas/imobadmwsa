@@ -25,7 +25,8 @@ export async function verificarPrimeiroAcesso(): Promise<'ok' | 'trocar' | 'venc
 
 /** Sessão restaurada: quem ainda não trocou a senha não fica fora da tela de nova senha. */
 export async function exigirNovaSenha(rotaNovaSenha: string): Promise<void> {
-  if (typeof window === 'undefined' || window.location.pathname === rotaNovaSenha) return;
+  if (typeof window === 'undefined') return;
+  if (window.location.pathname === new URL(rotaNovaSenha, window.location.origin).pathname) return;
   if ((await verificarPrimeiroAcesso()) === 'trocar') window.location.replace(rotaNovaSenha);
 }
 

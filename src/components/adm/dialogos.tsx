@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -139,20 +139,33 @@ export function VincularSistema({ gatilho, empresaId, compradorEmail }: { gatilh
   const recarregar = useRecarregar();
   const sistemas = useQuery({ queryKey: ["sistemas"], queryFn: api.listarSistemas, enabled: aberto });
   const [app, setApp] = useState("");
+  const [modo, setModo] = useState<"criar" | "existente" | "codigo">("codigo");
   const [ref, setRef] = useState("");
   const [plano, setPlano] = useState("");
   const [valor, setValor] = useState("");
   const [liberar, setLiberar] = useState(true);
   const [semPagamento, setSemPagamento] = useState(false);
   const sis = sistemas.data?.find((s) => s.app === app);
+  const plataforma = useQuery({ queryKey: ["plataforma-empresas", app], queryFn: () => api.plataformaEmpresas(app), enabled: aberto && !!app });
+  const p = plataforma.data;
+  const podeLiberar = !!compradorEmail && !!p?.pode_liberar;
 
+  const escolherSistema = (novo: string) => { setApp(novo); setRef(""); setModo("codigo"); };
+  useEffect(() => {
+    if (p) setModo(p.pode_criar ? "criar" : p.pode_listar ? "existente" : "codigo");
+  }, [p]);
+
+  const limpar = () => { setApp(""); setRef(""); setValor(""); setPlano(""); setSemPagamento(false); };
   const m = useMutation({
     mutationFn: async () => {
-      const vinculo = await api.salvarVinculo({
-        empresa_id: empresaId, app, plano, valor_mensal: valor.replace(",", "."),
-        ...(sis?.tipo_ref === "schema" ? { schema_ref: ref.trim() } : { tenant_ref: ref.trim() }),
-      });
-      if (!liberar || !compradorEmail) return null;
+      const valorMensal = valor.replace(",", ".");
+      const vinculo = modo === "criar"
+        ? await api.vincularCriando({ empresa_id: empresaId, app, plano, valor_mensal: valorMensal })
+        : await api.salvarVinculo({
+            empresa_id: empresaId, app, plano, valor_mensal: valorMensal,
+            ...(sis?.tipo_ref === "schema" ? { schema_ref: ref.trim() } : { tenant_ref: ref.trim() }),
+          });
+      if (!liberar || !podeLiberar) return null;
       // O vínculo já ficou salvo; se a liberação falhar, ela pode ser refeita pelo botão da linha.
       try {
         return await api.liberarAcesso(vinculo, semPagamento);
@@ -163,29 +176,64 @@ export function VincularSistema({ gatilho, empresaId, compradorEmail }: { gatilh
     },
     onSuccess: (r) => {
       toast.success(r ? `Sistema vinculado e e-mail de acesso enviado para ${r.email}.` : "Sistema vinculado.");
-      recarregar(); setAberto(false); setApp(""); setRef(""); setValor(""); setPlano(""); setSemPagamento(false);
+      recarregar(); setAberto(false); limpar();
     },
     onError: (e) => toast.error(mensagemErro(e)),
   });
 
+  const opcoes: [typeof modo, string][] = [
+    ...(p?.pode_criar ? [["criar", `Criar a empresa no ${sis?.nome ?? "sistema"}`] as [typeof modo, string]] : []),
+    ...(p?.pode_listar ? [["existente", "Usar empresa que já existe"] as [typeof modo, string]] : []),
+  ];
+
   return (
     <Janela gatilho={gatilho} titulo="Vincular sistema" aberto={aberto} setAberto={setAberto}
-      descricao="Liga a empresa ao lugar onde estão os dados dela no sistema (schema ou tenant).">
+      descricao="Liga a empresa à plataforma que ela comprou.">
       <form onSubmit={(e) => { e.preventDefault(); m.mutate(); }} className="space-y-3">
         <Campo rotulo="Sistema *">
-          <select className={SELECT} value={app} onChange={(e) => setApp(e.target.value)} required>
+          <select className={SELECT} value={app} onChange={(e) => escolherSistema(e.target.value)} required>
             <option value="">Escolha…</option>
-            {(sistemas.data ?? []).map((s) => <option key={s.app} value={s.app}>{s.app} — {s.nome}</option>)}
+            {(sistemas.data ?? []).map((s) => <option key={s.app} value={s.app}>{s.nome}</option>)}
           </select>
         </Campo>
-        <Campo rotulo={sis?.tipo_ref === "schema" ? "Schema da empresa *" : "Id do tenant da empresa *"} dica={sis?.descricao_ref ?? undefined}>
-          <Input value={ref} onChange={(e) => setRef(e.target.value)} required placeholder={sis?.tipo_ref === "schema" ? "loja_nome" : "uuid ou código"} />
-        </Campo>
+
+        {app && plataforma.isLoading ? <p className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="size-4 animate-spin" />Consultando a plataforma…</p> : null}
+        {app && p ? (
+          <>
+            {opcoes.length > 1 ? (
+              <div className="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="Empresa na plataforma">
+                {opcoes.map(([v, r]) => (
+                  <label key={v} className={`flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border px-3 text-sm font-semibold ${modo === v ? "border-primary bg-primary-soft" : "border-border"}`}>
+                    <input type="radio" name="modo" checked={modo === v} onChange={() => { setModo(v); setRef(""); }} />{r}
+                  </label>
+                ))}
+              </div>
+            ) : null}
+            {modo === "criar" ? (
+              <p className="rounded-lg bg-info-soft p-3 text-xs text-info">A empresa é criada no {sis?.nome} com o nome deste cadastro, já com os perfis e configurações iniciais.</p>
+            ) : modo === "existente" ? (
+              <Campo rotulo="Empresa na plataforma *">
+                <select className={SELECT} value={ref} onChange={(e) => setRef(e.target.value)} required>
+                  <option value="">Escolha…</option>
+                  {p.empresas.map((x) => (
+                    <option key={x.ref} value={x.ref} disabled={!!x.vinculada_a}>{x.nome}{x.vinculada_a ? ` (já vinculada a ${x.vinculada_a})` : ""}</option>
+                  ))}
+                </select>
+              </Campo>
+            ) : (
+              <Campo rotulo={sis?.tipo_ref === "schema" ? "Schema da empresa *" : "Código da empresa na plataforma *"} dica={sis?.descricao_ref ?? undefined}>
+                <Input value={ref} onChange={(e) => setRef(e.target.value)} required placeholder={sis?.tipo_ref === "schema" ? "loja_nome" : "código"} />
+              </Campo>
+            )}
+          </>
+        ) : null}
+
         <div className="grid gap-3 sm:grid-cols-2">
           <Campo rotulo="Plano"><Input value={plano} onChange={(e) => setPlano(e.target.value)} placeholder="Essencial, Profissional…" /></Campo>
           <Campo rotulo="Valor mensal (R$) *"><Input value={valor} onChange={(e) => setValor(e.target.value)} inputMode="decimal" required placeholder="290,00" /></Campo>
         </div>
-        {compradorEmail ? (
+
+        {app && p ? (podeLiberar ? (
           <div className="space-y-2 rounded-lg border border-border p-3 text-sm">
             <label className="flex items-start gap-2"><input type="checkbox" className="mt-0.5 size-4" checked={liberar} onChange={(e) => setLiberar(e.target.checked)} />
               <span>Liberar o acesso e enviar o e-mail para <b>{compradorEmail}</b></span></label>
@@ -195,9 +243,11 @@ export function VincularSistema({ gatilho, empresaId, compradorEmail }: { gatilh
             ) : null}
           </div>
         ) : (
-          <p className="rounded-lg bg-warning-soft p-3 text-xs text-warning-strong">Para liberar o acesso junto, preencha o e-mail do comprador em Editar.</p>
-        )}
-        <Rodape salvando={m.isPending} rotulo={liberar && compradorEmail ? "Vincular e liberar acesso" : "Vincular"} />
+          <p className="rounded-lg bg-warning-soft p-3 text-xs text-warning-strong">
+            {!compradorEmail ? "Para liberar o acesso junto, preencha o e-mail do comprador em Editar." : `O ${sis?.nome ?? "sistema"} ainda não envia o acesso pelo painel.`}
+          </p>
+        )) : null}
+        <Rodape salvando={m.isPending} rotulo={liberar && podeLiberar ? "Vincular e liberar acesso" : "Vincular"} />
       </form>
     </Janela>
   );

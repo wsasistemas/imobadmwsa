@@ -29,13 +29,24 @@ await db.exec(`
   create schema imobdoces; create function imobdoces.membro_da_loja(p text) returns boolean language sql stable as $$ select false $$;
   create schema suprimentos;
   create table suprimentos.usuarios (id uuid primary key, imobiliaria_id uuid not null, email text not null, nome text, perfil text not null default 'operador', ativo boolean not null default true);
-  insert into acessos.aplicativos (schema_name, nome, url) values ('imobdoces', 'ImobDoces', 'https://d.x'), ('imobsystem', 'ImobSystem', null), ('suprimentos', 'Suprimentos', 'https://s.x');
+  create table suprimentos.imobiliarias (id uuid primary key default gen_random_uuid(), nome text not null);
+  create schema imobimoveis;
+  create table imobimoveis.tenants (id uuid primary key default gen_random_uuid(), nome text not null, slug text not null unique, status text);
+  create table imobimoveis.tenant_users (tenant_id uuid not null references imobimoveis.tenants(id), user_id uuid not null, role text, perfil text, ativo boolean default true, primary key (tenant_id, user_id));
+  create table imobimoveis.user_roles (user_id uuid not null, role text not null, unique (user_id, role));
+  create table imobimoveis.profiles (user_id uuid primary key, full_name text);
+  insert into imobimoveis.tenants (nome, slug, status) values ('Tenant Padrão', 'default', 'ativo');
+  insert into acessos.aplicativos (schema_name, nome, url) values ('imobdoces', 'ImobDoces', 'https://d.x'), ('imobsystem', 'ImobSystem', null), ('suprimentos', 'Suprimentos', 'https://s.x'), ('imobimoveis', 'Imobimoveis', 'https://i.x');
   create table public.leads (id uuid primary key default gen_random_uuid(), nome text not null, email text not null, created_at timestamptz not null default now(), telefone text, interesse text, origem text, status text not null default 'novo', empresa text, produto text, mensagem text, consentimento_em timestamptz);
   create table public.saas_leads (id uuid primary key default gen_random_uuid(), nome text, email text, telefone text, empresa text, origem text, interesse jsonb, status text not null default 'novo', criado_em timestamptz not null default now(), produto_interesse text);
   select set_config('test.uid', '11111111-1111-1111-1111-111111111111', false), set_config('test.super', '1', false);
 `);
 for (const f of readdirSync(dir).filter((f) => f.endsWith(".sql")).sort()) await db.exec(readFileSync(`${dir}/${f}`, "utf8"));
 
+if (!(await um("select 1 x from adm.sistemas where app = 'imobimoveis'"))) {
+  await db.exec("insert into adm.sistemas (app, tipo_ref) values ('imobimoveis', 'tenant')");
+  await db.exec(readFileSync(`${dir}/20261110140000_adm_09_empresas_na_plataforma.sql`, "utf8").split("-- Painel ---")[0].split("UPDATE adm.sistemas SET funcao_provisionar")[1] ? "UPDATE adm.sistemas SET funcao_provisionar" + readFileSync(`${dir}/20261110140000_adm_09_empresas_na_plataforma.sql`, "utf8").split("UPDATE adm.sistemas SET funcao_provisionar")[1].split("-- Painel ---")[0] : "");
+}
 const tem = await um("select funcao_provisionar f from adm.sistemas where app = 'suprimentos'");
 if (!tem) await db.exec("insert into adm.sistemas (app, tipo_ref, funcao_provisionar) values ('suprimentos', 'tenant', 'adm.provisionar_suprimentos')");
 const t1 = "aaaaaaaa-0000-4000-8000-000000000001", t2 = "aaaaaaaa-0000-4000-8000-000000000002";
@@ -99,6 +110,26 @@ await db.query("update adm.empresas set asaas_subscription_id = null where id = 
 await db.query("select public.adm_excluir_empresa($1, ' Teste Apagar ')", [e2]);
 check("exclui a empresa e os vínculos", (await um("select (select count(*) from adm.empresas where id = $1) + (select count(*) from adm.vinculos where empresa_id = $1) c", [e2])).c == 0);
 check("anon não exclui", !(await (async () => (await um("select has_function_privilege('anon', 'public.adm_excluir_empresa(uuid,text)', 'execute') p")).p)()));
+
+console.log("\nImobimoveis: criar, listar e liberar");
+const emp3 = (await um("select public.adm_salvar_empresa('{\"razao_social\":\"Imobiliária São João Ltda\",\"nome_fantasia\":\"São João Imóveis\"}'::jsonb) r")).r;
+let pl = (await um("select public.adm_plataforma_empresas('imobimoveis') r")).r;
+check("plataforma oferece criar, listar e liberar", pl.pode_criar && pl.pode_listar && pl.pode_liberar);
+check("lista mostra a empresa existente", pl.empresas.some((x) => x.nome === "Tenant Padrão"));
+const v3 = (await um("select public.adm_vincular_criando($1::jsonb) r", [JSON.stringify({ empresa_id: emp3, app: "imobimoveis", plano: "Pro", valor_mensal: "390" })])).r;
+const t3 = await um("select t.* from adm.vinculos v join imobimoveis.tenants t on t.id::text = v.ref where v.id = $1", [v3]);
+check("cria a empresa na plataforma com o nome do cadastro", t3?.nome === "São João Imóveis" && /^sao-joao-imoveis-[0-9a-f]{5}$/.test(t3.slug), JSON.stringify(t3));
+pl = (await um("select public.adm_plataforma_empresas('imobimoveis') r")).r;
+check("empresa criada aparece como já vinculada", pl.empresas.find((x) => x.ref === t3.id).vinculada_a === "São João Imóveis");
+const u4 = (await um("insert into auth.users (email, encrypted_password) values ('dono@saojoao.com', 'h4') returning id")).id;
+await db.query("select adm.provisionar_imobimoveis($1, $2, 'dono@saojoao.com', 'Dono')", [u4, t3.id]);
+check("comprador vira admin da empresa nova", (await um("select perfil from imobimoveis.tenant_users where user_id = $1 and tenant_id = $2", [u4, t3.id])).perfil === "admin");
+await db.query("select adm.provisionar_imobimoveis($1, $2, 'dono@saojoao.com', 'Dono')", [u4, t3.id]);
+check("liberar de novo não duplica", (await um("select count(*)::int c from imobimoveis.tenant_users where user_id = $1", [u4])).c === 1);
+const padrao = (await um("select id from imobimoveis.tenants where slug = 'default'")).id;
+check("não coloca o mesmo login em outra imobiliária", /outra imobiliária/.test(await falha("select adm.provisionar_imobimoveis($1, $2, 'x', 'x')", [u4, padrao])));
+check("lista do Suprimentos funciona", Array.isArray((await um("select public.adm_plataforma_empresas('suprimentos') r")).r.empresas));
+check("authenticated não cria empresa direto", !(await (async () => (await um("select has_function_privilege('authenticated', 'adm.criar_empresa_imobimoveis(text)', 'execute') p")).p)()));
 
 console.log("\nPermissões");
 const priv = async (r, f) => (await um("select has_function_privilege($1, $2, 'execute') p", [r, f])).p;

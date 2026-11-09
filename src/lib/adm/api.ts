@@ -145,6 +145,11 @@ export interface Relatorio {
 
 export interface Previa { pontos: number; temperatura: Temperatura; motivos: Motivo[]; sistemas: string[]; proxima_acao: string }
 
+export interface PlataformaEmpresas {
+  pode_criar: boolean; pode_listar: boolean; pode_liberar: boolean;
+  empresas: { ref: string; nome: string; vinculada_a: string | null }[];
+}
+
 export interface AcessoComprador {
   vinculo_id: string; empresa_id: string; empresa: string; app: string; sistema: string; ref: string;
   comprador_nome: string | null; comprador_email: string | null; pago: boolean; ativo: boolean; disponivel: boolean; url_login: string | null;
@@ -207,6 +212,8 @@ export const api = {
   empresa: (id: string) => rpc<FichaEmpresa | null>("adm_empresa", { p_id: id }),
   salvarEmpresa: (p: Partial<Empresa> & { razao_social?: string }) => rpc<string>("adm_salvar_empresa", { p }),
   salvarVinculo: (p: Record<string, unknown>) => rpc<string>("adm_salvar_vinculo", { p }),
+  plataformaEmpresas: (app: string) => rpc<PlataformaEmpresas>("adm_plataforma_empresas", { p_app: app }),
+  vincularCriando: (p: { empresa_id: string; app: string; plano: string; valor_mensal: string }) => rpc<string>("adm_vincular_criando", { p }),
   excluirEmpresa: (empresa: string, confirmacao: string) => rpc<void>("adm_excluir_empresa", { p_empresa: empresa, p_confirmacao: confirmacao }),
   listarFaturas: (situacao?: string | null) => rpc<FaturaLista[]>("adm_listar_faturas", { p_situacao: situacao ?? null }),
   criarFatura: (empresa: string, competencia: string, vencimento: string, valor: number) =>
