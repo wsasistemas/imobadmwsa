@@ -134,7 +134,7 @@ export function NovaEmpresa({ gatilho, empresa }: { gatilho: ReactNode; empresa?
 }
 
 // ------------------------------------------------------------------ Vincular sistema
-export function VincularSistema({ gatilho, empresaId }: { gatilho: ReactNode; empresaId: string }) {
+export function VincularSistema({ gatilho, empresaId, compradorEmail }: { gatilho: ReactNode; empresaId: string; compradorEmail?: string | null }) {
   const [aberto, setAberto] = useState(false);
   const recarregar = useRecarregar();
   const sistemas = useQuery({ queryKey: ["sistemas"], queryFn: api.listarSistemas, enabled: aberto });
@@ -142,14 +142,29 @@ export function VincularSistema({ gatilho, empresaId }: { gatilho: ReactNode; em
   const [ref, setRef] = useState("");
   const [plano, setPlano] = useState("");
   const [valor, setValor] = useState("");
+  const [liberar, setLiberar] = useState(true);
+  const [semPagamento, setSemPagamento] = useState(false);
   const sis = sistemas.data?.find((s) => s.app === app);
 
   const m = useMutation({
-    mutationFn: () => api.salvarVinculo({
-      empresa_id: empresaId, app, plano, valor_mensal: valor.replace(",", "."),
-      ...(sis?.tipo_ref === "schema" ? { schema_ref: ref.trim() } : { tenant_ref: ref.trim() }),
-    }),
-    onSuccess: () => { toast.success("Sistema vinculado."); recarregar(); setAberto(false); setApp(""); setRef(""); setValor(""); setPlano(""); },
+    mutationFn: async () => {
+      const vinculo = await api.salvarVinculo({
+        empresa_id: empresaId, app, plano, valor_mensal: valor.replace(",", "."),
+        ...(sis?.tipo_ref === "schema" ? { schema_ref: ref.trim() } : { tenant_ref: ref.trim() }),
+      });
+      if (!liberar || !compradorEmail) return null;
+      // O vínculo já ficou salvo; se a liberação falhar, ela pode ser refeita pelo botão da linha.
+      try {
+        return await api.liberarAcesso(vinculo, semPagamento);
+      } catch (e) {
+        toast.error(`Sistema vinculado, mas o acesso não foi liberado: ${mensagemErro(e)}`);
+        return null;
+      }
+    },
+    onSuccess: (r) => {
+      toast.success(r ? `Sistema vinculado e e-mail de acesso enviado para ${r.email}.` : "Sistema vinculado.");
+      recarregar(); setAberto(false); setApp(""); setRef(""); setValor(""); setPlano(""); setSemPagamento(false);
+    },
     onError: (e) => toast.error(mensagemErro(e)),
   });
 
@@ -170,7 +185,19 @@ export function VincularSistema({ gatilho, empresaId }: { gatilho: ReactNode; em
           <Campo rotulo="Plano"><Input value={plano} onChange={(e) => setPlano(e.target.value)} placeholder="Essencial, Profissional…" /></Campo>
           <Campo rotulo="Valor mensal (R$) *"><Input value={valor} onChange={(e) => setValor(e.target.value)} inputMode="decimal" required placeholder="290,00" /></Campo>
         </div>
-        <Rodape salvando={m.isPending} rotulo="Vincular" />
+        {compradorEmail ? (
+          <div className="space-y-2 rounded-lg border border-border p-3 text-sm">
+            <label className="flex items-start gap-2"><input type="checkbox" className="mt-0.5 size-4" checked={liberar} onChange={(e) => setLiberar(e.target.checked)} />
+              <span>Liberar o acesso e enviar o e-mail para <b>{compradorEmail}</b></span></label>
+            {liberar ? (
+              <label className="flex items-start gap-2 text-muted-foreground"><input type="checkbox" className="mt-0.5 size-4" checked={semPagamento} onChange={(e) => setSemPagamento(e.target.checked)} />
+                <span>Liberar mesmo sem pagamento confirmado (fica no histórico)</span></label>
+            ) : null}
+          </div>
+        ) : (
+          <p className="rounded-lg bg-warning-soft p-3 text-xs text-warning-strong">Para liberar o acesso junto, preencha o e-mail do comprador em Editar.</p>
+        )}
+        <Rodape salvando={m.isPending} rotulo={liberar && compradorEmail ? "Vincular e liberar acesso" : "Vincular"} />
       </form>
     </Janela>
   );
@@ -328,6 +355,37 @@ export function CobrancaAvulsa({ gatilho, empresaId, valorPadrao }: { gatilho: R
         <Campo rotulo="Vencimento *"><Input type="date" value={venc} onChange={(e) => setVenc(e.target.value)} required /></Campo>
         <Campo rotulo="Valor (R$) *"><Input value={valor} onChange={(e) => setValor(e.target.value)} inputMode="decimal" required /></Campo>
         <div className="sm:col-span-2"><Rodape salvando={m.isPending} rotulo="Criar fatura" /></div>
+      </form>
+    </Janela>
+  );
+}
+
+// ------------------------------------------------------------------ Excluir empresa (só super admin; o banco confere)
+export function ExcluirEmpresa({ gatilho, empresa }: { gatilho: ReactNode; empresa: Empresa }) {
+  const [aberto, setAberto] = useState(false);
+  const [confirmacao, setConfirmacao] = useState("");
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+  const nome = empresa.nome_fantasia || empresa.razao_social;
+  const m = useMutation({
+    mutationFn: () => api.excluirEmpresa(empresa.id, confirmacao),
+    onSuccess: () => { toast.success("Empresa excluída."); setAberto(false); qc.invalidateQueries(); navigate({ to: "/empresas" }); },
+    onError: (e) => toast.error(mensagemErro(e)),
+  });
+  return (
+    <Janela gatilho={gatilho} titulo="Excluir empresa" aberto={aberto} setAberto={(v) => { setAberto(v); if (!v) setConfirmacao(""); }}
+      descricao="Apaga a empresa, os vínculos, as mensalidades e o histórico do painel. Não dá para desfazer.">
+      <form onSubmit={(e) => { e.preventDefault(); m.mutate(); }} className="space-y-3">
+        <p className="rounded-lg bg-destructive/10 p-3 text-xs text-destructive">
+          Os dados dentro de cada plataforma e os logins das pessoas não são apagados. Empresa com assinatura no Asaas precisa ter a assinatura cancelada antes.
+        </p>
+        <Campo rotulo={`Digite ${nome} para confirmar`}><Input value={confirmacao} onChange={(e) => setConfirmacao(e.target.value)} autoComplete="off" /></Campo>
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={() => setAberto(false)}>Cancelar</Button>
+          <Button type="submit" variant="destructive" disabled={m.isPending || confirmacao.trim().toLowerCase() !== nome.trim().toLowerCase()}>
+            {m.isPending ? <Loader2 className="size-4 animate-spin" /> : "Excluir definitivamente"}
+          </Button>
+        </DialogFooter>
       </form>
     </Janela>
   );

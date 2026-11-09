@@ -89,6 +89,17 @@ check("quem não veio da liberação não é afetado", (await um("select public.
 await db.query("insert into suprimentos.usuarios (id, imobiliaria_id, email) values ($1, $2, 'c@h.com')", [u3, t2]);
 check("não rouba usuário de outra empresa", /outra empresa/.test(await falha("select adm.provisionar_suprimentos($1, $2, 'c@h.com', 'C')", [u3, t1])));
 
+console.log("\nExcluir empresa");
+const e2 = (await um("select public.adm_salvar_empresa('{\"razao_social\":\"Teste Apagar\"}'::jsonb) r")).r;
+await db.query("insert into adm.vinculos (empresa_id, app, tenant_ref, valor_mensal) values ($1, 'suprimentos', $2, 10)", [e2, t2]);
+check("nome errado não exclui", /Digite o nome/.test(await falha("select public.adm_excluir_empresa($1, 'outro')", [e2])));
+await db.query("update adm.empresas set asaas_subscription_id = 'sub_x' where id = $1", [e2]);
+check("com assinatura no Asaas não exclui", /Asaas/.test(await falha("select public.adm_excluir_empresa($1, 'teste apagar')", [e2])));
+await db.query("update adm.empresas set asaas_subscription_id = null where id = $1", [e2]);
+await db.query("select public.adm_excluir_empresa($1, ' Teste Apagar ')", [e2]);
+check("exclui a empresa e os vínculos", (await um("select (select count(*) from adm.empresas where id = $1) + (select count(*) from adm.vinculos where empresa_id = $1) c", [e2])).c == 0);
+check("anon não exclui", !(await (async () => (await um("select has_function_privilege('anon', 'public.adm_excluir_empresa(uuid,text)', 'execute') p")).p)()));
+
 console.log("\nPermissões");
 const priv = async (r, f) => (await um("select has_function_privilege($1, $2, 'execute') p", [r, f])).p;
 check("authenticated não prepara", !(await priv("authenticated", "public.adm_srv_acesso_preparar(uuid,boolean)")));
@@ -98,6 +109,7 @@ check("anon não consulta", !(await priv("anon", "public.primeiro_acesso_situaca
 check("login consulta a própria situação", await priv("authenticated", "public.primeiro_acesso_situacao()"));
 await db.exec("select set_config('test.super', '0', false)");
 check("lista exige super admin", !!(await falha("select public.adm_acessos_comprador()")));
+check("excluir exige super admin", /super|admin|permiss/i.test(await falha("select public.adm_excluir_empresa($1, 'Horizonte')", [emp]) ?? ""));
 
 console.log(`\n${ok} ok, ${falhas} falhas`);
 process.exit(falhas ? 1 : 0);

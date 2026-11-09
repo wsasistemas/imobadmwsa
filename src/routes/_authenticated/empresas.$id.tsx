@@ -1,11 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Check, ExternalLink, Loader2, MoreHorizontal, Pencil, RefreshCw } from "lucide-react";
+import { Check, ExternalLink, Loader2, MoreHorizontal, Pencil, RefreshCw, Trash2 } from "lucide-react";
 import { BotaoAcesso, SituacaoAcesso } from "@/components/adm/acesso";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 
-import { CobrancaAvulsa, ConcederPrazo, NovaEmpresa, RegistrarPagamento, SuspenderManual, VincularSistema } from "@/components/adm/dialogos";
+import { CobrancaAvulsa, ConcederPrazo, NovaEmpresa, RegistrarPagamento, SuspenderManual, VincularSistema, ExcluirEmpresa } from "@/components/adm/dialogos";
 import { Carregando, Cartao, Erro, Pagina, Selo, SeloSituacao, Tabela, Vazio } from "@/components/adm/ui";
 import { IconeColorido } from "@/components/icones/icone-colorido";
 import { Button } from "@/components/ui/button";
@@ -130,6 +130,7 @@ function Conteudo({ f }: { f: FichaEmpresa }) {
       acoes={
         <>
           <NovaEmpresa empresa={e} gatilho={<Button variant="outline" size="sm" className="gap-1.5"><Pencil className="size-3.5" />Editar</Button>} />
+          <ExcluirEmpresa empresa={e} gatilho={<Button variant="outline" size="sm" className="gap-1.5 border-destructive/40 text-destructive hover:bg-destructive/5"><Trash2 className="size-3.5" />Excluir</Button>} />
           <ConcederPrazo empresaId={e.id} atual={e.prazo_extra_ate} gatilho={<Button variant="outline" size="sm">Conceder prazo</Button>} />
           <SuspenderManual empresaId={e.id} suspensa={e.suspensa_manual}
             gatilho={<Button variant="outline" size="sm" className={e.suspensa_manual ? "" : "border-destructive/40 text-destructive hover:bg-destructive/5"}>{e.suspensa_manual ? "Retirar suspensão" : "Suspender agora"}</Button>} />
@@ -144,7 +145,7 @@ function Conteudo({ f }: { f: FichaEmpresa }) {
 
       <div className="grid gap-4 2xl:grid-cols-[1.5fr_1fr]">
         <Cartao icone="fluent-color:link-24" titulo="Sistemas vinculados" semPadding
-          extra={<VincularSistema empresaId={e.id} gatilho={<Button size="sm" variant="outline">+ Vincular sistema</Button>} />}>
+          extra={<VincularSistema empresaId={e.id} compradorEmail={e.comprador_email} gatilho={<Button size="sm" variant="outline">+ Vincular sistema</Button>} />}>
           {f.vinculos.length === 0 ? (
             <Vazio icone="fluent-color:link-24" titulo="Nenhum sistema vinculado" texto="Vincule o schema ou o tenant da empresa em cada sistema que ela usa. O valor da mensalidade é a soma dos vínculos." />
           ) : (

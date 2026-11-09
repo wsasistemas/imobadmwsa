@@ -207,6 +207,7 @@ export const api = {
   empresa: (id: string) => rpc<FichaEmpresa | null>("adm_empresa", { p_id: id }),
   salvarEmpresa: (p: Partial<Empresa> & { razao_social?: string }) => rpc<string>("adm_salvar_empresa", { p }),
   salvarVinculo: (p: Record<string, unknown>) => rpc<string>("adm_salvar_vinculo", { p }),
+  excluirEmpresa: (empresa: string, confirmacao: string) => rpc<void>("adm_excluir_empresa", { p_empresa: empresa, p_confirmacao: confirmacao }),
   listarFaturas: (situacao?: string | null) => rpc<FaturaLista[]>("adm_listar_faturas", { p_situacao: situacao ?? null }),
   criarFatura: (empresa: string, competencia: string, vencimento: string, valor: number) =>
     rpc<string>("adm_criar_fatura", { p_empresa: empresa, p_competencia: competencia, p_vencimento: vencimento, p_valor: valor }),
