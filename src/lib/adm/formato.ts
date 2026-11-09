@@ -84,6 +84,12 @@ export const ORIGEM: Record<string, { rotulo: string; icone: NomeIcone }> = {
   whatsapp: { rotulo: "WhatsApp", icone: "fluent-color:chat-24" },
   manual: { rotulo: "Manual", icone: "fluent-color:person-add-24" },
   importado: { rotulo: "Importado", icone: "flat-color-icons:database" },
+  indicacao: { rotulo: "Indicação", icone: "fluent-color:person-add-24" },
+  prospeccao: { rotulo: "Prospecção ativa", icone: "fluent-color:chat-24" },
+  evento: { rotulo: "Evento", icone: "fluent-color:calendar-24" },
+  parceiro: { rotulo: "Parceiro / revenda", icone: "fluent-color:link-24" },
+  cliente_antigo: { rotulo: "Já era cliente", icone: "fluent-color:trophy-24" },
+  outro: { rotulo: "Outro", icone: "fluent-color:apps-24" },
 };
 
 /** Cor da etapa (coluna `cor` de comercial.etapas) → classe Tailwind da barra e tom do selo. */
@@ -141,6 +147,7 @@ export function textoEvento(tipo: string, d: Record<string, unknown>): string {
     case "suspensao_manual_removida": return "Suspensão manual retirada";
     case "asaas": return `Asaas: ${eventoAsaas(String(d.evento ?? ""))}`;
     case "aviso": return `Aviso ${String(d.passo ?? "").toUpperCase()} por ${d.canal === "email" ? "e-mail" : "WhatsApp"}${d.ok ? "" : ` (falhou: ${d.erro ?? "erro"})`}`;
+    case "origem_venda": return `Origem da venda registrada${d.origem ? ` (${ORIGEM[String(d.origem)]?.rotulo ?? d.origem})` : " (lead do funil)"}`;
     case "acesso_liberado": return `Acesso liberado para ${d.email}${d.sem_pagamento ? " (sem pagamento confirmado)" : ""}`;
     case "asaas_assinatura": return "Assinatura do Asaas criada/atualizada";
     default: return tipo.replace(/_/g, " ");

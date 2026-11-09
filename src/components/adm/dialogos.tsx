@@ -9,8 +9,14 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { api, mensagemErro, type Empresa, type Situacao } from "@/lib/adm/api";
-import { brl, SITUACAO } from "@/lib/adm/formato";
+import { api, mensagemErro, type CardNegocio, type Empresa, type Situacao } from "@/lib/adm/api";
+import { brl, ORIGEM, SITUACAO } from "@/lib/adm/formato";
+
+const ORIGENS_VENDA: [string, string][] = [
+  ["indicacao", "Indicação"], ["prospeccao", "Prospecção ativa"], ["evento", "Evento"], ["parceiro", "Parceiro / revenda"],
+  ["cliente_antigo", "Já era cliente"], ["site", "Site"], ["instagram", "Instagram"], ["facebook", "Facebook"],
+  ["whatsapp", "WhatsApp"], ["linkedin", "LinkedIn"], ["tiktok", "TikTok"], ["outro", "Outro"],
+];
 
 const SELECT = "h-10 w-full rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring";
 
@@ -73,6 +79,22 @@ export function NovaEmpresa({ gatilho, empresa }: { gatilho: ReactNode; empresa?
     comprador_whatsapp: empresa?.comprador_whatsapp ?? "", comprador_cargo: empresa?.comprador_cargo ?? "",
   }));
   const setC = (k: keyof typeof comprador) => (e: { target: { value: string } }) => setComprador((x) => ({ ...x, [k]: e.target.value }));
+  // Origem da venda: obrigatória na empresa nova; na empresa antiga sem origem, dá para registrar ao editar.
+  const pedeOrigem = !empresa || !empresa.negocio_id;
+  const [origemTipo, setOrigemTipo] = useState<"" | "lead" | "outra">("");
+  const [lead, setLead] = useState<CardNegocio | null>(null);
+  const [buscaLead, setBuscaLead] = useState("");
+  const [origem, setOrigem] = useState("");
+  const [detalhe, setDetalhe] = useState("");
+  const leads = useQuery({ queryKey: ["origem-leads", buscaLead], queryFn: () => api.leads(null, null, buscaLead.trim()), enabled: aberto && origemTipo === "lead" && buscaLead.trim().length >= 2 });
+  const escolherLead = (l: CardNegocio) => {
+    setLead(l);
+    // Aproveita os dados do lead no que ainda está vazio.
+    setF((x) => ({ ...x, razao_social: x.razao_social || l.empresa || l.nome, nome_fantasia: x.nome_fantasia || l.empresa || "" }));
+    setComprador((x) => ({ ...x, comprador_nome: x.comprador_nome || l.nome, comprador_email: x.comprador_email || l.email || "",
+      comprador_whatsapp: x.comprador_whatsapp || l.whatsapp || "", comprador_cargo: x.comprador_cargo || l.cargo || "" }));
+  };
+  const origemPronta = !pedeOrigem || (origemTipo === "lead" ? !!lead : origemTipo === "outra" ? !!origem : !!empresa);
   const set = (k: keyof typeof f) => (e: { target: { value: string } }) => setF((x) => ({ ...x, [k]: e.target.value }));
 
   const m = useMutation({
@@ -84,6 +106,9 @@ export function NovaEmpresa({ gatilho, empresa }: { gatilho: ReactNode; empresa?
         dia_vencimento: f.dia_vencimento ? Number(f.dia_vencimento) : null,
       } as never);
       await api.salvarComprador(id, comprador);
+      if (pedeOrigem && origemTipo) {
+        await api.empresaOrigem(id, origemTipo === "lead" ? { negocio_id: lead!.negocio_id } : { origem, detalhe });
+      }
       return id;
     },
     onSuccess: (id) => {
@@ -95,12 +120,62 @@ export function NovaEmpresa({ gatilho, empresa }: { gatilho: ReactNode; empresa?
     onError: (e) => toast.error(mensagemErro(e)),
   });
 
-  const enviar = (e: FormEvent) => { e.preventDefault(); m.mutate(); };
+  const enviar = (e: FormEvent) => {
+    e.preventDefault();
+    if (!origemPronta) { toast.error("Informe de onde veio a venda."); return; }
+    if (pedeOrigem && origemTipo === "outra" && !(comprador.comprador_email || comprador.comprador_whatsapp || f.email_financeiro || f.whatsapp)) {
+      toast.error("Preencha o e-mail ou o WhatsApp do comprador para registrar a origem da venda.");
+      return;
+    }
+    m.mutate();
+  };
 
   return (
     <Janela gatilho={gatilho} titulo={empresa ? "Editar empresa" : "Nova empresa"} aberto={aberto} setAberto={setAberto}
       descricao="A empresa é o cliente que paga. Depois de salvar, vincule os sistemas que ela usa.">
       <form onSubmit={enviar} className="grid gap-3 sm:grid-cols-2">
+        {pedeOrigem ? (
+          <fieldset className="grid gap-3 rounded-lg border border-primary/30 bg-primary-soft/40 p-3 sm:col-span-2">
+            <legend className="px-1 text-sm font-bold">Origem da venda {empresa ? "" : "*"}</legend>
+            <p className="-mt-1 text-xs text-muted-foreground">Conta nos Relatórios Comerciais: de onde veio este cliente.</p>
+            <div className="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="Origem da venda">
+              {([["lead", "Veio de um lead em Leads & Contatos"], ["outra", "Outra origem"]] as const).map(([v, r]) => (
+                <label key={v} className={`flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border bg-card px-3 text-sm font-semibold ${origemTipo === v ? "border-primary" : "border-border"}`}>
+                  <input type="radio" name="origem-tipo" checked={origemTipo === v} onChange={() => setOrigemTipo(v)} />{r}
+                </label>
+              ))}
+            </div>
+            {origemTipo === "lead" ? (
+              lead ? (
+                <div className="flex items-center justify-between gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm">
+                  <span><b>{lead.nome}</b>{lead.empresa ? ` · ${lead.empresa}` : ""} <span className="text-xs text-muted-foreground">({ORIGEM[lead.origem]?.rotulo ?? lead.origem})</span></span>
+                  <button type="button" className="text-xs font-semibold text-primary" onClick={() => setLead(null)}>Trocar</button>
+                </div>
+              ) : (
+                <div>
+                  <Input value={buscaLead} onChange={(e) => setBuscaLead(e.target.value)} placeholder="Buscar o lead pelo nome, empresa ou e-mail…" aria-label="Buscar lead" />
+                  <ul className="mt-1 max-h-44 overflow-y-auto">
+                    {(leads.data ?? []).filter((l) => !l.empresa_id).slice(0, 8).map((l) => (
+                      <li key={l.negocio_id}><button type="button" className="min-h-10 w-full rounded-md px-2 text-left text-sm hover:bg-muted" onClick={() => escolherLead(l)}>
+                        <b>{l.nome}</b>{l.empresa ? ` · ${l.empresa}` : ""} <span className="text-xs text-muted-foreground">({ORIGEM[l.origem]?.rotulo ?? l.origem})</span></button></li>
+                    ))}
+                    {buscaLead.trim().length >= 2 && leads.data && leads.data.filter((l) => !l.empresa_id).length === 0 ? <li className="px-2 py-2 text-xs text-muted-foreground">Nenhum lead encontrado. Use "Outra origem".</li> : null}
+                  </ul>
+                </div>
+              )
+            ) : origemTipo === "outra" ? (
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Campo rotulo="De onde veio *">
+                  <select className={SELECT} value={origem} onChange={(e) => setOrigem(e.target.value)}>
+                    <option value="">Escolha…</option>
+                    {ORIGENS_VENDA.map(([v, r]) => <option key={v} value={v}>{r}</option>)}
+                  </select>
+                </Campo>
+                <Campo rotulo="Detalhe"><Input value={detalhe} onChange={(e) => setDetalhe(e.target.value)} placeholder="Quem indicou, qual evento…" /></Campo>
+              </div>
+            ) : null}
+          </fieldset>
+        ) : null}
         <div className="sm:col-span-2"><Campo rotulo="Razão social *"><Input value={f.razao_social} onChange={set("razao_social")} required /></Campo></div>
         <Campo rotulo="Nome fantasia"><Input value={f.nome_fantasia} onChange={set("nome_fantasia")} /></Campo>
         <Campo rotulo="CPF ou CNPJ" dica="Obrigatório para gerar a cobrança no Asaas."><Input value={f.cnpj} onChange={set("cnpj")} inputMode="numeric" /></Campo>

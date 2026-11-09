@@ -23,6 +23,7 @@ export interface Empresa {
   situacao: Situacao; suspensa_manual: boolean; prazo_extra_ate: string | null; dia_vencimento: number | null;
   asaas_customer_id: string | null; asaas_subscription_id: string | null; observacoes: string | null; criado_em: string;
   comprador_nome: string | null; comprador_email: string | null; comprador_whatsapp: string | null; comprador_cargo: string | null;
+  negocio_id: string | null;
 }
 
 export interface Vinculo {
@@ -214,6 +215,7 @@ export const api = {
   salvarVinculo: (p: Record<string, unknown>) => rpc<string>("adm_salvar_vinculo", { p }),
   plataformaEmpresas: (app: string) => rpc<PlataformaEmpresas>("adm_plataforma_empresas", { p_app: app }),
   vincularCriando: (p: { empresa_id: string; app: string; plano: string; valor_mensal: string }) => rpc<string>("adm_vincular_criando", { p }),
+  empresaOrigem: (empresa: string, p: { negocio_id?: string; origem?: string; detalhe?: string }) => rpc<string>("adm_empresa_origem", { p_empresa: empresa, p }),
   excluirEmpresa: (empresa: string, confirmacao: string) => rpc<void>("adm_excluir_empresa", { p_empresa: empresa, p_confirmacao: confirmacao }),
   listarFaturas: (situacao?: string | null) => rpc<FaturaLista[]>("adm_listar_faturas", { p_situacao: situacao ?? null }),
   criarFatura: (empresa: string, competencia: string, vencimento: string, valor: number) =>

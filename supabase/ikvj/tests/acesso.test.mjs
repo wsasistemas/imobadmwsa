@@ -131,6 +131,33 @@ check("não coloca o mesmo login em outra imobiliária", /outra imobiliária/.te
 check("lista do Suprimentos funciona", Array.isArray((await um("select public.adm_plataforma_empresas('suprimentos') r")).r.empresas));
 check("authenticated não cria empresa direto", !(await (async () => (await um("select has_function_privilege('authenticated', 'adm.criar_empresa_imobimoveis(text)', 'execute') p")).p)()));
 
+console.log("\nOrigem da venda");
+const rel = async () => (await um("select public.com_relatorio(null, null) r")).r;
+const e5 = (await um("select public.adm_salvar_empresa('{\"razao_social\":\"Indicada Ltda\"}'::jsonb) r")).r;
+await db.query("insert into adm.vinculos (empresa_id, app, tenant_ref, valor_mensal) values ($1, 'suprimentos', 'ind-1', 250)", [e5]);
+check("sem contato do comprador é recusado", /e-mail ou o WhatsApp/.test(await falha("select public.adm_empresa_origem($1, '{\"origem\":\"indicacao\"}'::jsonb)", [e5])));
+await db.query(`select public.adm_salvar_comprador($1, '{"comprador_nome":"Ana","comprador_email":"ana@indicada.com"}'::jsonb)`, [e5]);
+check("sem origem é recusado", /de onde veio/.test(await falha("select public.adm_empresa_origem($1, '{}'::jsonb)", [e5])));
+const n5 = (await um("select public.adm_empresa_origem($1, '{\"origem\":\"indicacao\",\"detalhe\":\"Carlos\"}'::jsonb) r", [e5])).r;
+const linha5 = await um("select e.chave, n.empresa_id, n.valor_mensal_previsto v, n.origem_venda from comercial.negocios n join comercial.etapas e on e.id = n.etapa_id where n.id = $1", [n5]);
+check("outra origem cria negócio em Ganho ligado à empresa", linha5.chave === "ganho" && linha5.empresa_id === e5 && linha5.origem_venda === "indicacao", JSON.stringify(linha5));
+check("Ganho não criou empresa duplicada", (await um("select count(*)::int c from adm.empresas where razao_social = 'Indicada Ltda'")).c === 1);
+check("receita do negócio = vínculos", Number(linha5.v) === 250);
+await db.query("update adm.vinculos set valor_mensal = 300 where empresa_id = $1", [e5]);
+check("vínculo alterado atualiza a receita", Number((await um("select valor_mensal_previsto v from comercial.negocios where id = $1", [n5])).v) === 300);
+let r = await rel();
+check("relatório conta o ganho na origem Indicação", r.por_fonte.some((x) => x.origem === "indicacao" && Number(x.ganhos) === 1 && Number(x.receita) === 300), JSON.stringify(r.por_fonte));
+check("não registra a origem duas vezes", /já tem a origem/.test(await falha("select public.adm_empresa_origem($1, '{\"origem\":\"evento\"}'::jsonb)", [e5])));
+const lead6 = (await um("select comercial.receber_lead('instagram', '{\"nome\":\"Lia\",\"telefone\":\"11977776666\",\"empresa\":\"Lia Imóveis\"}'::jsonb) r")).r;
+const e6 = (await um("select public.adm_salvar_empresa('{\"razao_social\":\"Lia Imóveis Ltda\"}'::jsonb) r")).r;
+await db.query("select public.adm_empresa_origem($1, $2::jsonb)", [e6, JSON.stringify({ negocio_id: lead6.negocio_id })]);
+check("lead do funil vai para Ganho e liga à empresa", (await um("select e.chave, n.empresa_id from comercial.negocios n join comercial.etapas e on e.id = n.etapa_id where n.id = $1", [lead6.negocio_id])).empresa_id === e6);
+check("lead do funil não cria empresa a mais", (await um("select count(*)::int c from adm.empresas where negocio_id = $1", [lead6.negocio_id])).c === 1);
+r = await rel();
+check("relatório conta o ganho na origem Instagram", r.por_fonte.some((x) => x.origem === "instagram" && Number(x.ganhos) >= 1));
+const e7 = (await um("select public.adm_salvar_empresa('{\"razao_social\":\"Outra Ltda\"}'::jsonb) r")).r;
+check("lead que já virou empresa não liga em outra", /já virou outra empresa/.test(await falha("select public.adm_empresa_origem($1, $2::jsonb)", [e7, JSON.stringify({ negocio_id: lead6.negocio_id })])));
+
 console.log("\nPermissões");
 const priv = async (r, f) => (await um("select has_function_privilege($1, $2, 'execute') p", [r, f])).p;
 check("authenticated não prepara", !(await priv("authenticated", "public.adm_srv_acesso_preparar(uuid,boolean)")));
