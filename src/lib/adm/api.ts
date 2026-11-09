@@ -129,6 +129,19 @@ export interface RegrasQualificacao {
   emails_pessoais: string[]; sistemas: Record<string, string[]>;
 }
 
+export interface LinhaFonte { origem: string; leads: number; qualificados: number; reunioes: number; ganhos: number; perdidos: number; receita: number }
+export interface Relatorio {
+  periodo: { inicio: string; fim: string };
+  totais: { leads: number; qualificados: number; reunioes: number; ganhos: number; perdidos: number; receita: number };
+  por_fonte: LinhaFonte[];
+  por_temperatura: { temperatura: string; leads: number; ganhos: number }[];
+  por_etapa: { chave: string; nome: string; ordem: number; total: number }[];
+  por_sistema: { sistema: string; leads: number; ganhos: number }[];
+  motivos_perda: { motivo: string; total: number }[];
+  por_semana: { semana: string; leads: number; ganhos: number }[];
+  linhas: Record<string, string | number | null>[];
+}
+
 export interface Previa { pontos: number; temperatura: Temperatura; motivos: Motivo[]; sistemas: string[]; proxima_acao: string }
 
 async function rpc<T>(fn: string, args: Record<string, unknown> = {}): Promise<T> {
@@ -213,6 +226,13 @@ export const api = {
   regrasQualificacao: () => rpc<RegrasQualificacao>("com_config_qualificacao"),
   salvarRegrasQualificacao: (regras: RegrasQualificacao) => rpc<number>("com_config_qualificacao_salvar", { p_regras: regras }),
   previaClassificacao: (dados: Record<string, string>) => rpc<Previa>("com_classificar_previa", { p_dados: dados }),
+  ganhar: (negocio: string, p: {
+    razao_social?: string; nome_fantasia?: string; cnpj?: string; dia_vencimento?: string; email_financeiro?: string; whatsapp?: string;
+    sistemas: { app: string; ref: string; plano: string; valor_mensal: string }[];
+  }) => rpc<{ empresa_id: string; vinculos: number; pendentes: string[]; tem_cnpj: boolean; mensalidade: number }>("com_ganhar", { p_negocio: negocio, p }),
+  relatorio: (inicio: string | null, fim: string | null) => rpc<Relatorio>("com_relatorio", { p_inicio: inicio, p_fim: fim }),
+  importarLeads: (linhas: Record<string, string>[]) =>
+    rpc<{ novos: number; repetidos: number; erros: { linha: number; erro: string }[] }>("com_importar", { p_linhas: linhas }),
 
   schemasDisponiveis: () =>
     rpc<{ schema_name: string; tabelas: number; na_central: boolean; nome_central: string | null }[]>("adm_schemas_disponiveis"),

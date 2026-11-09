@@ -23,6 +23,7 @@ import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedMensalidadesRouteImport } from './routes/_authenticated/mensalidades'
 import { Route as AuthenticatedPermissoesRouteImport } from './routes/_authenticated/permissoes'
 import { Route as AuthenticatedReguaRouteImport } from './routes/_authenticated/regua'
+import { Route as AuthenticatedRelatoriosComerciaisRouteImport } from './routes/_authenticated/relatorios-comerciais'
 import { Route as AuthenticatedSistemasRouteImport } from './routes/_authenticated/sistemas'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
@@ -105,6 +106,12 @@ const AuthenticatedReguaRoute = AuthenticatedReguaRouteImport.update({
   path: '/regua',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedRelatoriosComerciaisRoute =
+  AuthenticatedRelatoriosComerciaisRouteImport.update({
+    id: '/relatorios-comerciais',
+    path: '/relatorios-comerciais',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSistemasRoute = AuthenticatedSistemasRouteImport.update({
   id: '/sistemas',
   path: '/sistemas',
@@ -164,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/mensalidades': typeof AuthenticatedMensalidadesRoute
   '/permissoes': typeof AuthenticatedPermissoesRoute
   '/regua': typeof AuthenticatedReguaRoute
+  '/relatorios-comerciais': typeof AuthenticatedRelatoriosComerciaisRoute
   '/sistemas': typeof AuthenticatedSistemasRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -187,6 +195,7 @@ export interface FileRoutesByTo {
   '/mensalidades': typeof AuthenticatedMensalidadesRoute
   '/permissoes': typeof AuthenticatedPermissoesRoute
   '/regua': typeof AuthenticatedReguaRoute
+  '/relatorios-comerciais': typeof AuthenticatedRelatoriosComerciaisRoute
   '/sistemas': typeof AuthenticatedSistemasRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -212,6 +221,7 @@ export interface FileRoutesById {
   '/_authenticated/mensalidades': typeof AuthenticatedMensalidadesRoute
   '/_authenticated/permissoes': typeof AuthenticatedPermissoesRoute
   '/_authenticated/regua': typeof AuthenticatedReguaRoute
+  '/_authenticated/relatorios-comerciais': typeof AuthenticatedRelatoriosComerciaisRoute
   '/_authenticated/sistemas': typeof AuthenticatedSistemasRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/mensalidades'
     | '/permissoes'
     | '/regua'
+    | '/relatorios-comerciais'
     | '/sistemas'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -260,6 +271,7 @@ export interface FileRouteTypes {
     | '/mensalidades'
     | '/permissoes'
     | '/regua'
+    | '/relatorios-comerciais'
     | '/sistemas'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -284,6 +296,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mensalidades'
     | '/_authenticated/permissoes'
     | '/_authenticated/regua'
+    | '/_authenticated/relatorios-comerciais'
     | '/_authenticated/sistemas'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -407,6 +420,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReguaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/relatorios-comerciais': {
+      id: '/_authenticated/relatorios-comerciais'
+      path: '/relatorios-comerciais'
+      fullPath: '/relatorios-comerciais'
+      preLoaderRoute: typeof AuthenticatedRelatoriosComerciaisRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/sistemas': {
       id: '/_authenticated/sistemas'
       path: '/sistemas'
@@ -474,6 +494,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMensalidadesRoute: typeof AuthenticatedMensalidadesRoute
   AuthenticatedPermissoesRoute: typeof AuthenticatedPermissoesRoute
   AuthenticatedReguaRoute: typeof AuthenticatedReguaRoute
+  AuthenticatedRelatoriosComerciaisRoute: typeof AuthenticatedRelatoriosComerciaisRoute
   AuthenticatedSistemasRoute: typeof AuthenticatedSistemasRoute
   AuthenticatedEmpresasIdRoute: typeof AuthenticatedEmpresasIdRoute
   AuthenticatedFontesLandingRoute: typeof AuthenticatedFontesLandingRoute
@@ -489,6 +510,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMensalidadesRoute: AuthenticatedMensalidadesRoute,
   AuthenticatedPermissoesRoute: AuthenticatedPermissoesRoute,
   AuthenticatedReguaRoute: AuthenticatedReguaRoute,
+  AuthenticatedRelatoriosComerciaisRoute:
+    AuthenticatedRelatoriosComerciaisRoute,
   AuthenticatedSistemasRoute: AuthenticatedSistemasRoute,
   AuthenticatedEmpresasIdRoute: AuthenticatedEmpresasIdRoute,
   AuthenticatedFontesLandingRoute: AuthenticatedFontesLandingRoute,

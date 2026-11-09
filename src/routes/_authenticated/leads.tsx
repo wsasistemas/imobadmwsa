@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Plus, Search } from "lucide-react";
 import { useDeferredValue, useState } from "react";
 
-import { FichaLead, NovoContato, Origem, SeloTemperatura } from "@/components/adm/comercial";
+import { FichaLead, ImportarCsv, NovoContato, Origem, SeloTemperatura } from "@/components/adm/comercial";
 import { Carregando, Cartao, Chip, Erro, Filtros, Kpi, Pagina, Selo, Tabela, Vazio } from "@/components/adm/ui";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,7 +47,10 @@ function Leads() {
       voltar="Gestão Comercial › Leads & Contatos"
       titulo="Leads & Contatos"
       texto="Interessados nos sistemas WSA. Entram sozinhos pelo site, pelo Instagram e pelo Facebook e já chegam classificados (quente, morno ou frio)."
-      acoes={<NovoContato gatilho={<Button className="gap-1.5"><Plus className="size-4" />Novo contato</Button>} />}
+      acoes={<>
+        <ImportarCsv gatilho={<Button variant="outline">Importar CSV</Button>} />
+        <NovoContato gatilho={<Button className="gap-1.5"><Plus className="size-4" />Novo contato</Button>} />
+      </>}
     >
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <Kpi icone="fluent-color:person-add-24" tom="info" rotulo="Leads novos (30 dias)" valor={r?.novos_30d ?? "—"}

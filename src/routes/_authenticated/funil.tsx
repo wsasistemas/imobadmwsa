@@ -4,7 +4,7 @@ import { Plus, SlidersHorizontal } from "lucide-react";
 import { useState, type DragEvent } from "react";
 import { toast } from "sonner";
 
-import { FichaLead, NovoContato, PerderNegocio, RegrasClassificacao, SeloTemperatura, useRecarregarComercial } from "@/components/adm/comercial";
+import { FichaLead, GanharNegocio, NovoContato, PerderNegocio, RegrasClassificacao, SeloTemperatura, useRecarregarComercial } from "@/components/adm/comercial";
 import { Carregando, Erro, Filtros, Pagina } from "@/components/adm/ui";
 import { IconeColorido } from "@/components/icones/icone-colorido";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,7 @@ function Funil() {
   const [arrastando, setArrastando] = useState<string | null>(null);
   const [sobre, setSobre] = useState<string | null>(null);
   const [perder, setPerder] = useState<string | null>(null);
+  const [ganhar, setGanhar] = useState<CardNegocio | null>(null);
   const [regras, setRegras] = useState(false);
   const recarregar = useRecarregarComercial();
 
@@ -49,6 +50,7 @@ function Funil() {
     const atual = q.data?.find((c) => c.negocios.some((n) => n.negocio_id === id))?.chave;
     if (atual === etapa) return;
     if (etapa === "perdido") setPerder(id);
+    else if (etapa === "ganho") setGanhar(q.data?.flatMap((c) => c.negocios).find((n) => n.negocio_id === id) ?? null);
     else mover.mutate({ id, etapa });
   };
 
@@ -109,10 +111,11 @@ function Funil() {
 
       <div className="flex items-start gap-3 rounded-xl border border-success/30 bg-success-soft p-3 text-sm">
         <IconeColorido nome="fluent-color:trophy-24" tamanho={22} />
-        <p><b>Ganho vira cliente:</b> ao mover para "Ganho", o sistema cria a <b>Empresa</b> com os dados do contato. Abra a empresa para completar o CNPJ, vincular os sistemas e criar a assinatura no Asaas.</p>
+        <p><b>Ganho vira cliente:</b> ao mover para "Ganho", o sistema pede CNPJ, sistemas, plano e vencimento, cria a <b>Empresa</b>, os <b>vínculos</b> e a <b>assinatura no Asaas</b>. A cobrança assume a partir daí.</p>
       </div>
 
       <PerderNegocio negocioId={perder} aberto={!!perder} setAberto={(v) => { if (!v) setPerder(null); }} />
+      <GanharNegocio negocio={ganhar} aberto={!!ganhar} setAberto={(v) => { if (!v) setGanhar(null); }} />
       <RegrasClassificacao aberto={regras} setAberto={setRegras} />
       <FichaLead negocioId={negocio ?? null} onFechar={() => abrir(undefined)} />
     </Pagina>

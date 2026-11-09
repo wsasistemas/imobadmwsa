@@ -98,6 +98,216 @@ export function PerderNegocio({ negocioId, aberto, setAberto, onFeito }: {
   );
 }
 
+// ------------------------------------------------------------------ Ganho → cliente (empresa + vínculos + Asaas)
+interface LinhaSistema { app: string; ref: string; plano: string; valor_mensal: string }
+
+export function GanharNegocio({ negocio, aberto, setAberto }: {
+  negocio: { negocio_id: string; nome: string; empresa: string | null; email: string | null; whatsapp: string | null; sistemas: string[] } | null;
+  aberto: boolean; setAberto: (v: boolean) => void;
+}) {
+  const recarregar = useRecarregarComercial();
+  const qc = useQueryClient();
+  const sistemas = useQuery({ queryKey: ["sistemas"], queryFn: api.listarSistemas, enabled: aberto });
+  const [f, setF] = useState({ razao_social: "", cnpj: "", dia_vencimento: "10", email_financeiro: "" });
+  const [linhas, setLinhas] = useState<LinhaSistema[]>([]);
+  const [asaas, setAsaas] = useState(true);
+  const [resultado, setResultado] = useState<{ empresa_id: string; texto: string } | null>(null);
+
+  useEffect(() => {
+    if (aberto && negocio) {
+      setF({ razao_social: negocio.empresa ?? "", cnpj: "", dia_vencimento: "10", email_financeiro: negocio.email ?? "" });
+      setLinhas((negocio.sistemas.length ? negocio.sistemas : [""]).map((app) => ({ app, ref: "", plano: "", valor_mensal: "" })));
+      setResultado(null);
+    }
+  }, [aberto, negocio]);
+
+  const set = (k: keyof typeof f) => (e: { target: { value: string } }) => setF((x) => ({ ...x, [k]: e.target.value }));
+  const setLinha = (i: number, k: keyof LinhaSistema, v: string) => setLinhas((ls) => ls.map((l, j) => (j === i ? { ...l, [k]: v } : l)));
+  const tipo = (app: string) => sistemas.data?.find((s) => s.app === app);
+
+  const m = useMutation({
+    mutationFn: async () => {
+      const r = await api.ganhar(negocio!.negocio_id, {
+        ...f, whatsapp: negocio!.whatsapp ?? "",
+        sistemas: linhas.filter((l) => l.app).map((l) => ({ ...l, valor_mensal: l.valor_mensal.replace(/\./g, "").replace(",", ".") })),
+      });
+      let asaasTexto = "";
+      if (asaas && r.vinculos > 0 && r.tem_cnpj && Number(r.mensalidade) > 0) {
+        try { await api.sincronizarAsaas(r.empresa_id); asaasTexto = " Assinatura criada no Asaas."; }
+        catch (e) { asaasTexto = ` A assinatura no Asaas falhou: ${mensagemErro(e)} Tente de novo na ficha da empresa.`; }
+      } else if (asaas) {
+        asaasTexto = " Assinatura do Asaas não criada: precisa de CNPJ e de pelo menos um sistema vinculado com valor.";
+      }
+      const pend = r.pendentes.length ? ` Falta vincular: ${r.pendentes.join(", ")} (informe o schema/tenant na ficha da empresa).` : "";
+      return { empresa_id: r.empresa_id, texto: `Cliente criado com ${r.vinculos} sistema(s) vinculado(s).${pend}${asaasTexto}` };
+    },
+    onSuccess: (r) => {
+      setResultado(r);
+      recarregar();
+      qc.invalidateQueries({ predicate: (q) => ["empresas", "empresa", "painel"].includes(String(q.queryKey[0])) });
+    },
+    onError: (e) => toast.error(mensagemErro(e)),
+  });
+
+  return (
+    <Dialog open={aberto} onOpenChange={setAberto}>
+      <DialogContent className="max-h-[92dvh] overflow-y-auto sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="font-display text-xl">Fechar negócio: {negocio?.nome}</DialogTitle>
+          <DialogDescription>Ganho vira cliente: cria a empresa, vincula os sistemas e, se quiser, já cria a assinatura mensal no Asaas.</DialogDescription>
+        </DialogHeader>
+        {resultado ? (
+          <div className="space-y-4">
+            <div className="flex items-start gap-3 rounded-xl border border-success/30 bg-success-soft p-4 text-sm">
+              <IconeColorido nome="fluent-color:trophy-24" tamanho={24} />
+              <p>{resultado.texto}</p>
+            </div>
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => setAberto(false)}>Fechar</Button>
+              <Button asChild><Link to="/empresas/$id" params={{ id: resultado.empresa_id }}>Abrir a empresa</Link></Button>
+            </DialogFooter>
+          </div>
+        ) : (
+          <form onSubmit={(e) => { e.preventDefault(); m.mutate(); }} className="space-y-4">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="space-y-1.5 sm:col-span-2"><Label>Razão social</Label><Input value={f.razao_social} onChange={set("razao_social")} placeholder="Como vai na nota e no boleto" /></div>
+              <div className="space-y-1.5"><Label>CPF ou CNPJ</Label><Input value={f.cnpj} onChange={set("cnpj")} inputMode="numeric" placeholder="Obrigatório para o Asaas" /></div>
+              <div className="space-y-1.5"><Label>Dia do vencimento</Label>
+                <select className={SELECT} value={f.dia_vencimento} onChange={set("dia_vencimento")}>
+                  {Array.from({ length: 28 }, (_, i) => i + 1).map((d) => <option key={d} value={d}>dia {d}</option>)}
+                </select></div>
+              <div className="space-y-1.5 sm:col-span-2"><Label>E-mail financeiro</Label><Input type="email" value={f.email_financeiro} onChange={set("email_financeiro")} /></div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Sistemas contratados</Label>
+              {linhas.map((l, i) => {
+                const s = tipo(l.app);
+                return (
+                  <div key={i} className="grid gap-2 rounded-xl border border-border p-3 sm:grid-cols-[1.1fr_1.2fr_1fr_0.8fr_auto]">
+                    <select className={SELECT} value={l.app} onChange={(e) => setLinha(i, "app", e.target.value)}>
+                      <option value="">Sistema…</option>
+                      {(sistemas.data ?? []).map((x) => <option key={x.app} value={x.app}>{x.app}</option>)}
+                    </select>
+                    <Input value={l.ref} onChange={(e) => setLinha(i, "ref", e.target.value)}
+                      placeholder={s?.tipo_ref === "schema" ? "schema (ex.: loja_nome)" : "tenant / id do cliente"}
+                      title={s?.descricao_ref ?? "Deixe em branco se o cliente ainda não foi criado no sistema"} />
+                    <Input value={l.plano} onChange={(e) => setLinha(i, "plano", e.target.value)} placeholder="Plano" />
+                    <Input value={l.valor_mensal} onChange={(e) => setLinha(i, "valor_mensal", e.target.value)} inputMode="decimal" placeholder="R$ / mês" />
+                    <Button type="button" variant="ghost" size="sm" onClick={() => setLinhas((ls) => ls.filter((_, j) => j !== i))} aria-label="Remover">×</Button>
+                  </div>
+                );
+              })}
+              <Button type="button" variant="outline" size="sm" onClick={() => setLinhas((ls) => [...ls, { app: "", ref: "", plano: "", valor_mensal: "" }])}>+ Sistema</Button>
+              <p className="text-xs text-muted-foreground">Sem o schema/tenant o sistema fica para vincular depois, na ficha da empresa (o cliente ainda pode não existir no sistema).</p>
+            </div>
+
+            <label className="flex items-center gap-2 text-sm">
+              <Switch checked={asaas} onCheckedChange={setAsaas} /> Criar a assinatura mensal no Asaas agora
+            </label>
+            <DialogFooter>
+              <Button type="submit" disabled={m.isPending} className="min-w-40 bg-success text-success-foreground hover:bg-success/90">
+                {m.isPending ? <Loader2 className="size-4 animate-spin" /> : "Marcar como Ganho"}
+              </Button>
+            </DialogFooter>
+          </form>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ------------------------------------------------------------------ Importar CSV
+const CABECALHOS: Record<string, string> = {
+  nome: "nome", name: "nome", "nome completo": "nome", email: "email", "e-mail": "email",
+  telefone: "telefone", whatsapp: "telefone", celular: "telefone", phone: "telefone", fone: "telefone",
+  empresa: "empresa", company: "empresa", cargo: "cargo", mensagem: "mensagem", observacao: "mensagem", observações: "mensagem",
+  sistema: "sistema", interesse: "sistema",
+};
+
+/** CSV simples (vírgula ou ponto e vírgula, aspas opcionais) → linhas com as colunas reconhecidas. */
+export function lerCsv(texto: string): Record<string, string>[] {
+  const linhas = texto.replace(/^﻿/, "").split(/\r?\n/).filter((l) => l.trim());
+  if (linhas.length < 2) return [];
+  const sep = (linhas[0].match(/;/g)?.length ?? 0) > (linhas[0].match(/,/g)?.length ?? 0) ? ";" : ",";
+  const partir = (l: string) => {
+    const out: string[] = []; let atual = ""; let aspas = false;
+    for (let i = 0; i < l.length; i++) {
+      const ch = l[i];
+      if (ch === '"') { if (aspas && l[i + 1] === '"') { atual += '"'; i++; } else aspas = !aspas; }
+      else if (ch === sep && !aspas) { out.push(atual); atual = ""; }
+      else atual += ch;
+    }
+    out.push(atual);
+    return out.map((x) => x.trim());
+  };
+  const cab = partir(linhas[0]).map((h) => CABECALHOS[h.toLowerCase()] ?? "");
+  return linhas.slice(1).map((l) => {
+    const v = partir(l);
+    const o: Record<string, string> = {};
+    cab.forEach((k, i) => { if (k && v[i]) o[k] = o[k] ? `${o[k]} ${v[i]}` : v[i]; });
+    return o;
+  }).filter((o) => Object.keys(o).length > 0);
+}
+
+export function ImportarCsv({ gatilho }: { gatilho: ReactNode }) {
+  const [aberto, setAberto] = useState(false);
+  const [linhas, setLinhas] = useState<Record<string, string>[]>([]);
+  const [arquivo, setArquivo] = useState("");
+  const recarregar = useRecarregarComercial();
+  const m = useMutation({
+    mutationFn: () => api.importarLeads(linhas),
+    onSuccess: (r) => {
+      toast.success(`Importado: ${r.novos} novo(s), ${r.repetidos} repetido(s)${r.erros.length ? `, ${r.erros.length} com erro` : ""}.`);
+      if (r.erros.length) toast.message(`Linhas com erro: ${r.erros.slice(0, 8).map((e) => `${e.linha + 1} (${e.erro})`).join("; ")}`);
+      recarregar(); setAberto(false); setLinhas([]); setArquivo("");
+    },
+    onError: (e) => toast.error(mensagemErro(e)),
+  });
+  return (
+    <>
+      <span onClick={() => setAberto(true)}>{gatilho}</span>
+      <Dialog open={aberto} onOpenChange={setAberto}>
+        <DialogContent className="max-h-[92dvh] overflow-y-auto sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl">Importar contatos (CSV)</DialogTitle>
+            <DialogDescription>
+              Colunas reconhecidas: nome, email, telefone (ou whatsapp), empresa, cargo, mensagem, sistema. Separador vírgula ou ponto e vírgula.
+              Entram como "Importado", sem mensagem de boas-vindas, classificados e sem duplicar (mesmo WhatsApp ou e-mail).
+            </DialogDescription>
+          </DialogHeader>
+          <Input type="file" accept=".csv,text/csv" onChange={async (e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            setArquivo(file.name);
+            setLinhas(lerCsv(await file.text()));
+          }} />
+          {arquivo ? (
+            linhas.length === 0 ? <p className="text-sm text-destructive">Nenhuma linha reconhecida. Confira o cabeçalho (nome, email, telefone…).</p> : (
+              <div className="space-y-2">
+                <p className="text-sm"><b>{linhas.length}</b> linha(s) prontas para importar. Prévia:</p>
+                <div className="overflow-x-auto rounded-xl border border-border">
+                  <table className="w-full text-xs">
+                    <thead><tr className="border-b border-border text-left text-muted-foreground">{["nome", "email", "telefone", "empresa", "cargo"].map((h) => <th key={h} className="px-2 py-1.5">{h}</th>)}</tr></thead>
+                    <tbody>{linhas.slice(0, 5).map((l, i) => (
+                      <tr key={i} className="border-b border-border last:border-0">{["nome", "email", "telefone", "empresa", "cargo"].map((h) => <td key={h} className="px-2 py-1.5">{l[h] ?? ""}</td>)}</tr>
+                    ))}</tbody>
+                  </table>
+                </div>
+              </div>
+            )
+          ) : null}
+          <DialogFooter>
+            <Button disabled={!linhas.length || m.isPending} onClick={() => m.mutate()} className="min-w-32">
+              {m.isPending ? <Loader2 className="size-4 animate-spin" /> : `Importar ${linhas.length || ""}`}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
 // ------------------------------------------------------------------ Novo contato (cadastro manual)
 export function NovoContato({ gatilho }: { gatilho: ReactNode }) {
   const [aberto, setAberto] = useState(false);
@@ -164,6 +374,7 @@ export function FichaLead({ negocioId, onFechar }: { negocioId: string | null; o
 function ConteudoFicha({ f }: { f: FichaNegocio }) {
   const recarregar = useRecarregarComercial();
   const [perder, setPerder] = useState(false);
+  const [ganhar, setGanhar] = useState(false);
   const [nota, setNota] = useState("");
   const [valor, setValor] = useState(f.valor != null ? String(f.valor) : "");
   useEffect(() => { setValor(f.valor != null ? String(f.valor) : ""); }, [f.negocio_id, f.valor]);
@@ -233,7 +444,7 @@ function ConteudoFicha({ f }: { f: FichaNegocio }) {
         <div className="space-y-1.5">
           <Label>Etapa do funil</Label>
           <select className={SELECT} value={f.etapa} disabled={mover.isPending}
-            onChange={(e) => (e.target.value === "perdido" ? setPerder(true) : mover.mutate(e.target.value))}>
+            onChange={(e) => (e.target.value === "perdido" ? setPerder(true) : e.target.value === "ganho" ? setGanhar(true) : mover.mutate(e.target.value))}>
             {ETAPAS.map((e) => <option key={e.chave} value={e.chave}>{e.nome}</option>)}
           </select>
           {f.motivo_perda ? <p className="text-xs text-muted-foreground">Motivo: {f.motivo_perda}</p> : null}
@@ -323,6 +534,7 @@ function ConteudoFicha({ f }: { f: FichaNegocio }) {
 
       {f.valor ? <p className="text-xs text-muted-foreground">Mensalidade prevista: {brl(f.valor)}</p> : null}
       <PerderNegocio negocioId={f.negocio_id} aberto={perder} setAberto={setPerder} />
+      <GanharNegocio negocio={f} aberto={ganhar} setAberto={setGanhar} />
     </div>
   );
 }
