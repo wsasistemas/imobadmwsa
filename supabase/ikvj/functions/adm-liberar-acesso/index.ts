@@ -24,7 +24,7 @@ function linkLogin(url: string, email: string): string {
   return u.toString();
 }
 
-function emailHtml(d: { nome: string; empresa: string; sistema: string; email: string; senha: string | null; link: string; criarSenha: boolean }) {
+function emailHtml(d: { nome: string; empresa: string; sistema: string; email: string; senha: string | null; link: string; criarSenha: boolean; entraDireto: boolean }) {
   const nome = esc(d.nome.trim().split(/\s+/)[0] ?? ""), sistema = esc(d.sistema), email = esc(d.email);
   const linha = (r: string, v: string) => `<tr><td style="padding:7px 0;color:#667085;font-size:14px">${r}</td><td style="padding:7px 0;text-align:right;font:700 15px Consolas,monospace;color:#1f2937">${v}</td></tr>`;
   const cred = `<table width="100%" style="background:#eef3fb;border-radius:12px;padding:12px 16px;margin:16px 0">${linha("Login", email)}${d.senha ? linha("Senha provisória", esc(d.senha)) : ""}</table>`;
@@ -35,8 +35,10 @@ function emailHtml(d: { nome: string; empresa: string; sistema: string; email: s
     ? "O botão vale por pouco tempo. Se ele já tiver vencido, entre com o login e a senha provisória acima e crie a sua senha em seguida. A senha provisória vale por 7 dias."
     : d.senha
     ? "Por segurança, você vai criar uma senha só sua no primeiro acesso. Esta senha provisória vale por 7 dias."
+    : d.entraDireto
+    ? "O botão já entra direto, sem digitar senha, e vale por pouco tempo. Depois, use a mesma senha que você já tem nos sistemas WSA. Se não lembrar, clique em \"Esqueci minha senha\" na tela de login."
     : "Use a mesma senha que você já tem nos sistemas WSA. Se não lembrar, clique em \"Esqueci minha senha\" na tela de login.";
-  const botao = d.criarSenha ? "Criar minha senha e acessar" : `Acessar o ${sistema}`;
+  const botao = d.criarSenha ? "Criar minha senha e acessar" : d.entraDireto ? `Entrar no ${sistema}` : `Acessar o ${sistema}`;
   return `<div style="background:#eef0f4;padding:20px 10px;font-family:Arial,sans-serif;color:#1f2937"><div style="max-width:600px;margin:auto;background:#fff;border-radius:12px;overflow:hidden">
     <div style="background:#2f5f9e;color:#fff;padding:28px"><small style="font-weight:700;letter-spacing:1px">WSA SISTEMAS</small><h1 style="font:600 28px Georgia,serif;margin:10px 0 0">Parabéns pela compra do ${sistema}!</h1></div>
     <div style="padding:26px 28px"><p style="font-size:15px">Olá, <b>${nome}</b>!</p>
@@ -95,6 +97,25 @@ Deno.serve(async (req) => {
   // Login com senha provisória: o botão abre a tela de criar senha da plataforma, já com a sessão (token de recuperação).
   let link = linkLogin(p.url, p.email);
   let criarSenha = false;
+  let entraDireto = false;
+  if (!senha) {
+    // Já tinha login: a senha não muda; o botão entra direto com um token de uso único.
+    try {
+      const { data: pode } = await db.rpc("adm_srv_entra_pelo_link", { p_app: p.app });
+      if (pode === true) {
+        const g = await db.auth.admin.generateLink({ type: "magiclink", email: p.email });
+        const token = g.data?.properties?.hashed_token;
+        if (token) {
+          const u = new URL("/auth", new URL(link).origin);
+          u.search = new URLSearchParams({ token_hash: token, type: "magiclink", email: p.email }).toString();
+          link = u.toString();
+          entraDireto = true;
+        }
+      }
+    } catch (e) {
+      console.error("[adm-liberar-acesso] link de entrada", e instanceof Error ? e.message.slice(0, 200) : "erro");
+    }
+  }
   if (senha) {
     try {
       const { data: rota } = await db.rpc("adm_srv_rota_primeiro_acesso", { p_app: p.app });
@@ -114,7 +135,7 @@ Deno.serve(async (req) => {
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST", headers: { Authorization: `Bearer ${resend}`, "Content-Type": "application/json" },
     body: JSON.stringify({ from: de, to: [p.email], subject: `Parabéns pela compra do ${p.sistema}! Seu acesso está pronto`,
-      html: emailHtml({ nome: p.nome, empresa: p.empresa, sistema: p.sistema, email: p.email, senha, link, criarSenha }) }),
+      html: emailHtml({ nome: p.nome, empresa: p.empresa, sistema: p.sistema, email: p.email, senha, link, criarSenha, entraDireto }) }),
   });
   const b = await res.json().catch(() => ({}));
   await db.rpc("adm_srv_acesso_resultado", { p_vinculo: vinculo, p_ok: res.ok, p_erro: res.ok ? null : String(b?.message ?? `Resend ${res.status}`) });

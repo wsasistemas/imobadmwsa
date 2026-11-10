@@ -40,19 +40,20 @@ export async function concluirPrimeiroAcesso(): Promise<void> {
 }
 
 /**
- * Botão "Criar minha senha" do e-mail de parabéns: ?token_hash=...&type=recovery. Abre a sessão sem digitar senha.
+ * Botão do e-mail de parabéns: ?token_hash=...&type=recovery (criar senha) ou type=magiclink (já tinha login: entra direto).
  * Devolve null quando a URL não traz o token; false quando o link venceu (a pessoa entra com a senha provisória).
  */
 export async function abrirLinkDoEmail(): Promise<boolean | null> {
   if (typeof window === 'undefined') return null;
   const p = new URLSearchParams(window.location.search);
   const token = p.get('token_hash');
-  if (!token || p.get('type') !== 'recovery') return null;
+  const tipo = p.get('type');
+  if (!token || (tipo !== 'recovery' && tipo !== 'magiclink')) return null;
   p.delete('token_hash');
   p.delete('type');
   window.history.replaceState(null, '', `${window.location.pathname}${p.toString() ? `?${p}` : ''}`);
   try {
-    const { error } = await supabase.auth.verifyOtp({ token_hash: token, type: 'recovery' });
+    const { error } = await supabase.auth.verifyOtp({ token_hash: token, type: tipo === 'recovery' ? 'recovery' : 'email' });
     return !error;
   } catch {
     return false;
