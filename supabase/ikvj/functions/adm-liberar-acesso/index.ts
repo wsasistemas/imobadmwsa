@@ -24,20 +24,25 @@ function linkLogin(url: string, email: string): string {
   return u.toString();
 }
 
-function emailHtml(d: { nome: string; empresa: string; sistema: string; email: string; senha: string | null; link: string }) {
+function emailHtml(d: { nome: string; empresa: string; sistema: string; email: string; senha: string | null; link: string; criarSenha: boolean }) {
   const nome = esc(d.nome.trim().split(/\s+/)[0] ?? ""), sistema = esc(d.sistema), email = esc(d.email);
   const linha = (r: string, v: string) => `<tr><td style="padding:7px 0;color:#667085;font-size:14px">${r}</td><td style="padding:7px 0;text-align:right;font:700 15px Consolas,monospace;color:#1f2937">${v}</td></tr>`;
   const cred = `<table width="100%" style="background:#eef3fb;border-radius:12px;padding:12px 16px;margin:16px 0">${linha("Login", email)}${d.senha ? linha("Senha provisória", esc(d.senha)) : ""}</table>`;
-  const intro = d.senha ? "<p style=\"font-size:15px\">Estes são os seus dados de acesso:</p>" : "";
-  const fim = d.senha
+  const intro = d.criarSenha
+    ? "<p style=\"font-size:15px\">Clique no botão para criar a sua senha e entrar. O seu login já está pronto:</p>"
+    : d.senha ? "<p style=\"font-size:15px\">Estes são os seus dados de acesso:</p>" : "";
+  const fim = d.criarSenha
+    ? "O botão vale por pouco tempo. Se ele já tiver vencido, entre com o login e a senha provisória acima e crie a sua senha em seguida. A senha provisória vale por 7 dias."
+    : d.senha
     ? "Por segurança, você vai criar uma senha só sua no primeiro acesso. Esta senha provisória vale por 7 dias."
     : "Use a mesma senha que você já tem nos sistemas WSA. Se não lembrar, clique em \"Esqueci minha senha\" na tela de login.";
+  const botao = d.criarSenha ? "Criar minha senha e acessar" : `Acessar o ${sistema}`;
   return `<div style="background:#eef0f4;padding:20px 10px;font-family:Arial,sans-serif;color:#1f2937"><div style="max-width:600px;margin:auto;background:#fff;border-radius:12px;overflow:hidden">
     <div style="background:#2f5f9e;color:#fff;padding:28px"><small style="font-weight:700;letter-spacing:1px">WSA SISTEMAS</small><h1 style="font:600 28px Georgia,serif;margin:10px 0 0">Parabéns pela compra do ${sistema}!</h1></div>
     <div style="padding:26px 28px"><p style="font-size:15px">Olá, <b>${nome}</b>!</p>
     <p style="font-size:15px">Seu pagamento foi confirmado e o <b>${sistema}</b> da <b>${esc(d.empresa)}</b> já está pronto para uso.</p>
     ${intro}${cred}
-    <a href="${esc(d.link)}" style="display:block;text-align:center;background:#2f5f9e;color:#fff;font-weight:700;font-size:16px;padding:15px;border-radius:10px;text-decoration:none">Acessar o ${sistema}</a>
+    <a href="${esc(d.link)}" style="display:block;text-align:center;background:#2f5f9e;color:#fff;font-weight:700;font-size:16px;padding:15px;border-radius:10px;text-decoration:none">${botao}</a>
     <p style="font-size:13px;color:#667085;margin-top:16px">${fim}</p></div>
     <div style="background:#f5f3f0;padding:16px 28px;font-size:12px;color:#667085">WSA Sistemas · Você recebeu este e-mail porque sua empresa contratou o ${sistema}.</div></div></div>`;
 }
@@ -87,10 +92,29 @@ Deno.serve(async (req) => {
     return json({ ok: false, erro: msg.slice(0, 300) }, 502);
   }
 
+  // Login com senha provisória: o botão abre a tela de criar senha da plataforma, já com a sessão (token de recuperação).
+  let link = linkLogin(p.url, p.email);
+  let criarSenha = false;
+  if (senha) {
+    try {
+      const { data: rota } = await db.rpc("adm_srv_rota_primeiro_acesso", { p_app: p.app });
+      const g = await db.auth.admin.generateLink({ type: "recovery", email: p.email });
+      const token = g.data?.properties?.hashed_token;
+      if (token) {
+        const u = new URL(String(rota || "/auth"), new URL(link).origin);
+        u.search = new URLSearchParams({ token_hash: token, type: "recovery", email: p.email, "primeiro-acesso": "1" }).toString();
+        link = u.toString();
+        criarSenha = true;
+      }
+    } catch (e) {
+      console.error("[adm-liberar-acesso] link de criar senha", e instanceof Error ? e.message.slice(0, 200) : "erro");
+    }
+  }
+
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST", headers: { Authorization: `Bearer ${resend}`, "Content-Type": "application/json" },
     body: JSON.stringify({ from: de, to: [p.email], subject: `Parabéns pela compra do ${p.sistema}! Seu acesso está pronto`,
-      html: emailHtml({ nome: p.nome, empresa: p.empresa, sistema: p.sistema, email: p.email, senha, link: linkLogin(p.url, p.email) }) }),
+      html: emailHtml({ nome: p.nome, empresa: p.empresa, sistema: p.sistema, email: p.email, senha, link, criarSenha }) }),
   });
   const b = await res.json().catch(() => ({}));
   await db.rpc("adm_srv_acesso_resultado", { p_vinculo: vinculo, p_ok: res.ok, p_erro: res.ok ? null : String(b?.message ?? `Resend ${res.status}`) });

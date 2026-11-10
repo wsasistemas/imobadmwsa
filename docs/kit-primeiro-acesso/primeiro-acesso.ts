@@ -39,6 +39,26 @@ export async function concluirPrimeiroAcesso(): Promise<void> {
   }
 }
 
+/**
+ * Botão "Criar minha senha" do e-mail de parabéns: ?token_hash=...&type=recovery. Abre a sessão sem digitar senha.
+ * Devolve null quando a URL não traz o token; false quando o link venceu (a pessoa entra com a senha provisória).
+ */
+export async function abrirLinkDoEmail(): Promise<boolean | null> {
+  if (typeof window === 'undefined') return null;
+  const p = new URLSearchParams(window.location.search);
+  const token = p.get('token_hash');
+  if (!token || p.get('type') !== 'recovery') return null;
+  p.delete('token_hash');
+  p.delete('type');
+  window.history.replaceState(null, '', `${window.location.pathname}${p.toString() ? `?${p}` : ''}`);
+  try {
+    const { error } = await supabase.auth.verifyOtp({ token_hash: token, type: 'recovery' });
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
 /** E-mail que vem no botão do e-mail de parabéns (?email=...), para já preencher o login. */
 export const emailDoLink = (): string =>
   typeof window === 'undefined' ? '' : new URLSearchParams(window.location.search).get('email') ?? '';
