@@ -4,3 +4,6 @@
 -- =====================================================================================
 
 UPDATE adm.sistemas SET url_login = 'https://imobimoveis.imobsystems.com.br' WHERE app = 'imobimoveis';
+
+-- Nome exibido volta a ser Imobimoveis (título "Reenviar acesso ao …", e-mail de parabéns, funil).
+UPDATE acessos.aplicativos SET nome = 'Imobimoveis' WHERE schema_name = 'imobimoveis' AND nome = 'ImobVendas';
