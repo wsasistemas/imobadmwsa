@@ -27,7 +27,15 @@ export async function opewa(caminho: string, init: { method?: string; body?: unk
     const dados = await res.json().catch(() => ({})) as Record<string, unknown>;
     return { ok: res.ok, status: res.status, dados };
   } catch (e) {
-    return { ok: false, status: 0, dados: { message: e instanceof Error && e.name === "AbortError" ? "O OpeWA não respondeu a tempo." : "Não foi possível falar com o OpeWA." } };
+    let host = "";
+    try { host = new URL(base()).host; } catch { host = "endereço inválido"; }
+    const local = /^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|\[?::1)/.test(host);
+    const message = e instanceof Error && e.name === "AbortError"
+      ? `O OpeWA (${host}) não respondeu a tempo.`
+      : local
+      ? `O endereço do OpeWA (${host}) é local: o Supabase não alcança. Publique o OpeWA num endereço da internet.`
+      : `Não foi possível falar com o OpeWA em ${host}. Confira se o endereço está acessível pela internet.`;
+    return { ok: false, status: 0, dados: { message } };
   } finally {
     clearTimeout(t);
   }

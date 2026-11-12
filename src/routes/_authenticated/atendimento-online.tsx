@@ -72,6 +72,24 @@ const CATEGORIAS: Record<AtendResposta["categoria"], string> = {
 };
 const SELECT = "h-10 w-full rounded-md border border-input bg-card px-3 text-sm";
 
+// Só os campos que a tela edita (os que o robô muda sozinho, como o próximo envio, não contam como alteração).
+const NAO_EDITAVEIS = new Set([
+  "ligado",
+  "simulado_em",
+  "atualizado_em",
+  "atualizado_por",
+  "proximo_envio_em",
+  "webhook_id",
+  "webhook_vault_id",
+  "id",
+]);
+const editavel = (c: AtendConfig) =>
+  JSON.stringify(
+    Object.entries(c)
+      .filter(([k]) => !NAO_EDITAVEIS.has(k))
+      .sort(([a], [b]) => a.localeCompare(b)),
+  );
+
 function AtendimentoOnline() {
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ["atend-painel"], queryFn: api.atendPainel });
@@ -81,7 +99,7 @@ function AtendimentoOnline() {
     if (q.data && !cfg) setCfg(q.data.config);
   }, [q.data, cfg]);
 
-  const sujo = !!cfg && !!q.data && JSON.stringify(cfg) !== JSON.stringify(q.data.config);
+  const sujo = !!cfg && !!q.data && editavel(cfg) !== editavel(q.data.config);
   const recarregar = async () => {
     await qc.invalidateQueries({ queryKey: ["atend-painel"] });
     await qc.invalidateQueries({ queryKey: ["atend-fila"] });
