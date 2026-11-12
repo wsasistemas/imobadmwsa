@@ -30,16 +30,16 @@ criatividade fixa 0,3.
 ### Fase 1 — Configuração pré-preenchida
 - [x] Migração `comercial_10_atendimento_online`: config, base de sistemas, respostas prontas, consultores, conversas,
       mensagens, saída do lead (`contatos.nao_whatsapp`), RPCs do painel, prévia da fila de boas-vindas
-- [ ] Pré-preenchimento: Sophia, roteiro de 5 passos, regras de passar para consultor, regras fixas, 7 sistemas do site,
+- [x] Pré-preenchimento: Sophia, roteiro de 5 passos, regras de passar para consultor, regras fixas, 7 sistemas do site,
       respostas prontas, horários
-- [ ] Teste PGlite `atendimento.test.mjs`
-- [ ] Tela `/atendimento-online` com as abas de configuração (Boas-vindas e regras, Base, Prompt, Fila e horários, WhatsApp)
-- [ ] Item no menu Gestão Comercial
+- [x] Teste PGlite `atendimento.test.mjs`
+- [x] Tela `/atendimento-online` com as abas de configuração (Boas-vindas e regras, Base, Prompt, Fila e horários, WhatsApp)
+- [x] Item no menu Gestão Comercial
 
 ### Fase 2 — Simulador
-- [ ] `_shared/atendimento.ts`: monta o prompt a partir da config + base + respostas prontas
-- [ ] Edge Function `atend-simulador` (super admin, não envia nada, não grava no funil)
-- [ ] Aba Simulador com "o que o robô faria" e trava "robô só liga depois de 1 simulação"
+- [x] `_shared/atendimento.ts`: monta o prompt a partir da config + base + respostas prontas
+- [x] Edge Function `atend-simulador` (super admin, não envia nada, não grava no funil)
+- [x] Aba Simulador com "o que o robô faria" e trava "robô só liga depois de 1 simulação"
 
 ### Fase 3 — WhatsApp de verdade (pelo OpeWA, sessão wsa-admin)
 - [x] Envio da boas-vindas pelo OpeWA (pg_cron com-atend a cada minuto + Edge Function atend-cron; janela, limite e intervalo no banco; começa com 30/dia)
@@ -53,6 +53,7 @@ criatividade fixa 0,3.
 - [ ] Migração `comercial_11` rodada no ikvj (Wagner)
 - [ ] Webhook conectado pela aba WhatsApp (botão "Conectar webhook")
 - Secrets: ADM_OPEWA_URL, ADM_OPEWA_API_KEY, ADM_OPEWA_SESSAO (já cadastrados). Decisão: OpeWA no lugar da API oficial da Meta.
+
 ### Fase 4 — Painel e relatórios
 - [ ] Aba Painel do robô (boas-vindas, responderam, demonstrações, foram ao consultor, onde parou, sistema mais procurado)
 - [ ] Origem "Atendimento ONLINE" nos Relatórios Comerciais
