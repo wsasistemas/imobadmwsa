@@ -28,7 +28,7 @@ criatividade fixa 0,3.
 ## Fases (checklist binário)
 
 ### Fase 1 — Configuração pré-preenchida
-- [ ] Migração `comercial_10_atendimento_online`: config, base de sistemas, respostas prontas, consultores, conversas,
+- [x] Migração `comercial_10_atendimento_online`: config, base de sistemas, respostas prontas, consultores, conversas,
       mensagens, saída do lead (`contatos.nao_whatsapp`), RPCs do painel, prévia da fila de boas-vindas
 - [ ] Pré-preenchimento: Sophia, roteiro de 5 passos, regras de passar para consultor, regras fixas, 7 sistemas do site,
       respostas prontas, horários
@@ -41,14 +41,18 @@ criatividade fixa 0,3.
 - [ ] Edge Function `atend-simulador` (super admin, não envia nada, não grava no funil)
 - [ ] Aba Simulador com "o que o robô faria" e trava "robô só liga depois de 1 simulação"
 
-### Fase 3 — WhatsApp de verdade
-- [ ] Envio da boas-vindas (pg_cron + Edge Function, modelo da Meta, janela/limite/intervalo)
-- [ ] Webhook de entrada do WhatsApp → Sophia responde → grava conversa, temperatura e etapa
-- [ ] PARAR/SAIR tira o lead da lista
-- [ ] Aba Conversas: lista, chat, "Assumir conversa", resposta do consultor (robô pausa)
-- [ ] Lembrete único sem resposta (4 h)
-- Depende do Wagner: secrets `ADM_WHATSAPP_TOKEN`/`ADM_WHATSAPP_PHONE_ID` e modelo `boas_vindas_ecossistema` aprovado na Meta
-
+### Fase 3 — WhatsApp de verdade (pelo OpeWA, sessão wsa-admin)
+- [x] Envio da boas-vindas pelo OpeWA (pg_cron com-atend a cada minuto + Edge Function atend-cron; janela, limite e intervalo no banco; começa com 30/dia)
+- [x] Webhook de entrada (atend-webhook, assinatura HMAC) → Sophia responde → grava conversa, nota e etapa
+- [x] PARAR/SAIR tira o lead da lista
+- [x] Aba Conversas: lista, chat, "Assumir conversa", resposta do consultor pelo painel (robô pausa)
+- [x] Consultor respondendo direto no celular da sessão: grava como consultor e pausa a Sophia
+- [x] Passar para consultor: rodízio entre os aptos; aviso no WhatsApp só para consultor com outro número
+- [x] Lembrete único sem resposta
+- [x] Teste PGlite `atendimento-whatsapp.test.mjs`
+- [ ] Migração `comercial_11` rodada no ikvj (Wagner)
+- [ ] Webhook conectado pela aba WhatsApp (botão "Conectar webhook")
+- Secrets: ADM_OPEWA_URL, ADM_OPEWA_API_KEY, ADM_OPEWA_SESSAO (já cadastrados). Decisão: OpeWA no lugar da API oficial da Meta.
 ### Fase 4 — Painel e relatórios
 - [ ] Aba Painel do robô (boas-vindas, responderam, demonstrações, foram ao consultor, onde parou, sistema mais procurado)
 - [ ] Origem "Atendimento ONLINE" nos Relatórios Comerciais

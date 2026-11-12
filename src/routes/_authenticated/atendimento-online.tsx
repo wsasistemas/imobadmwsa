@@ -15,6 +15,8 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   api,
   mensagemErro,
+  type AtendConversa,
+  type SituacaoConversa,
   type AtendConfig,
   type AtendPainel,
   type AtendResposta,
@@ -172,7 +174,7 @@ function AtendimentoOnline() {
             ))}
           </div>
 
-          {aba === "conversas" && <AbaConversas />}
+          {aba === "conversas" && <AbaConversas agente={q.data.config.agente_nome} />}
           {aba === "boasvindas" && <AbaBoasVindas cfg={cfg} set={set} painel={q.data} />}
           {aba === "base" && <AbaBase painel={q.data} aoMudar={recarregar} />}
           {aba === "prompt" && <AbaPrompt cfg={cfg} set={set} />}
@@ -384,16 +386,233 @@ const boasVindas = (painel: AtendPainel, texto: string, nome: string, apps: stri
     .replaceAll("{{sistemas}}", nomesSistemas(painel, apps));
 
 // Conversas -------------------------------------------------------------------------------------------
-function AbaConversas() {
+const SITUACAO: Record<SituacaoConversa, [string, "ok" | "war" | "err" | "info" | "neu"]> = {
+  aguardando: ["Boas-vindas enviada", "info"],
+  robo: ["Com a Sophia", "ok"],
+  consultor: ["Com o consultor", "war"],
+  encerrada: ["Encerrada", "neu"],
+  saiu: ["Pediu para sair", "neu"],
+  falhou: ["Não enviada", "err"],
+};
+const quando = (d: string | null) =>
+  d
+    ? new Date(d).toLocaleString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "";
+
+function AbaConversas({ agente }: { agente: string }) {
+  const [busca, setBusca] = useState("");
+  const [sel, setSel] = useState<string | null>(null);
+  const lista = useQuery({
+    queryKey: ["atend-conversas", busca],
+    queryFn: () => api.atendConversas(busca),
+    refetchInterval: 15000,
+  });
+  const atual = lista.data?.find((c) => c.id === sel) ?? lista.data?.[0] ?? null;
+  if (lista.isLoading) return <Carregando />;
+  if (lista.error) return <Erro erro={lista.error} />;
+  if (!busca && (lista.data ?? []).length === 0) {
+    return (
+      <div className="space-y-4">
+        <Aviso tom="info">
+          Nenhuma conversa ainda. Com o robô ligado e o webhook conectado (aba WhatsApp), a {agente}{" "}
+          envia a boas-vindas para a fila abaixo, uma por vez.
+        </Aviso>
+        <FilaPrevia />
+      </div>
+    );
+  }
   return (
-    <div className="space-y-4">
-      <Aviso tom="info">
-        As conversas do WhatsApp aparecem aqui quando o número estiver ligado (Fase 3): lista com a
-        temperatura de cada lead, o chat e o botão <b>Assumir conversa</b>. Enquanto isso, veja
-        abaixo quem vai receber a boas-vindas.
-      </Aviso>
-      <FilaPrevia />
+    <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
+      <div className="overflow-hidden rounded-xl border border-border bg-card">
+        <div className="border-b border-border p-2">
+          <Input
+            aria-label="Buscar conversa"
+            placeholder="Buscar nome ou telefone"
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+          />
+        </div>
+        <ul className="max-h-[620px] divide-y divide-border overflow-y-auto">
+          {(lista.data ?? []).map((c) => (
+            <li key={c.id}>
+              <button
+                type="button"
+                onClick={() => setSel(c.id)}
+                className={cn(
+                  "w-full px-3 py-2.5 text-left",
+                  atual?.id === c.id ? "bg-primary-soft" : "hover:bg-muted",
+                )}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <b className="truncate text-sm">{c.nome ?? c.whatsapp}</b>
+                  <span className="shrink-0 text-[11px] text-muted-foreground">
+                    {quando(c.ultima_msg_em)}
+                  </span>
+                </div>
+                <div className="mt-0.5 flex items-center gap-1.5">
+                  <Selo tom={SITUACAO[c.situacao][1]}>
+                    {c.consultor && c.situacao === "consultor"
+                      ? c.consultor
+                      : SITUACAO[c.situacao][0]}
+                  </Selo>
+                  <span className="truncate text-xs text-muted-foreground">
+                    {c.ultima?.texto ?? c.bv_erro ?? ""}
+                  </span>
+                </div>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+      {atual ? <Chat key={atual.id} c={atual} agente={agente} /> : null}
     </div>
+  );
+}
+
+function Chat({ c, agente }: { c: AtendConversa; agente: string }) {
+  const qc = useQueryClient();
+  const msgs = useQuery({
+    queryKey: ["atend-msgs", c.id],
+    queryFn: () => api.atendMensagens(c.id),
+    refetchInterval: 8000,
+  });
+  const [texto, setTexto] = useState("");
+  const fim = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    fim.current?.scrollIntoView({ block: "nearest" });
+  }, [msgs.data]);
+  const recarregar = () =>
+    Promise.all([
+      qc.invalidateQueries({ queryKey: ["atend-msgs", c.id] }),
+      qc.invalidateQueries({ queryKey: ["atend-conversas"] }),
+    ]);
+  const assumir = useMutation({
+    mutationFn: (v: boolean) => api.atendAssumir(c.id, v),
+    onSuccess: async (_, v) => {
+      toast.success(
+        v ? "Conversa assumida: a Sophia pausou." : "Conversa devolvida para a Sophia.",
+      );
+      await recarregar();
+    },
+    onError: (e) => toast.error(mensagemErro(e)),
+  });
+  const enviar = useMutation({
+    mutationFn: () => api.atendEnviar(c.id, texto),
+    onSuccess: async () => {
+      setTexto("");
+      await recarregar();
+    },
+    onError: (e) => toast.error(mensagemErro(e)),
+  });
+  const comRobo = c.situacao === "robo" || c.situacao === "aguardando" || c.situacao === "falhou";
+  return (
+    <Cartao
+      icone="fluent-color:chat-24"
+      titulo={c.nome ?? c.whatsapp ?? "Conversa"}
+      extra={
+        c.situacao === "saiu" ? null : comRobo ? (
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={assumir.isPending}
+            onClick={() => assumir.mutate(true)}
+          >
+            Assumir conversa
+          </Button>
+        ) : (
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={assumir.isPending}
+            onClick={() => assumir.mutate(false)}
+          >
+            Devolver para a {agente}
+          </Button>
+        )
+      }
+    >
+      <div className="space-y-3 text-sm">
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          <span>
+            {c.whatsapp}
+            {c.empresa ? ` · ${c.empresa}` : ""}
+          </span>
+          <SeloTemperatura t={c.temperatura} pontos={c.pontuacao} />
+          <Selo tom={SITUACAO[c.situacao][1]}>
+            {SITUACAO[c.situacao][0]}
+            {c.consultor ? ` · ${c.consultor}` : ""}
+          </Selo>
+          {c.origem === "lead" ? <span>o lead escreveu primeiro</span> : null}
+        </div>
+        <Whats className="max-h-[480px] min-h-[300px] overflow-y-auto">
+          {msgs.isLoading ? (
+            <Carregando />
+          ) : (
+            (msgs.data ?? []).map((m) =>
+              m.autor === "sistema" ? (
+                <p
+                  key={m.id}
+                  className="mx-auto w-fit rounded-full bg-card/80 px-3 py-1 text-center text-[11.5px] text-muted-foreground"
+                >
+                  {m.texto}
+                </p>
+              ) : (
+                <BolhaWhats
+                  key={m.id}
+                  autor={m.autor === "lead" ? "lead" : "robo"}
+                  nome={
+                    m.autor === "robo"
+                      ? agente
+                      : `Consultor${m.detalhe?.pelo === "celular" ? " · pelo celular" : ""}`
+                  }
+                  texto={m.texto}
+                />
+              ),
+            )
+          )}
+          <div ref={fim} />
+        </Whats>
+        {c.situacao === "saiu" ? (
+          <p className="text-xs text-muted-foreground">
+            O lead pediu para não receber mais WhatsApp.
+          </p>
+        ) : (
+          <>
+            <form
+              className="flex gap-2"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (texto.trim()) enviar.mutate();
+              }}
+            >
+              <Input
+                aria-label="Responder como consultor"
+                placeholder="Responder como consultor (a Sophia pausa nesta conversa)"
+                value={texto}
+                onChange={(e) => setTexto(e.target.value)}
+              />
+              <Button type="submit" className="gap-1" disabled={!texto.trim() || enviar.isPending}>
+                {enviar.isPending ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Send className="size-4" />
+                )}
+                Enviar
+              </Button>
+            </form>
+            <p className="text-xs text-muted-foreground">
+              Você também pode responder direto no celular da sessão: a {agente} pausa sozinha nesta
+              conversa.
+            </p>
+          </>
+        )}
+      </div>
+    </Cartao>
   );
 }
 
@@ -527,19 +746,9 @@ function AbaBoasVindas({
       <Cartao icone="fluent-color:send-24" titulo="Mensagem de boas-vindas">
         <div className="space-y-3 text-sm">
           <Aviso>
-            É a primeira mensagem para quem ainda não falou com a gente: o WhatsApp exige um{" "}
-            <b>modelo aprovado pela Meta</b>. Mudou o texto? Atualize o modelo na Meta com o mesmo
-            texto.
+            Sai pelo número da sessão <b>wsa-admin</b> do OpeWA. Os botões vão como opções numeradas
+            (1, 2, 3), que é o que o WhatsApp Web aceita.
           </Aviso>
-          <Campo id="bv-modelo" rotulo="Nome do modelo na Meta">
-            <Input
-              id="bv-modelo"
-              value={cfg.bv_modelo}
-              onChange={(e) =>
-                set({ bv_modelo: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, "_") })
-              }
-            />
-          </Campo>
           <Campo
             id="bv-texto"
             rotulo="Texto"
@@ -1805,26 +2014,114 @@ function AbaSimulador({
 // WhatsApp --------------------------------------------------------------------------------------------------
 function AbaWhatsApp({ cfg, set }: { cfg: AtendConfig; set: (p: Partial<AtendConfig>) => void }) {
   const [palavra, setPalavra] = useState("");
+  const [fone, setFone] = useState("");
+  const qc = useQueryClient();
+  const sessao = useQuery({ queryKey: ["atend-sessao"], queryFn: api.atendSessao });
+  const info = useQuery({
+    queryKey: ["atend-whats-info"],
+    queryFn: api.atendWhatsInfo,
+    refetchInterval: 30000,
+  });
+  const conectar = useMutation({
+    mutationFn: api.atendConectarWebhook,
+    onSuccess: async () => {
+      toast.success("Webhook conectado: as respostas dos leads chegam na Sophia.");
+      await qc.invalidateQueries({ queryKey: ["atend-whats-info"] });
+    },
+    onError: (e) => toast.error(mensagemErro(e)),
+  });
+  const teste = useMutation({
+    mutationFn: () => api.atendTeste(fone),
+    onSuccess: () => toast.success("Mensagem de teste enviada. Confira no celular."),
+    onError: (e) => toast.error(mensagemErro(e)),
+  });
+  const s = sessao.data?.sessao;
+  const pronta = s?.ok && s.status === "ready";
+  const i = info.data;
   return (
     <div className="grid gap-4 xl:grid-cols-2">
-      <Cartao icone="flat-color-icons:phone" titulo="Número do WhatsApp">
+      <Cartao icone="flat-color-icons:phone" titulo="WhatsApp pelo OpeWA">
         <div className="space-y-3 text-sm">
-          <p>WhatsApp oficial (API da Meta), o mesmo número que envia a confirmação de reunião.</p>
-          <ul className="space-y-1.5">
-            <li>
-              Modelo de boas-vindas:{" "}
-              <code className="rounded bg-muted px-1.5 py-0.5">{cfg.bv_modelo}</code>
-            </li>
-            <li>
-              Outros modelos usados:{" "}
-              <code className="rounded bg-muted px-1.5 py-0.5">reuniao_confirmada</code>{" "}
-              <code className="rounded bg-muted px-1.5 py-0.5">lembrete_reuniao</code>
-            </li>
-          </ul>
+          {sessao.isLoading ? (
+            <Carregando />
+          ) : sessao.data && !sessao.data.configurado ? (
+            <Aviso>{sessao.data.erro}</Aviso>
+          ) : (
+            <ul className="space-y-1.5">
+              <li className="flex flex-wrap items-center gap-2">
+                Sessão <b>wsa-admin</b>:
+                {pronta ? (
+                  <Selo tom="ok">Conectada</Selo>
+                ) : (
+                  <Selo tom="err">{s?.status || "sem resposta"}</Selo>
+                )}
+                {s?.telefone ? <span className="text-muted-foreground">+{s.telefone}</span> : null}
+              </li>
+              {s?.erro ? <li className="text-destructive">{s.erro}</li> : null}
+              <li className="flex flex-wrap items-center gap-2">
+                Webhook (respostas dos leads):
+                {i?.webhook_conectado ? (
+                  <Selo tom="ok">Conectado</Selo>
+                ) : (
+                  <Selo tom="war">Não conectado</Selo>
+                )}
+              </li>
+              {i ? (
+                <li>
+                  Boas-vindas hoje: <b>{i.enviadas_hoje}</b> de {i.limite_dia}
+                  {i.falhas_hoje ? ` · ${i.falhas_hoje} não saíram` : ""} ·{" "}
+                  {i.na_janela ? "dentro da janela de envio" : "fora da janela de envio"}
+                </li>
+              ) : null}
+            </ul>
+          )}
+          <div className="flex flex-wrap gap-2">
+            <Button
+              disabled={conectar.isPending || !sessao.data?.configurado}
+              onClick={() => conectar.mutate()}
+            >
+              {conectar.isPending ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : i?.webhook_conectado ? (
+                "Reconectar webhook"
+              ) : (
+                "Conectar webhook"
+              )}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                void sessao.refetch();
+                void info.refetch();
+              }}
+            >
+              Atualizar
+            </Button>
+          </div>
+          <form
+            className="flex gap-2 border-t border-border pt-3"
+            onSubmit={(e) => {
+              e.preventDefault();
+              teste.mutate();
+            }}
+          >
+            <Input
+              aria-label="Telefone para teste"
+              placeholder="Teste: 5521999999999"
+              value={fone}
+              onChange={(e) => setFone(e.target.value)}
+            />
+            <Button
+              type="submit"
+              variant="outline"
+              disabled={teste.isPending || fone.replace(/\D/g, "").length < 12}
+            >
+              Enviar teste
+            </Button>
+          </form>
           <Aviso>
-            Pendente do seu lado para o robô conversar de verdade (Fase 3): cadastrar no Supabase os
-            secrets <b>ADM_WHATSAPP_TOKEN</b> e <b>ADM_WHATSAPP_PHONE_ID</b> e aprovar o modelo{" "}
-            <b>{cfg.bv_modelo}</b> na Meta, com o texto da aba Boas-vindas.
+            O OpeWA usa o WhatsApp Web, não a API oficial. Mandar para quem nunca falou com o número
+            pode bloqueá-lo: comece com até 30 boas-vindas por dia e mantenha o intervalo.
           </Aviso>
         </div>
       </Cartao>

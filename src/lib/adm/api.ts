@@ -292,6 +292,16 @@ export interface SimulacaoPedido {
   };
   fora_do_horario: boolean;
 }
+export type SituacaoConversa = "aguardando" | "robo" | "consultor" | "encerrada" | "saiu" | "falhou";
+export interface AtendConversa {
+  id: string; negocio_id: string; nome: string | null; empresa: string | null; whatsapp: string | null; temperatura: Temperatura | null;
+  pontuacao: number | null; situacao: SituacaoConversa; origem: "boas_vindas" | "lead"; consultor: string | null; bv_erro: string | null;
+  ultima_msg_em: string | null; ultima_msg_lead_em: string | null; ultima: { autor: string; texto: string } | null;
+}
+export interface AtendMensagem { id: number; autor: "lead" | "robo" | "consultor" | "sistema"; texto: string; detalhe: Record<string, unknown>; criado_em: string }
+export interface AtendWhatsInfo { webhook_conectado: boolean; proximo_envio_em: string | null; na_janela: boolean; enviadas_hoje: number; limite_dia: number; falhas_hoje: number }
+export interface AtendSessao { ok: boolean; configurado: boolean; webhook_url: string; erro?: string; sessao?: { ok: boolean; status: string | null; telefone: string | null; erro: string | null } }
+
 export interface SimulacaoResposta {
   ok: true;
   resposta: string;
@@ -418,6 +428,14 @@ export const api = {
   atendFila: () => rpc<AtendFila>("com_atend_fila"),
   atendSimular: (body: SimulacaoPedido) =>
     edge<SimulacaoResposta>("atend-simulador", body as unknown as Record<string, unknown>),
+  atendConversas: (busca?: string) => rpc<AtendConversa[]>("com_atend_conversas", { p_busca: busca || null }),
+  atendMensagens: (conversa: string) => rpc<AtendMensagem[]>("com_atend_mensagens", { p_conversa: conversa }),
+  atendAssumir: (conversa: string, assumir: boolean) => rpc<void>("com_atend_assumir", { p_conversa: conversa, p_assumir: assumir }),
+  atendWhatsInfo: () => rpc<AtendWhatsInfo>("com_atend_whatsapp_info"),
+  atendSessao: () => edge<AtendSessao>("atend-painel", { acao: "situacao" }),
+  atendConectarWebhook: () => edge<{ ok: true; webhook_id: string }>("atend-painel", { acao: "conectar_webhook" }),
+  atendEnviar: (conversa: string, texto: string) => edge<{ ok: true }>("atend-painel", { acao: "enviar", conversa_id: conversa, texto }),
+  atendTeste: (telefone: string) => edge<{ ok: true }>("atend-painel", { acao: "teste", telefone }),
   googleSituacao: () => edge<{ configurado: boolean; retorno_url: string }>("adm-google", { acao: "situacao" }),
   googleInicio: (retorno: string, vendedor: string | null) => edge<{ url: string }>("adm-google", { acao: "inicio", retorno, vendedor }),
   googleDesconectar: (agendaId: string) => edge<{ ok: boolean }>("adm-google", { acao: "desconectar", agendaId }),
