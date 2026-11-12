@@ -17,6 +17,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as AuthenticatedAgendamentosRouteImport } from './routes/_authenticated/agendamentos'
+import { Route as AuthenticatedAtendimentoOnlineRouteImport } from './routes/_authenticated/atendimento-online'
 import { Route as AuthenticatedComoFuncionaRouteImport } from './routes/_authenticated/como-funciona'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedFunilRouteImport } from './routes/_authenticated/funil'
@@ -76,6 +77,12 @@ const AuthenticatedAgendamentosRoute =
   AuthenticatedAgendamentosRouteImport.update({
     id: '/agendamentos',
     path: '/agendamentos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAtendimentoOnlineRoute =
+  AuthenticatedAtendimentoOnlineRouteImport.update({
+    id: '/atendimento-online',
+    path: '/atendimento-online',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedComoFuncionaRoute =
@@ -185,6 +192,7 @@ export interface FileRoutesByFullPath {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/agendamentos': typeof AuthenticatedAgendamentosRoute
+  '/atendimento-online': typeof AuthenticatedAtendimentoOnlineRoute
   '/como-funciona': typeof AuthenticatedComoFuncionaRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/funil': typeof AuthenticatedFunilRoute
@@ -212,6 +220,7 @@ export interface FileRoutesByTo {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/agendamentos': typeof AuthenticatedAgendamentosRoute
+  '/atendimento-online': typeof AuthenticatedAtendimentoOnlineRoute
   '/como-funciona': typeof AuthenticatedComoFuncionaRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/funil': typeof AuthenticatedFunilRoute
@@ -241,6 +250,7 @@ export interface FileRoutesById {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/agendamentos': typeof AuthenticatedAgendamentosRoute
+  '/_authenticated/atendimento-online': typeof AuthenticatedAtendimentoOnlineRoute
   '/_authenticated/como-funciona': typeof AuthenticatedComoFuncionaRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/funil': typeof AuthenticatedFunilRoute
@@ -270,6 +280,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/agendamentos'
+    | '/atendimento-online'
     | '/como-funciona'
     | '/dashboard'
     | '/funil'
@@ -297,6 +308,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/agendamentos'
+    | '/atendimento-online'
     | '/como-funciona'
     | '/dashboard'
     | '/funil'
@@ -325,6 +337,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/_authenticated/agendamentos'
+    | '/_authenticated/atendimento-online'
     | '/_authenticated/como-funciona'
     | '/_authenticated/dashboard'
     | '/_authenticated/funil'
@@ -415,6 +428,13 @@ declare module '@tanstack/react-router' {
       path: '/agendamentos'
       fullPath: '/agendamentos'
       preLoaderRoute: typeof AuthenticatedAgendamentosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/atendimento-online': {
+      id: '/_authenticated/atendimento-online'
+      path: '/atendimento-online'
+      fullPath: '/atendimento-online'
+      preLoaderRoute: typeof AuthenticatedAtendimentoOnlineRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/como-funciona': {
@@ -548,6 +568,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgendamentosRoute: typeof AuthenticatedAgendamentosRoute
+  AuthenticatedAtendimentoOnlineRoute: typeof AuthenticatedAtendimentoOnlineRoute
   AuthenticatedComoFuncionaRoute: typeof AuthenticatedComoFuncionaRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFunilRoute: typeof AuthenticatedFunilRoute
@@ -566,6 +587,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAgendamentosRoute: AuthenticatedAgendamentosRoute,
+  AuthenticatedAtendimentoOnlineRoute: AuthenticatedAtendimentoOnlineRoute,
   AuthenticatedComoFuncionaRoute: AuthenticatedComoFuncionaRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFunilRoute: AuthenticatedFunilRoute,

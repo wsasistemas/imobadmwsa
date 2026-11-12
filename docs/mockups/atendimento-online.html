@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atendimento ONLINE — mockup</title>
+<style>
+  :root{--bg:#fbf1ea;--card:#fff;--tx:#1f2937;--mut:#667085;--ln:#ece4dd;--pri:#2f5f9e;--pri2:#e8eff9;--ok:#1f7a4a;--okbg:#e5f4ea;--warn:#a15c00;--warnbg:#fdf0d9;--hot:#b42318;--hotbg:#fde7e5;--cold:#1d6f6a;--coldbg:#e1f3f1;--soft:#f3f3f2;--new:#7c3aed}
+  *{box-sizing:border-box}
+  body{margin:0;font:14px/1.45 "Segoe UI",Inter,Arial,sans-serif;color:var(--tx);background:var(--bg)}
+  .app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+  aside{background:linear-gradient(180deg,#24497a,#2f5f9e);color:#dfe8f5;padding:18px 12px}
+  aside h1{font-size:15px;color:#fff;margin:0 8px 18px}
+  aside small{display:block;margin:16px 8px 6px;font-size:11px;letter-spacing:.8px;opacity:.7}
+  aside a{display:flex;gap:8px;align-items:center;padding:8px 10px;border-radius:8px;color:inherit;text-decoration:none;font-size:13.5px}
+  aside a.on{background:#fff;color:var(--pri);font-weight:700}
+  aside a .tag{margin-left:auto;font-size:10px;background:#ffd166;color:#5b3c00;border-radius:6px;padding:1px 5px;font-weight:700}
+  main{padding:22px 26px;min-width:0}
+  .top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .top h2{margin:0;font:600 24px Georgia,serif}
+  .pill{font-size:12px;border-radius:999px;padding:3px 10px;font-weight:600}
+  .on-air{background:var(--okbg);color:var(--ok)}
+  .sub{color:var(--mut);margin:4px 0 16px}
+  .tabs{display:flex;gap:4px;background:#f3e6dd;border-radius:12px;padding:4px;overflow-x:auto;margin-bottom:16px}
+  .tabs button{border:0;background:none;padding:8px 13px;border-radius:9px;font:inherit;color:#475467;cursor:pointer;white-space:nowrap}
+  .tabs button.on{background:#fff;color:var(--tx);font-weight:700;box-shadow:0 1px 3px #0001}
+  .tab{display:none}.tab.on{display:block}
+  .card{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:18px}
+  .card h3{margin:0 0 4px;font-size:16px}
+  .card p.h{margin:0 0 14px;color:var(--mut);font-size:13px}
+  .grid{display:grid;gap:14px}
+  .g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+  label{display:block;font-size:13px;color:#344054;margin-bottom:5px;font-weight:600}
+  input,select,textarea{width:100%;border:1px solid #e4e7ec;background:var(--soft);border-radius:9px;padding:9px 11px;font:inherit;color:var(--tx)}
+  textarea{min-height:90px;resize:vertical}
+  .hint{font-size:12px;color:var(--mut);margin-top:4px}
+  .btn{border:0;border-radius:9px;padding:9px 14px;font:inherit;font-weight:700;cursor:pointer;background:var(--pri);color:#fff}
+  .btn.sec{background:var(--pri2);color:var(--pri)}
+  .btn.ghost{background:#fff;border:1px solid #d0d5dd;color:#344054}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .sp{flex:1}
+  .new{display:inline-block;font-size:10px;font-weight:800;color:#fff;background:var(--new);border-radius:5px;padding:1px 5px;vertical-align:middle;margin-left:4px}
+  .t-m{background:var(--warnbg);color:var(--warn)}.t-q{background:var(--hotbg);color:var(--hot)}.t-f{background:var(--coldbg);color:var(--cold)}
+  .chip{display:inline-block;font-size:12px;border:1px solid #c9d8ef;background:#eef4fc;color:#24497a;border-radius:7px;padding:1px 7px;margin:1px}
+  table{width:100%;border-collapse:collapse}
+  th{font-size:11px;letter-spacing:.6px;color:var(--mut);text-align:left;padding:9px 10px;border-bottom:1px solid var(--ln)}
+  td{padding:10px;border-bottom:1px solid var(--ln);vertical-align:top}
+  .kpi{background:#fff;border:1px solid var(--ln);border-radius:12px;padding:14px}
+  .kpi b{display:block;font-size:24px}.kpi span{color:var(--mut);font-size:12.5px}
+  .bar{height:8px;background:#eee;border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:var(--pri)}
+  .switch{width:38px;height:22px;border-radius:99px;background:var(--ok);position:relative;display:inline-block;vertical-align:middle}
+  .switch:after{content:"";position:absolute;right:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff}
+  .switch.off{background:#cfd4dc}.switch.off:after{right:auto;left:3px}
+  .wa{background:#efe7de;border-radius:14px;padding:12px;min-height:200px}
+  .msg{max-width:85%;padding:8px 11px;border-radius:10px;margin:6px 0;font-size:13.5px;box-shadow:0 1px 1px #0001}
+  .msg.bot{background:#fff}.msg.me{background:#d9fdd3;margin-left:auto}
+  .msg small{display:block;color:var(--pri);font-weight:700;font-size:11.5px}
+  .msg .opts{border-top:1px solid #eee;margin-top:7px;padding-top:5px;text-align:center}
+  .msg .opts div{color:#1a73e8;padding:3px 0;font-size:13px}
+  .note{border-left:4px solid var(--warn);background:var(--warnbg);padding:10px 12px;border-radius:8px;font-size:13px}
+  .note.blue{border-color:var(--pri);background:var(--pri2)}
+  .list{display:grid;gap:6px}
+  .list .it{padding:9px 11px;border-radius:9px;border:1px solid var(--ln);cursor:pointer}
+  .list .it.on{background:#e9e5f3;border-color:#d6cdee;font-weight:700}
+  .inbox{display:grid;grid-template-columns:300px 1fr 260px;gap:12px;min-height:520px}
+  .conv{padding:10px;border-bottom:1px solid var(--ln);cursor:pointer}
+  .conv.on{background:#f4f7fc}
+  .conv b{font-size:13.5px}.conv div{font-size:12px;color:var(--mut)}
+  .step{display:flex;gap:10px;align-items:flex-start;padding:10px;border:1px solid var(--ln);border-radius:10px;background:#fff}
+  .step .n{width:24px;height:24px;border-radius:50%;background:var(--pri);color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px;flex:none}
+  .lock{color:var(--mut);font-size:12px}
+  @media (max-width:1000px){.app{grid-template-columns:1fr}aside{display:none}.g2,.g3,.g4,.inbox{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <h1>ImobAdm WSA</h1>
+    <small>GESTÃO COMERCIAL</small>
+    <a>📊 Painel</a>
+    <a>👥 Leads &amp; contatos</a>
+    <a>🧭 Funil de vendas</a>
+    <a class="on">💬 Atendimento ONLINE <span class="tag">NOVO</span></a>
+    <a>📅 Agendamentos</a>
+    <a>📈 Relatórios comerciais</a>
+    <small>EMPRESAS</small>
+    <a>🏢 Empresas</a>
+    <a>🧩 Sistemas</a>
+  </aside>
+
+  <main>
+    <div class="top">
+      <h2>Atendimento ONLINE</h2>
+      <span class="pill on-air">● Robô no ar · Sophia WSA</span>
+      <span class="sp"></span>
+      <button class="btn ghost">Pausar robô</button>
+    </div>
+    <p class="sub">WhatsApp do ecossistema WSA Sistemas IA. Recebe os contatos de <b>Leads &amp; contatos</b>, envia a mensagem de boas-vindas e conversa só com leads <span class="pill t-m">Morno</span> e <span class="pill t-q">Quente</span>.</p>
+
+    <div class="tabs" id="tabs">
+      <button data-t="conversas" class="on">💬 Conversas</button>
+      <button data-t="boasvindas">👋 Boas-vindas e regras</button>
+      <button data-t="base">📚 Base de conhecimento</button>
+      <button data-t="prompt">🧠 Prompt do atendimento</button>
+      <button data-t="fila">🕘 Fila e horários</button>
+      <button data-t="painel">📊 Painel do robô</button>
+      <button data-t="sim">🧪 Simulador do robô</button>
+      <button data-t="whats">🔌 WhatsApp</button>
+    </div>
+
+    <!-- ================= CONVERSAS ================= -->
+    <section class="tab on" id="conversas">
+      <div class="inbox">
+        <div class="card" style="padding:0;overflow:hidden">
+          <div style="padding:10px"><input placeholder="Buscar nome ou telefone"></div>
+          <div class="row" style="padding:0 10px 8px;gap:6px">
+            <span class="chip">Todas 6</span><span class="chip">Robô 4</span><span class="chip">Consultor 1</span><span class="chip">Aguardando 1</span>
+          </div>
+          <div class="conv on"><b>Iris Trindade Chacon</b> <span class="pill t-m">Morno · 50</span><div>🤖 Robô · "Quero ver como funciona o estoque…" · 2 min</div></div>
+          <div class="conv"><b>ANTONIO CRUZ</b> <span class="pill t-q">Quente · 70</span><div>👤 Consultor Wagner · reunião amanhã 10h</div></div>
+          <div class="conv"><b>Fulano Teste</b> <span class="pill t-q">Quente · 60</span><div>⏳ Boas-vindas enviada · sem resposta há 3 h</div></div>
+          <div class="conv"><b>Teste ImobDoces</b> <span class="pill t-m">Morno · 45</span><div>🤖 Robô · pediu o material do ImobDoces</div></div>
+          <div class="conv" style="opacity:.55"><b>&lt;test lead&gt;</b> <span class="pill t-f">Frio · 25</span><div>🚫 Fora do robô: lead frio (nutrição por e-mail)</div></div>
+        </div>
+
+        <div class="card" style="display:flex;flex-direction:column">
+          <div class="row"><b>Iris Trindade Chacon</b><span class="lock">(21) 9 9724-1073 · Senador Camara</span><span class="sp"></span><button class="btn sec">Assumir conversa</button></div>
+          <div class="wa" style="flex:1;margin-top:10px">
+            <div class="msg bot"><small>Sophia · WSA Sistemas IA</small>Olá, Iris! 👋 Seja bem-vinda ao <b>Ecossistema WSA Sistemas IA</b>. Vi que você se interessou pelo <b>Imobimoveis</b> e pelo <b>Suprimentos</b>. Posso te mostrar como eles funcionam?
+              <div class="opts"><div>Sim, quero conhecer</div><div>Quero agendar uma demonstração</div><div>Falar com um consultor</div></div></div>
+            <div class="msg me">Sim, quero conhecer</div>
+            <div class="msg bot"><small>Sophia · WSA Sistemas IA</small>Ótimo! Para eu te mostrar o que faz sentido: a sua empresa é imobiliária, construtora ou corretor autônomo?</div>
+            <div class="msg me">Construtora. Quero ver como funciona o estoque de materiais</div>
+            <div class="msg bot"><small>Sophia · WSA Sistemas IA</small>Para isso o ideal é o <b>Suprimentos</b>: controle de estoque por obra, pedidos de compra e cotação. Te mando o material de 1 página e, se quiser, marco 30 min com um consultor para ver ao vivo. Pode ser?</div>
+          </div>
+          <div class="row" style="margin-top:10px"><input placeholder="Responder como consultor (o robô pausa nesta conversa)"><button class="btn">Enviar</button></div>
+        </div>
+
+        <div class="card">
+          <h3>Lead</h3>
+          <p class="h">Dados de Leads &amp; contatos</p>
+          <div class="list" style="font-size:13px">
+            <div>Origem: <b>🌐 Site · portal</b></div>
+            <div>Temperatura: <span class="pill t-m">Morno · 50</span></div>
+            <div>Interesse: <span class="chip">imobimoveis</span><span class="chip">suprimentos</span></div>
+            <div>Etapa do funil: <b>Novo lead → Em conversa</b></div>
+            <div>Próximo passo: <b>Robô oferece demonstração</b></div>
+          </div>
+          <hr style="border:0;border-top:1px solid var(--ln);margin:12px 0">
+          <h3 style="font-size:14px">O que o robô já fez</h3>
+          <div class="list" style="font-size:12.5px;color:#475467">
+            <div>✔ Boas-vindas enviada (modelo aprovado)</div>
+            <div>✔ Perguntou o segmento: construtora</div>
+            <div>✔ Temperatura 45 → 50</div>
+            <div>✔ Moveu no funil: Em conversa</div>
+          </div>
+          <button class="btn ghost" style="width:100%;margin-top:12px">Abrir no Funil</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= BOAS-VINDAS ================= -->
+    <section class="tab" id="boasvindas">
+      <div class="grid g2">
+        <div class="card">
+          <h3>Quem recebe</h3>
+          <p class="h">O robô só puxa de Leads &amp; contatos quem passa em todas as regras.</p>
+          <div class="list">
+            <div class="step"><span class="n">1</span><div><b>Tem telefone válido</b> no campo "Telefone" (celular com DDD)<div class="hint">Sem telefone: fica fora e aparece no Painel como "sem WhatsApp".</div></div></div>
+            <div class="step"><span class="n">2</span><div><b>Temperatura</b>: <span class="pill t-m">Morno</span> a partir de <input style="width:60px;display:inline;padding:3px 6px" value="40"> e <span class="pill t-q">Quente</span> a partir de <input style="width:60px;display:inline;padding:3px 6px" value="60"><div class="hint">Frio (abaixo de 40) não recebe. Se esquentar depois, entra sozinho.</div></div></div>
+            <div class="step"><span class="n">3</span><div><b>Etapa do funil</b> não é Ganho nem Perdido, e nenhum consultor está com ele</div></div>
+            <div class="step"><span class="n">4</span><div><b>Nunca recebeu</b> a boas-vindas (uma vez por telefone) e não pediu para sair</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Mensagem de boas-vindas</h3>
+          <p class="h">É a primeira mensagem para quem ainda não falou com a gente: o WhatsApp exige um <b>modelo aprovado pela Meta</b>.</p>
+          <div class="grid g2">
+            <div><label>Modelo da Meta</label><select><option>boas_vindas_ecossistema · ✔ aprovado</option></select></div>
+            <div><label>Assinatura</label><input value="Sophia · WSA Sistemas IA"></div>
+          </div>
+          <label style="margin-top:12px">Texto (variáveis: {{nome}}, {{sistemas}})</label>
+          <textarea>Olá, {{nome}}! 👋 Seja bem-vindo(a) ao Ecossistema WSA Sistemas IA. Vi que você se interessou pelo {{sistemas}}. Posso te mostrar como funciona?</textarea>
+          <label style="margin-top:8px">Botões</label>
+          <div class="row"><input value="Sim, quero conhecer"><input value="Quero agendar uma demonstração"><input value="Falar com um consultor"></div>
+          <div class="hint">Mudou o texto? O modelo volta para aprovação da Meta (até 24 h) e o envio espera.</div>
+        </div>
+
+        <div class="card">
+          <h3>Quando e quanto envia</h3>
+          <div class="grid g2">
+            <div><label>Janela de envio</label><input value="Seg a sex · 9h às 18h · sáb 9h às 12h"></div>
+            <div><label>Limite por dia</label><input value="80 boas-vindas"></div>
+            <div><label>Intervalo entre envios</label><input value="40 a 90 segundos (aleatório)"></div>
+            <div><label>Lead novo entra</label><select><option>Na hora (dentro da janela)</option><option>Uma vez por dia, às 9h</option></select></div>
+          </div>
+          <div class="note" style="margin-top:12px">Enviar muitas mensagens para quem não falou com a gente pode bloquear o número. Por isso: só Morno/Quente, uma vez por telefone, com limite diário e intervalo.</div>
+        </div>
+
+        <div class="card">
+          <h3>Fila de boas-vindas <span class="new">PRÉVIA</span></h3>
+          <p class="h">Quem vai receber agora, pelas regras ao lado.</p>
+          <table>
+            <tr><th>CONTATO</th><th>TEMP.</th><th>SITUAÇÃO</th></tr>
+            <tr><td>Iris Trindade Chacon</td><td><span class="pill t-m">50</span></td><td>✔ Enviada · respondeu</td></tr>
+            <tr><td>Fulano Teste</td><td><span class="pill t-q">60</span></td><td>✔ Enviada · sem resposta</td></tr>
+            <tr><td>Teste ImobDoces</td><td><span class="pill t-m">45</span></td><td>⏳ Na fila · 14:20</td></tr>
+            <tr><td>ANTONIO CRUZ</td><td><span class="pill t-q">70</span></td><td class="lock">Fora: consultor já atende</td></tr>
+            <tr><td>wagner antunes</td><td><span class="pill t-q">60</span></td><td class="lock">Fora: etapa Ganho</td></tr>
+            <tr><td>&lt;test lead&gt;</td><td><span class="pill t-f">25</span></td><td class="lock">Fora: frio</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= BASE ================= -->
+    <section class="tab" id="base">
+      <div class="tabs" style="background:#f6ece5;width:max-content">
+        <button class="on">Sistemas do ecossistema</button><button>Respostas prontas</button><button>Planos e preços</button><button>Site imobsystems.com.br</button>
+      </div>
+      <div class="grid" style="grid-template-columns:240px 1fr">
+        <div>
+          <div class="card" style="padding:12px"><div class="list">
+            <div class="it on">Imobimoveis</div><div class="it">Suprimentos</div><div class="it">ImobDoces</div><div class="it">ImobAtend</div><div class="it">ImobDesk</div>
+            <div class="it" style="color:var(--pri)">+ Novo sistema</div></div></div>
+          <p class="hint" style="margin:10px 4px">Só os sistemas <b>ativos</b> aparecem no menu do robô.</p>
+        </div>
+        <div class="card">
+          <h3>Imobimoveis</h3>
+          <div class="grid g3" style="margin-top:12px">
+            <div><label>Nome</label><input value="Imobimoveis"></div>
+            <div><label>Segmento</label><input value="Imobiliárias e construtoras"></div>
+            <div><label>Nome no menu do robô ⓘ</label><input value="IMOBIMOVEIS - VENDAS COM IA"></div>
+            <div><label>Sistema do cadastro</label><select><option>imobimoveis (Sistemas)</option></select><div class="hint">Liga ao cadastro de Sistemas: interesse e funil usam este código.</div></div>
+            <div><label>Página no site</label><input value="https://www.imobsystems.com.br/imobimoveis"></div>
+            <div><label>No ar</label><div class="row" style="padding-top:6px"><span class="switch"></span> Ativo no robô</div></div>
+          </div>
+          <label style="margin-top:14px">Material (PDF, até 20 MB) ⓘ</label>
+          <div class="row" style="background:var(--soft);border-radius:10px;padding:10px"><span>📄 imobimoveis-apresentacao.pdf · 3,2 MB</span><span class="sp"></span><button class="btn sec">Trocar PDF</button></div>
+          <div class="grid" style="grid-template-columns:1fr 330px;margin-top:14px">
+            <div>
+              <label>Texto de apresentação (enviado exatamente assim)</label>
+              <textarea>O Imobimoveis atende seus leads no WhatsApp 24h com IA, qualifica, agenda visitas e entrega o lead pronto ao corretor, com funil de vendas e relatórios.</textarea>
+              <label style="margin-top:10px">Texto que acompanha o material</label>
+              <textarea style="min-height:60px">Aqui está a apresentação do Imobimoveis. Quer ver funcionando em 30 min com um consultor?</textarea>
+              <label style="margin-top:10px">Para quem é / para quem não é <span class="new">IA USA</span></label>
+              <textarea style="min-height:60px">É para: imobiliárias e construtoras com lançamentos. Não é para: quem só aluga imóveis (indicar ImobAtend).</textarea>
+            </div>
+            <div>
+              <label>Prévia no WhatsApp</label>
+              <div class="wa"><div class="msg bot"><small>Sophia · WSA Sistemas IA</small>O Imobimoveis atende seus leads no WhatsApp 24h com IA, qualifica, agenda visitas e entrega o lead pronto ao corretor…
+                <div class="opts"><div>Sim, quero o material</div><div>Agendar demonstração</div><div>Falar com um consultor</div></div></div></div>
+            </div>
+          </div>
+          <div class="row" style="margin-top:14px"><span class="sp"></span><button class="btn ghost">Cancelar</button><button class="btn">Salvar sistema</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PROMPT ================= -->
+    <section class="tab" id="prompt">
+      <div class="grid g2">
+        <div class="card">
+          <h3>Identidade</h3>
+          <div class="grid g2" style="margin-top:10px">
+            <div><label>Nome do agente</label><input value="Sophia"></div>
+            <div><label>Empresa</label><input value="WSA Sistemas IA"></div>
+            <div><label>Tom</label><select><option>Consultivo e próximo</option><option>Formal</option></select></div>
+            <div><label>Emojis</label><select><option>Poucos</option><option>Nenhum</option></select></div>
+          </div>
+          <label style="margin-top:12px">Objetivo principal</label>
+          <textarea style="min-height:70px">Entender o negócio do lead, indicar o sistema certo do ecossistema (www.imobsystems.com.br) e marcar uma demonstração com um consultor.</textarea>
+        </div>
+        <div class="card">
+          <h3>Roteiro da conversa</h3>
+          <p class="h">Ordem que o robô segue. Arraste para mudar.</p>
+          <div class="list">
+            <div class="step"><span class="n">1</span><div><b>Descobrir o segmento</b> (imobiliária, construtora, corretor, doceria…) · obrigatório</div></div>
+            <div class="step"><span class="n">2</span><div><b>Entender a dor principal</b> (atendimento, estoque, vendas, financeiro) · obrigatório</div></div>
+            <div class="step"><span class="n">3</span><div><b>Indicar 1 sistema</b> da Base e enviar o material · obrigatório</div></div>
+            <div class="step"><span class="n">4</span><div><b>Oferecer demonstração</b> e marcar em Agendamentos · obrigatório</div></div>
+            <div class="step"><span class="n">5</span><div><b>Tamanho da empresa</b> (nº de usuários) · opcional</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Passar para um consultor quando</h3>
+          <div class="list" style="font-size:13.5px">
+            <label class="row" style="font-weight:400"><input type="checkbox" checked style="width:auto"> O lead pedir para falar com uma pessoa</label>
+            <label class="row" style="font-weight:400"><input type="checkbox" checked style="width:auto"> Perguntar preço fechado, desconto ou contrato</label>
+            <label class="row" style="font-weight:400"><input type="checkbox" checked style="width:auto"> Temperatura chegar a 80 (muito quente)</label>
+            <label class="row" style="font-weight:400"><input type="checkbox" checked style="width:auto"> O robô não entender 2 vezes seguidas</label>
+            <label class="row" style="font-weight:400"><input type="checkbox" style="width:auto"> Lead é cliente atual (tem empresa cadastrada)</label>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Regras fixas <span class="lock">🔒 não editáveis</span></h3>
+          <div class="list" style="font-size:13px;color:#475467">
+            <div>• Só fala dos sistemas da Base de conhecimento e do site imobsystems.com.br.</div>
+            <div>• Não inventa preço, prazo, desconto nem funcionalidade.</div>
+            <div>• Não promete integração que não está na Base.</div>
+            <div>• Se o lead pedir para sair ("PARAR"), para na hora e marca no contato.</div>
+            <div>• Nunca pede senha, cartão ou documento.</div>
+          </div>
+          <div class="grid g3" style="margin-top:12px">
+            <div><label>Tamanho da resposta</label><select><option>Curta</option><option>Média</option></select></div>
+            <div><label>Retomar sem resposta</label><select><option>1 lembrete em 4 h</option><option>Nunca</option></select></div>
+            <div><label>Criatividade</label><input value="0,3 · fixo" disabled></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= FILA ================= -->
+    <section class="tab" id="fila">
+      <div class="grid g2">
+        <div class="card">
+          <h3>Consultores (fila)</h3>
+          <p class="h">Recebem a conversa quando o robô passa adiante. Rodízio na ordem.</p>
+          <table>
+            <tr><th>CONSULTOR</th><th>SISTEMAS</th><th>APTO</th></tr>
+            <tr><td>Wagner Antunes</td><td><span class="chip">todos</span></td><td><span class="switch"></span></td></tr>
+            <tr><td>Consultor 2</td><td><span class="chip">imobimoveis</span><span class="chip">imobatend</span></td><td><span class="switch"></span></td></tr>
+            <tr><td>Consultor 3</td><td><span class="chip">suprimentos</span></td><td><span class="switch off"></span></td></tr>
+          </table>
+          <div class="row" style="margin-top:10px"><label style="margin:0">Consultor sem resposta em</label><input style="width:110px" value="15 min"><span class="hint">→ passa para o próximo</span></div>
+        </div>
+        <div class="card">
+          <h3>Horário de atendimento</h3>
+          <table>
+            <tr><th>DIA</th><th>ROBÔ</th><th>CONSULTORES</th></tr>
+            <tr><td>Seg a sex</td><td>24 h</td><td>9h às 18h</td></tr>
+            <tr><td>Sábado</td><td>24 h</td><td>9h às 12h</td></tr>
+            <tr><td>Domingo</td><td>24 h</td><td>—</td></tr>
+          </table>
+          <label style="margin-top:12px">Mensagem fora do horário dos consultores</label>
+          <textarea style="min-height:60px">Nossos consultores voltam amanhã às 9h. Enquanto isso, posso tirar suas dúvidas ou já deixar sua demonstração marcada.</textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PAINEL ================= -->
+    <section class="tab" id="painel">
+      <div class="row" style="margin-bottom:12px"><select style="width:auto"><option>Últimos 30 dias</option></select><select style="width:auto"><option>Todos os sistemas</option></select><select style="width:auto"><option>Todas as origens</option></select></div>
+      <div class="grid g4">
+        <div class="kpi"><span>Boas-vindas enviadas</span><b>142</b><span>de 168 aptos · 26 sem telefone</span></div>
+        <div class="kpi"><span>Responderam</span><b>61 · 43%</b><span>tempo médio 22 min</span></div>
+        <div class="kpi"><span>Demonstrações marcadas</span><b>18</b><span>pelo robô em Agendamentos</span></div>
+        <div class="kpi"><span>Foram ao consultor</span><b>27</b><span>9 viraram Ganho</span></div>
+      </div>
+      <div class="grid g2" style="margin-top:14px">
+        <div class="card">
+          <h3>Onde a conversa parou</h3>
+          <div class="list" style="font-size:13px">
+            <div>Não respondeu a boas-vindas <div class="bar"><i style="width:57%"></i></div></div>
+            <div>Parou no segmento <div class="bar"><i style="width:14%"></i></div></div>
+            <div>Recebeu material, não marcou <div class="bar"><i style="width:21%"></i></div></div>
+            <div>Marcou demonstração <div class="bar"><i style="width:13%;background:var(--ok)"></i></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Sistema mais procurado</h3>
+          <table>
+            <tr><th>SISTEMA</th><th>CONVERSAS</th><th>DEMOS</th><th>GANHOS</th></tr>
+            <tr><td>Imobimoveis</td><td>34</td><td>11</td><td>6</td></tr>
+            <tr><td>Suprimentos</td><td>15</td><td>4</td><td>2</td></tr>
+            <tr><td>ImobDoces</td><td>12</td><td>3</td><td>1</td></tr>
+          </table>
+          <p class="hint">Ganhos contam nos Relatórios Comerciais com origem "Atendimento ONLINE".</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SIMULADOR ================= -->
+    <section class="tab" id="sim">
+      <div class="grid" style="grid-template-columns:1fr 340px">
+        <div class="card">
+          <div class="row"><h3>Simulador do robô</h3><span class="lock">sem enviar nada a ninguém e sem gravar no Funil</span><span class="sp"></span><button class="btn ghost">Recomeçar</button></div>
+          <div class="grid g3" style="margin:12px 0">
+            <div><label>Lead de teste</label><select><option>Iris (Morno · 50)</option><option>Novo lead quente</option></select></div>
+            <div><label>Interesse</label><select><option>imobimoveis + suprimentos</option></select></div>
+            <div><label>Horário simulado</label><select><option>Agora (dentro do horário)</option><option>Domingo 22h</option></select></div>
+          </div>
+          <div class="wa" style="min-height:300px">
+            <div class="msg bot"><small>Sophia · simulação</small>Olá, Iris! 👋 Seja bem-vinda ao Ecossistema WSA Sistemas IA…<div class="opts"><div>Sim, quero conhecer</div><div>Quero agendar uma demonstração</div><div>Falar com um consultor</div></div></div>
+            <div class="msg me">Quanto custa o Imobimoveis?</div>
+            <div class="msg bot"><small>Sophia · simulação</small>O valor depende do número de usuários e dos módulos. Um consultor monta a proposta certinha para você. Quer que eu marque 30 min amanhã às 10h ou às 15h?</div>
+          </div>
+          <div class="row" style="margin-top:10px"><input placeholder="Escreva como se fosse o lead"><button class="btn">Enviar</button></div>
+        </div>
+        <div class="card">
+          <h3>O que o robô faria</h3>
+          <div class="list" style="font-size:13px">
+            <div>📌 Regra usada: <b>preço → consultor</b></div>
+            <div>🌡 Temperatura: 50 → <b>60</b></div>
+            <div>🧭 Funil: Novo lead → <b>Em conversa</b></div>
+            <div>📅 Ofereceu horários de Agendamentos</div>
+            <div>📚 Base usada: Imobimoveis · Planos e preços</div>
+          </div>
+          <div class="note blue" style="margin-top:12px">Teste antes de ligar: o robô só entra no ar depois de 1 simulação completa salva.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= WHATSAPP ================= -->
+    <section class="tab" id="whats">
+      <div class="grid g2">
+        <div class="card">
+          <h3>Número do WhatsApp</h3>
+          <p class="h">WhatsApp oficial (API da Meta), o mesmo que já envia a confirmação de reunião.</p>
+          <div class="list" style="font-size:13.5px">
+            <div>Número: <b>+55 21 9 xxxx-xxxx</b> · <span class="pill on-air">conectado</span></div>
+            <div>Modelos aprovados: <span class="chip">boas_vindas_ecossistema</span><span class="chip">reuniao_confirmada</span><span class="chip">lembrete_reuniao</span></div>
+            <div>Qualidade do número: <b style="color:var(--ok)">Alta</b> · limite Meta 1.000 conversas/dia</div>
+          </div>
+          <div class="note" style="margin-top:12px">Pendente no seu lado: token e ID do número (secrets ADM_WHATSAPP_*) e aprovar o modelo de boas-vindas na Meta.</div>
+        </div>
+        <div class="card">
+          <h3>Saída do lead</h3>
+          <p class="h">Respeito à LGPD e às regras da Meta.</p>
+          <div class="list" style="font-size:13.5px">
+            <div>Palavras que tiram o lead da lista: <span class="chip">PARAR</span><span class="chip">SAIR</span><span class="chip">NÃO QUERO</span></div>
+            <div>Quem sai: marcado em Leads &amp; contatos como <b>"Não enviar WhatsApp"</b>.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+<script>
+  document.getElementById('tabs').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    document.querySelectorAll('#tabs button').forEach(function (x) { x.classList.toggle('on', x === b); });
+    document.querySelectorAll('main > .tab').forEach(function (s) { s.classList.toggle('on', s.id === b.dataset.t); });
+  });
+</script>
+</body>
+</html>

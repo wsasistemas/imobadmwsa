@@ -32,6 +32,7 @@ export const MENU: GrupoMenu[] = [
     itens: [
       { to: "/leads", label: "Leads & Contatos", icone: "fluent-color:people-list-24" },
       { to: "/funil", label: "Funil de Vendas", icone: "fluent-color:board-24" },
+      { to: "/atendimento-online", label: "Atendimento ONLINE", icone: "fluent-color:chat-24" },
       { to: "/agendamentos", label: "Agendamentos", icone: "fluent-color:calendar-24" },
       { to: "/relatorios-comerciais", label: "Relatórios Comerciais", icone: "fluent-color:chart-multiple-24" },
     ],

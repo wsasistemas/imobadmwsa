@@ -167,6 +167,150 @@ export interface ConfigAgenda {
   distribuicao: "rodizio" | "primeiro_livre";
 }
 
+// Atendimento ONLINE ----------------------------------------------------------------------------
+export type Faixa = [string, string] | null;
+export interface Janela {
+  seg_sex: Faixa;
+  sab: Faixa;
+  dom: Faixa;
+}
+export interface PassoRoteiro {
+  titulo: string;
+  descricao: string;
+  obrigatorio: boolean;
+}
+export interface PassarConsultor {
+  pedido_humano: boolean;
+  preco: boolean;
+  temperatura_80: boolean;
+  nao_entendeu_2: boolean;
+  cliente_atual: boolean;
+}
+export interface AtendConfig {
+  ligado: boolean;
+  agente_nome: string;
+  empresa_nome: string;
+  tom: "consultivo" | "formal" | "descontraido";
+  emojis: "nenhum" | "poucos";
+  objetivo: string;
+  roteiro: PassoRoteiro[];
+  passar_consultor: PassarConsultor;
+  regras_extras: string;
+  tamanho_resposta: "curta" | "media";
+  retomar_horas: number;
+  bv_temperaturas: Temperatura[];
+  bv_etapas: string[];
+  bv_modelo: string;
+  bv_texto: string;
+  bv_botoes: string[];
+  bv_janela: Janela;
+  bv_limite_dia: number;
+  bv_intervalo: [number, number];
+  bv_quando: "na_hora" | "diario_9h";
+  horario_consultores: Janela;
+  msg_fora_horario: string;
+  consultor_espera_min: number;
+  palavras_sair: string[];
+  simulado_em: string | null;
+  atualizado_em: string;
+  atualizado_por: string | null;
+}
+export interface Funcionalidade {
+  titulo: string;
+  descricao: string;
+  status: "disponivel" | "em_validacao";
+}
+export interface AtendSistema {
+  id: string;
+  app: string | null;
+  nome: string;
+  segmento: string;
+  menu_nome: string;
+  pagina_url: string | null;
+  sistema_url: string | null;
+  material_url: string | null;
+  ativo: boolean;
+  apresentacao: string;
+  texto_material: string;
+  para_quem: string;
+  nao_para_quem: string;
+  funcionalidades: Funcionalidade[];
+  ordem: number;
+}
+export interface AtendResposta {
+  id: string;
+  categoria: "geral" | "preco" | "integracao" | "seguranca" | "implantacao";
+  pergunta: string;
+  resposta: string;
+  ativo: boolean;
+  ordem: number;
+}
+export interface AtendConsultor {
+  vendedor_id: string;
+  nome: string;
+  email: string | null;
+  na_fila: boolean;
+  apps: string[];
+  apto: boolean;
+  ordem: number | null;
+}
+export interface AtendPainel {
+  config: AtendConfig;
+  sistemas: AtendSistema[];
+  respostas: AtendResposta[];
+  consultores: AtendConsultor[];
+  apps: { app: string; nome: string }[];
+  etapas: { chave: string; nome: string }[];
+}
+export interface AtendFilaLinha {
+  negocio_id: string;
+  nome: string | null;
+  empresa: string | null;
+  whatsapp: string | null;
+  temperatura: Temperatura | null;
+  pontuacao: number | null;
+  etapa: string;
+  sistemas: string[];
+  grupo: "na_fila" | "conversa" | "fora";
+  motivo: string | null;
+  conversa: string | null;
+  bv_enviada_em: string | null;
+  respondeu: boolean;
+}
+export interface AtendFila {
+  resumo: { na_fila: number; conversas: number; fora: number; sem_telefone: number };
+  linhas: AtendFilaLinha[];
+}
+export interface SimulacaoPedido {
+  mensagens: { autor: "lead" | "robo"; texto: string }[];
+  lead: {
+    nome: string;
+    empresa?: string;
+    temperatura: Temperatura;
+    pontuacao: number;
+    sistemas: string[];
+  };
+  fora_do_horario: boolean;
+}
+export interface SimulacaoResposta {
+  ok: true;
+  resposta: string;
+  botoes: string[];
+  acoes: {
+    regra: string | null;
+    resposta_pronta: string | null;
+    sistema_indicado: string | null;
+    enviar_pagina: boolean;
+    oferecer_agenda: boolean;
+    passar_consultor: boolean;
+    motivo_consultor: string | null;
+    temperatura: number;
+    etapa: string | null;
+    passo_roteiro: number | null;
+  };
+  simulado: boolean;
+}
+
 export interface AgendaPainel {
   config: ConfigAgenda;
   agendas: { id: string; email: string; ativo: boolean; token_valido: boolean; detalhe: string | null; vendedor: string | null }[];
@@ -259,6 +403,21 @@ export const api = {
   agendaConfigSalvar: (p: ConfigAgenda) => rpc<void>("com_agenda_config_salvar", { p }),
   reunioes: (de: string, ate: string) => rpc<Reuniao[]>("com_reunioes", { p_de: de, p_ate: ate }),
   reuniaoSituacao: (id: string, situacao: string) => rpc<void>("com_reuniao_situacao", { p_reuniao: id, p_situacao: situacao }),
+
+  // Comercial: Atendimento ONLINE (robô Sophia no WhatsApp)
+  atendPainel: () => rpc<AtendPainel>("com_atend_painel"),
+  atendConfigSalvar: (p: Partial<AtendConfig>) => rpc<void>("com_atend_config_salvar", { p }),
+  atendLigar: (ligado: boolean) => rpc<void>("com_atend_ligar", { p_ligado: ligado }),
+  atendSistemaSalvar: (p: Partial<AtendSistema>) => rpc<string>("com_atend_sistema_salvar", { p }),
+  atendSistemaExcluir: (id: string) => rpc<void>("com_atend_sistema_excluir", { p_id: id }),
+  atendRespostaSalvar: (p: Partial<AtendResposta>) =>
+    rpc<string>("com_atend_resposta_salvar", { p }),
+  atendRespostaExcluir: (id: string) => rpc<void>("com_atend_resposta_excluir", { p_id: id }),
+  atendConsultoresSalvar: (lista: { vendedor_id: string; apps: string[]; apto: boolean }[]) =>
+    rpc<void>("com_atend_consultores_salvar", { p: lista }),
+  atendFila: () => rpc<AtendFila>("com_atend_fila"),
+  atendSimular: (body: SimulacaoPedido) =>
+    edge<SimulacaoResposta>("atend-simulador", body as unknown as Record<string, unknown>),
   googleSituacao: () => edge<{ configurado: boolean; retorno_url: string }>("adm-google", { acao: "situacao" }),
   googleInicio: (retorno: string, vendedor: string | null) => edge<{ url: string }>("adm-google", { acao: "inicio", retorno, vendedor }),
   googleDesconectar: (agendaId: string) => edge<{ ok: boolean }>("adm-google", { acao: "desconectar", agendaId }),
