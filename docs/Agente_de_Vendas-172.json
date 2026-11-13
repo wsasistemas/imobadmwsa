@@ -1,0 +1,367 @@
+{
+  "exportedAt": "2026-11-10T01:13:33.677Z",
+  "schemaVersion": 2,
+  "promptId": 172,
+  "v2": {
+    "schemaVersion": 2,
+    "integration": {
+      "apiKey": "demo-not-used",
+      "model": "gpt-4o-mini",
+      "responderGrupo": true,
+      "queueId": null,
+      "maxMessages": 10,
+      "maxTokens": 2200,
+      "temperature": 1,
+      "voice": "texto",
+      "voiceKey": "",
+      "voiceRegion": ""
+    },
+    "agent": {
+      "name": "Agente de Vendas",
+      "description": "Agente de demonstração pré configurado para atendimento e vendas.",
+      "role": "Vendas",
+      "objective": "",
+      "language": "pt-BR",
+      "emojisEnabled": true,
+      "responseDelay": 0,
+      "formality": "",
+      "writingStyle": "",
+      "businessHours": "",
+      "agentColor": "#0D9488",
+      "messages": {
+        "initial": "",
+        "fallback": "",
+        "afterHours": "",
+        "transferHuman": ""
+      }
+    },
+    "generalRules": "Regras gerais do Agente de Vendas (demo):\nSeja educado e objetivo.\nEntenda a necessidade antes de oferecer.\nNão invente informações.\nUtilize apenas informações disponíveis (FAQ, inventário, roteiro).\nIdentifique intenção de compra.\nQualifique o lead (necessidade, orçamento, prazo, autoridade).\nRegistre informações relevantes.\nEncaminhe para humano quando necessário.\nNão prometa condições que não estejam cadastradas.",
+    "attendance": {
+      "script": "Roteiro de vendas (demo):\n1. Saudação: cumprimente e apresente-se.\n2. Identificação do cliente: confirme nome e contexto.\n3. Descoberta da necessidade: faça perguntas abertas.\n4. Qualificação: entenda fit e urgência.\n5. Apresentação da solução: use inventário e benefícios.\n6. Tratamento de objeções: responda com fatos.\n7. Oferta: proponha o próximo passo comercial.\n8. Próximo passo: agende follow-up ou envie proposta.\n9. Encerramento: agradeça e confirme o combinado.",
+      "settings": {
+        "objective": "",
+        "serviceType": "consultivo",
+        "mandatoryFlow": false,
+        "allowInterrupt": true,
+        "maxResponseTimeSec": 120,
+        "maxAttempts": 5,
+        "smartFallback": true,
+        "canImprovise": true,
+        "canTransferHuman": true,
+        "scriptContext": ""
+      },
+      "enabled": true,
+      "steps": [],
+      "completion": {
+        "actions": [],
+        "message": ""
+      }
+    },
+    "faq": [
+      {
+        "id": "1495",
+        "question": "O que é um lead?",
+        "answer": "É um contato potencial de compra, acompanhado no funil de Leads/Vendas.",
+        "category": "demo",
+        "priority": 4
+      },
+      {
+        "id": "1494",
+        "question": "Como funciona o atendimento?",
+        "answer": "Conversas chegam no Multiatendimento; a equipe ou a IA responde com histórico e tags.",
+        "category": "demo",
+        "priority": 3
+      },
+      {
+        "id": "1493",
+        "question": "Quais canais posso integrar?",
+        "answer": "WhatsApp Web, WhatsApp API Oficial, Telegram, Facebook e Instagram (no teste grátis).",
+        "category": "demo",
+        "priority": 2
+      },
+      {
+        "id": "1492",
+        "question": "Como funciona?",
+        "answer": "Você conecta canais (WhatsApp, Instagram etc.), configura agentes e atende leads em um só lugar.",
+        "category": "demo",
+        "priority": 1
+      },
+      {
+        "id": "1491",
+        "question": "O que é o sistema?",
+        "answer": "O VBSolution CRM é uma plataforma completa de atendimento, vendas e automação com IA.",
+        "category": "demo",
+        "priority": 0
+      }
+    ],
+    "faqEnabled": true,
+    "knowledge": {
+      "enabled": true,
+      "manualText": "",
+      "fileListId": null,
+      "websites": [],
+      "sources": []
+    },
+    "knowledgeEnabled": true,
+    "inventory": {
+      "enabled": true,
+      "productIds": [],
+      "reply": {
+        "tone": "consultivo",
+        "strategyPreset": "price_first",
+        "template": "",
+        "includePrice": true,
+        "includeStock": true,
+        "includeLink": true,
+        "includeDescription": false,
+        "includeSku": false,
+        "includePromo": false,
+        "promoText": "",
+        "includeInstallment": false,
+        "installmentText": "",
+        "sendImages": false,
+        "imageMode": "none",
+        "imageCount": 3,
+        "sendDocument": false,
+        "documentUrl": "",
+        "documentName": "",
+        "resumeHint": true,
+        "resumeHintText": "Quando quiser, seguimos de onde paramos."
+      },
+      "productReplies": {},
+      "useSameMessage": false
+    },
+    "smartActions": [
+      {
+        "id": "1094",
+        "name": "Consultar lead",
+        "slug": "",
+        "type": "crm_lookup_lead",
+        "description": "Consulta dados do lead no CRM.",
+        "triggerType": "intent",
+        "triggerValue": "",
+        "condition": "",
+        "variables": {
+          "slotMinutes": 60,
+          "meetingDurationMinutes": "60",
+          "activityType": "task"
+        },
+        "apiUrl": "",
+        "workflowId": null,
+        "confirm": false,
+        "autoExecute": false,
+        "responseMessage": "",
+        "enabled": true,
+        "agentTriggerPatterns": [],
+        "userTriggerPatterns": [],
+        "intentSlotSchema": []
+      },
+      {
+        "id": "1095",
+        "name": "Criar atividade",
+        "slug": "",
+        "type": "crm_create_activity",
+        "description": "Cria atividade de follow-up.",
+        "triggerType": "intent",
+        "triggerValue": "",
+        "condition": "",
+        "variables": {},
+        "apiUrl": "",
+        "workflowId": null,
+        "confirm": false,
+        "autoExecute": false,
+        "responseMessage": "",
+        "enabled": true,
+        "agentTriggerPatterns": [],
+        "userTriggerPatterns": [],
+        "intentSlotSchema": []
+      },
+      {
+        "id": "1096",
+        "name": "Encaminhar atendimento",
+        "slug": "",
+        "type": "transfer_human",
+        "description": "Encaminha para atendimento humano.",
+        "triggerType": "intent",
+        "triggerValue": "",
+        "condition": "",
+        "variables": {},
+        "apiUrl": "",
+        "workflowId": null,
+        "confirm": false,
+        "autoExecute": false,
+        "responseMessage": "",
+        "enabled": true,
+        "agentTriggerPatterns": [],
+        "userTriggerPatterns": [],
+        "intentSlotSchema": []
+      },
+      {
+        "id": "1097",
+        "name": "Agendamento",
+        "slug": "agendamento",
+        "type": "agendamento",
+        "description": "Agenda uma reunião / visita / consulta na agenda do agente.",
+        "triggerType": "",
+        "triggerValue": "",
+        "condition": "",
+        "variables": {
+          "agentSpeechPrompt": "Gostaria de realizar um agendamento? Vou consultar a agenda para ver a disponibilidade e, em seguida, confirmar o horário com você."
+        },
+        "apiUrl": "",
+        "workflowId": null,
+        "confirm": false,
+        "autoExecute": false,
+        "responseMessage": "",
+        "enabled": true,
+        "agentTriggerPatterns": [
+          "gostaria de realizar um agendamento",
+          "gostaria de agendar",
+          "quer agendar",
+          "podemos marcar",
+          "qual o melhor dia",
+          "qual o melhor horário",
+          "me passe o dia e horário",
+          "vamos agendar",
+          "posso reservar um horário",
+          "quer marcar uma visita",
+          "qual data funciona melhor",
+          "me diga uma data",
+          "tem algum horário de preferência",
+          "posso confirmar sua agenda",
+          "vou registrar seu horário"
+        ],
+        "userTriggerPatterns": [
+          "quero agendar",
+          "preciso agendar",
+          "gostaria de agendar",
+          "pode agendar",
+          "marcar horário",
+          "amanhã",
+          "depois de amanhã",
+          "semana que vem",
+          "próxima semana",
+          "dia 1",
+          "às 10h",
+          "horário",
+          "hoje",
+          "segunda",
+          "terça",
+          "quarta",
+          "quinta",
+          "sexta",
+          "de manhã",
+          "à tarde",
+          "noite",
+          "15/05",
+          "amanha as 10",
+          "pode ser amanhã"
+        ],
+        "intentSlotSchema": [
+          {
+            "name": "date",
+            "type": "datetime",
+            "label": "Data e horário",
+            "required": true
+          }
+        ]
+      },
+      {
+        "id": "1098",
+        "name": "Transferir chamado",
+        "slug": "transferirchamado",
+        "type": "transferir",
+        "description": "Transfere o atendimento para um humano.",
+        "triggerType": "",
+        "triggerValue": "",
+        "condition": "",
+        "variables": {
+          "agentSpeechPrompt": "Entendi. Vou transferir você agora para um de nossos especialistas que continuará o atendimento."
+        },
+        "apiUrl": "",
+        "workflowId": null,
+        "confirm": false,
+        "autoExecute": false,
+        "responseMessage": "",
+        "enabled": true,
+        "agentTriggerPatterns": [
+          "vou te transferir",
+          "passar para um atendente",
+          "encaminhar para um atendente",
+          "atendente humano",
+          "vou direcionar para o time",
+          "vou passar para o setor responsável",
+          "um consultor vai te atender",
+          "vou chamar um especialista",
+          "vou encaminhar seu atendimento",
+          "vou transferir seu chamado",
+          "nosso time humano continua"
+        ],
+        "userTriggerPatterns": [
+          "gostaria de falar com um atendente",
+          "quero falar com atendente humano",
+          "quero suporte humano",
+          "transferir atendimento",
+          "me transfere para um atendente",
+          "pode transferir para humano",
+          "falar com humano",
+          "chama um atendente",
+          "preciso de atendente humano",
+          "encaminhar para atendente"
+        ],
+        "intentSlotSchema": []
+      },
+      {
+        "id": "1099",
+        "name": "Enviar link",
+        "slug": "enviarlink",
+        "type": "enviar_link",
+        "description": "Envia um link relevante (catálogo, formulário, agenda).",
+        "triggerType": "",
+        "triggerValue": "",
+        "condition": "",
+        "variables": {
+          "agentSpeechPrompt": "Claro! Segue o {{nome}} para você acessar: {{url}}"
+        },
+        "apiUrl": "",
+        "workflowId": null,
+        "confirm": false,
+        "autoExecute": false,
+        "responseMessage": "",
+        "enabled": true,
+        "agentTriggerPatterns": [
+          "segue o link",
+          "vou te enviar o link",
+          "aqui está o link",
+          "acesse por aqui",
+          "vou mandar o formulário",
+          "vou enviar o catálogo",
+          "segue nosso catálogo",
+          "segue o formulário",
+          "link de pagamento",
+          "link para cadastro"
+        ],
+        "userTriggerPatterns": [
+          "manda o link",
+          "envia o link",
+          "qual o link",
+          "pode enviar",
+          "me manda",
+          "manda pra mim",
+          "quero o link",
+          "envia pra mim",
+          "onde acesso",
+          "tem link"
+        ],
+        "intentSlotSchema": []
+      }
+    ],
+    "mediaLibrary": [],
+    "proactive": {},
+    "transferChamado": {
+      "queueId": null,
+      "userId": null,
+      "queueIntegrationId": null
+    }
+  }
+}
