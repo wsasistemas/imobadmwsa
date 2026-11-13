@@ -157,6 +157,34 @@ const av = await r("select public.com_srv_atend_reuniao_aviso($1) r", [reu]);
 check("aviso da reunião traz consultor e lead", av.consultor.nome === "Ana" && av.lead.nome === "Quente Um", JSON.stringify(av));
 check("roteiro passo 4 sem link", !(await um("select roteiro->3->>'descricao' d from comercial.atend_config")).d.includes("link"));
 
+console.log("\nUsuários e consultores");
+const sv = (p) => r("select public.com_usuario_salvar($1::jsonb) r", [JSON.stringify(p)]);
+const u1 = await sv({ nome: "Carla Consultora", email: "Carla@WSA.com", whatsapp: "(21) 98765-4321", papel: "consultor", na_fila: true, apps: ["imobimoveis"] });
+const uc = (await r("select public.com_usuarios() r")).find((u) => u.id === u1);
+check("salva com WhatsApp normalizado e e-mail minúsculo", uc.whatsapp === "5521987654321" && uc.email === "carla@wsa.com", JSON.stringify(uc));
+check("entra na fila com os sistemas", uc.na_fila && uc.apto && uc.apps[0] === "imobimoveis");
+check("avisos padrão (remarcada desligado)", uc.avisos.reuniao_marcada === true && uc.avisos.remarcada === false);
+check("fila sem WhatsApp é recusada", /WhatsApp/.test(await falha(`select public.com_usuario_salvar('{"nome":"Sem Fone","na_fila":true}'::jsonb)`)));
+check("WhatsApp inválido é recusado", /inválido/.test(await falha(`select public.com_usuario_salvar('{"nome":"X","whatsapp":"123"}'::jsonb)`)));
+check("WhatsApp repetido é recusado", /outro usuário/.test(await falha(`select public.com_usuario_salvar('{"nome":"Outra","whatsapp":"21987654321"}'::jsonb)`)));
+check("nome obrigatório", /nome/.test(await falha(`select public.com_usuario_salvar('{"nome":" "}'::jsonb)`)));
+await sv({ id: u1, nome: "Carla Consultora", whatsapp: "21987654321", papel: "administrador", na_fila: false, avisos: { lembrete_1h: false } });
+const uc2 = (await r("select public.com_usuarios() r")).find((u) => u.id === u1);
+check("editar: sai da fila, vira administrador e muda só o aviso pedido", !uc2.na_fila && uc2.papel === "administrador" && uc2.avisos.lembrete_1h === false && uc2.avisos.reuniao_marcada === true);
+check("aviso permitido segue a escolha do usuário", (await r("select public.com_srv_aviso_permitido('+55 (21) 98765-4321', 'reuniao_marcada') r")) === true
+  && (await r("select public.com_srv_aviso_permitido('5521987654321', 'lembrete_1h') r")) === false);
+check("número que não é de usuário não recebe aviso", (await r("select public.com_srv_aviso_permitido('5511900000000', 'reuniao_marcada') r")) === false);
+await db.query("insert into comercial.agendas_google (vendedor_id, email, calendar_id, ativo, token_valido) values ($1, 'carla@wsa.com', 'primary', true, true)", [u1]);
+await db.query("select public.com_usuario_ativo($1, false)", [u1]);
+check("desativar pausa a agenda e tira o aviso", (await um("select ativo, pausada_por_usuario from comercial.agendas_google where vendedor_id = $1", [u1])).pausada_por_usuario === true
+  && (await r("select public.com_srv_aviso_permitido('5521987654321', 'reuniao_marcada') r")) === false);
+await db.query("select public.com_usuario_ativo($1, true)", [u1]);
+check("reativar devolve a agenda", (await um("select ativo from comercial.agendas_google where vendedor_id = $1", [u1])).ativo === true);
+const reu2 = (await um("insert into comercial.reunioes (negocio_id, vendedor_id, inicio, fim, meet_url) values ($1, $2, now() + interval '40 min', now() + interval '70 min', 'https://meet/x') returning id", [m1.negocio_id, v1])).id;
+await db.exec(`update comercial.vendedores set whatsapp = '5521988880000', avisos = avisos || '{"lembrete_1h": true}' where nome = 'Ana'`);
+const lb1 = await r("select public.com_srv_usuario_lembretes_pegar() r");
+check("lembrete 1 h antes para o consultor da reunião", lb1.some((x) => x.whatsapp === "5521988880000" && x.lead === "Morno Um" && x.meet_url === "https://meet/x"), JSON.stringify(lb1));
+check("lembrete sai uma vez só", (await r("select public.com_srv_usuario_lembretes_pegar() r")).length === 0);
 console.log("\nPainel e webhook");
 const cs = await r("select public.com_atend_conversas() r");
 check("lista de conversas", cs.length === 3 && cs.some((c) => c.situacao === "saiu"), cs.map((c) => c.situacao).join());

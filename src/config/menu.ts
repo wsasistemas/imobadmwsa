@@ -56,6 +56,7 @@ export const MENU: GrupoMenu[] = [
   {
     titulo: "Configurações",
     itens: [
+      { to: "/usuarios", label: "Usuários", icone: "fluent-color:people-24" },
       { to: "/regua", label: "Régua de cobrança", icone: "fluent-color:clock-24" },
       { to: "/google-agenda", label: "Google Agenda", icone: "fluent-color:calendar-sync-24" },
       { to: "/permissoes", label: "Permissões por aplicativo", icone: "fluent-color:lock-shield-24" },

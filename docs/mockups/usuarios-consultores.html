@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Usuários e consultores — mockup</title>
+<style>
+  :root{--bg:#fbf1ea;--card:#fff;--tx:#1f2937;--mut:#667085;--ln:#ece4dd;--pri:#2f5f9e;--pri2:#e8eff9;--ok:#1f7a4a;--okbg:#e5f4ea;--warn:#a15c00;--warnbg:#fdf0d9;--err:#b42318;--errbg:#fde7e5;--soft:#f3f3f2;--new:#7c3aed}
+  *{box-sizing:border-box}
+  body{margin:0;font:14px/1.45 "Segoe UI",Inter,Arial,sans-serif;color:var(--tx);background:var(--bg)}
+  .app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+  aside{background:linear-gradient(180deg,#24497a,#2f5f9e);color:#dfe8f5;padding:18px 12px}
+  aside h1{font-size:15px;color:#fff;margin:0 8px 18px}
+  aside small{display:block;margin:16px 8px 6px;font-size:11px;letter-spacing:.8px;opacity:.7}
+  aside a{display:flex;gap:8px;align-items:center;padding:8px 10px;border-radius:8px;color:inherit;text-decoration:none;font-size:13.5px}
+  aside a.on{background:#fff;color:var(--pri);font-weight:700}
+  aside a .tag{margin-left:auto;font-size:10px;background:#ffd166;color:#5b3c00;border-radius:6px;padding:1px 5px;font-weight:700}
+  main{padding:22px 26px;min-width:0}
+  .crumb{color:var(--mut);font-size:12.5px}
+  .top{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;margin:4px 0 16px}
+  .top h2{margin:0;font:600 26px Georgia,serif}
+  .sub{color:var(--mut);margin:4px 0 0;max-width:760px}
+  .sp{flex:1}
+  .btn{border:0;border-radius:9px;padding:9px 14px;font:inherit;font-weight:700;cursor:pointer;background:var(--pri);color:#fff}
+  .btn.sec{background:var(--pri2);color:var(--pri)}
+  .btn.ghost{background:#fff;border:1px solid #d0d5dd;color:#344054}
+  .btn.sm{padding:6px 10px;font-size:12.5px}
+  .grid{display:grid;gap:14px}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  .kpi{background:#fff;border:1px solid var(--ln);border-radius:12px;padding:14px}
+  .kpi b{display:block;font-size:24px}.kpi span{color:var(--mut);font-size:12.5px}
+  .card{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:18px}
+  .card h3{margin:0 0 4px;font-size:16px}
+  .card p.h{margin:0 0 12px;color:var(--mut);font-size:13px}
+  table{width:100%;border-collapse:collapse}
+  th{font-size:11px;letter-spacing:.6px;color:var(--mut);text-align:left;padding:10px;border-bottom:1px solid var(--ln)}
+  td{padding:12px 10px;border-bottom:1px solid var(--ln);vertical-align:top}
+  tr.sel td{background:#f4f7fc}
+  .pill{display:inline-block;font-size:12px;border-radius:999px;padding:2px 9px;font-weight:600}
+  .p-ok{background:var(--okbg);color:var(--ok)}.p-warn{background:var(--warnbg);color:var(--warn)}.p-err{background:var(--errbg);color:var(--err)}.p-info{background:var(--pri2);color:var(--pri)}.p-neu{background:var(--soft);color:#475467}
+  .chip{display:inline-block;font-size:12px;border:1px solid #c9d8ef;background:#eef4fc;color:#24497a;border-radius:7px;padding:1px 7px;margin:1px}
+  .mut{color:var(--mut);font-size:12.5px}
+  .new{display:inline-block;font-size:10px;font-weight:800;color:#fff;background:var(--new);border-radius:5px;padding:1px 5px;vertical-align:middle;margin-left:4px}
+  .lay{display:grid;grid-template-columns:1fr 440px;gap:16px;margin-top:16px;align-items:start}
+  label.l{display:block;font-size:13px;color:#344054;margin:0 0 5px;font-weight:600}
+  input,select{width:100%;border:1px solid #e4e7ec;background:var(--soft);border-radius:9px;padding:9px 11px;font:inherit;color:var(--tx)}
+  .hint{font-size:12px;color:var(--mut);margin-top:4px}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .sec-t{font-size:12px;letter-spacing:.7px;color:var(--mut);font-weight:700;margin:16px 0 8px;text-transform:uppercase}
+  .switch{width:38px;height:22px;border-radius:99px;background:var(--ok);position:relative;display:inline-block;vertical-align:middle;flex:none}
+  .switch:after{content:"";position:absolute;right:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff}
+  .switch.off{background:#cfd4dc}.switch.off:after{right:auto;left:3px}
+  .tg{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px dashed var(--ln)}
+  .tg div{flex:1}.tg b{font-size:13.5px}
+  .radio{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--ln);border-radius:10px;padding:10px;margin-bottom:8px;cursor:pointer}
+  .radio.on{border-color:var(--pri);background:var(--pri2)}
+  .radio i{width:16px;height:16px;border-radius:50%;border:2px solid #98a2b3;flex:none;margin-top:2px}
+  .radio.on i{border:5px solid var(--pri)}
+  .wa{background:#efe7de;border-radius:12px;padding:10px}
+  .msg{background:#fff;border-radius:10px;padding:8px 10px;font-size:13px;margin:6px 0;box-shadow:0 1px 1px #0001}
+  .msg small{display:block;color:var(--pri);font-weight:700;font-size:11px}
+  .note{border-left:4px solid var(--warn);background:var(--warnbg);padding:10px 12px;border-radius:8px;font-size:13px}
+  .note.blue{border-color:var(--pri);background:var(--pri2)}
+  .note.red{border-color:var(--err);background:var(--errbg)}
+  .ana{margin-top:22px}
+  .ana ol{margin:6px 0 0 18px;padding:0}.ana li{margin:6px 0}
+  @media (max-width:1100px){.lay,.g4{grid-template-columns:1fr}.app{grid-template-columns:1fr}aside{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <h1>ImobAdm WSA</h1>
+    <small>GESTÃO COMERCIAL</small>
+    <a>👥 Leads &amp; Contatos</a><a>🧭 Funil de Vendas</a><a>💬 Atendimento ONLINE</a><a>📅 Agendamentos</a><a>📈 Relatórios Comerciais</a>
+    <small>CONFIGURAÇÕES</small>
+    <a class="on">🧑‍💼 Usuários <span class="tag">NOVO</span></a>
+    <a>⏱ Régua de cobrança</a><a>🗓 Google Agenda</a><a>🔐 Permissões por aplicativo</a><a>🗄 Como funciona</a>
+  </aside>
+
+  <main>
+    <div class="crumb">Configurações › Usuários</div>
+    <div class="top">
+      <div>
+        <h2>Usuários e consultores</h2>
+        <p class="sub">Quem atende as vendas. Cada usuário é um consultor: entra no rodízio do Atendimento ONLINE, tem a agenda das demonstrações e recebe pelo <b>WhatsApp (OpenWA)</b> os avisos de reunião marcada e de lead que pediu para falar com alguém.</p>
+      </div>
+      <span class="sp"></span>
+      <button class="btn">+ Novo usuário</button>
+    </div>
+
+    <div class="grid g4">
+      <div class="kpi"><span>Consultores ativos</span><b>2</b><span>no rodízio do Atendimento</span></div>
+      <div class="kpi"><span>Agendas Google</span><b>1</b><span>conectada</span></div>
+      <div class="kpi"><span>Sem WhatsApp</span><b style="color:var(--err)">1</b><span>não recebe avisos</span></div>
+      <div class="kpi"><span>Avisos enviados hoje</span><b>3</b><span>2 reuniões · 1 lead pediu consultor</span></div>
+    </div>
+
+    <div class="lay">
+      <div class="card" style="padding:0;overflow:hidden">
+        <table>
+          <tr><th>USUÁRIO</th><th>WHATSAPP</th><th>PAPEL</th><th>AGENDA</th><th>ATENDIMENTO</th><th></th></tr>
+          <tr class="sel">
+            <td><b>Wagner Antunes</b><div class="mut">wsasistemas.ia@gmail.com</div></td>
+            <td><span class="pill p-err">Sem WhatsApp</span><div class="mut">não recebe avisos</div></td>
+            <td><span class="pill p-info">Administrador</span></td>
+            <td><span class="pill p-ok">Conectada</span></td>
+            <td><span class="pill p-ok">Na fila · apto</span><div class="mut">todos os sistemas</div></td>
+            <td><button class="btn ghost sm">Editar</button></td>
+          </tr>
+          <tr>
+            <td><b>Consultor 2</b><div class="mut">consultor2@wsa.com.br</div></td>
+            <td>(21) 9 8888-0000<div class="mut"><span class="pill p-ok">teste ok</span></div></td>
+            <td><span class="pill p-neu">Consultor</span></td>
+            <td><span class="pill p-warn">Não conectada</span><div class="mut">não aparece nos horários</div></td>
+            <td><span class="pill p-ok">Na fila · apto</span><div class="mut"><span class="chip">Imobimoveis</span><span class="chip">ImobSuprimentos</span></div></td>
+            <td><button class="btn ghost sm">Editar</button></td>
+          </tr>
+          <tr style="opacity:.55">
+            <td><b>Ex-consultor</b><div class="mut">antigo@wsa.com.br</div></td>
+            <td>(21) 9 7777-0000</td>
+            <td><span class="pill p-neu">Consultor</span></td>
+            <td>—</td>
+            <td><span class="pill p-neu">Desativado</span></td>
+            <td><button class="btn ghost sm">Reativar</button></td>
+          </tr>
+        </table>
+        <div style="padding:12px 16px" class="mut">Desativar tira da fila e da agenda, mas mantém o histórico de leads e reuniões. Não existe excluir.</div>
+      </div>
+
+      <!-- Editor -->
+      <div class="card">
+        <div class="row"><h3 style="margin:0">Editar · Wagner Antunes</h3><span class="sp"></span><span class="pill p-ok">Ativo</span></div>
+
+        <div class="sec-t">Dados</div>
+        <div class="grid" style="grid-template-columns:1fr 1fr">
+          <div><label class="l">Nome (aparece para o lead)</label><input value="Wagner Antunes"></div>
+          <div><label class="l">Cargo</label><input value="Diretor comercial"></div>
+          <div><label class="l">E-mail</label><input value="wsasistemas.ia@gmail.com"></div>
+          <div><label class="l">WhatsApp <span class="new">OBRIGATÓRIO P/ AVISOS</span></label><input placeholder="(21) 9 9999-9999" value="(21) 9 9477-1524"></div>
+        </div>
+        <div class="row" style="margin-top:8px"><button class="btn sec sm">Enviar mensagem de teste</button><span class="mut">sai pelo OpenWA (sessão wsa-admin)</span></div>
+        <div class="note blue" style="margin-top:10px">Este é o <b>mesmo número da sessão wsa-admin</b>. Você já vê as conversas dos leads no celular; os avisos chegam no seu chat <b>"Você" (mensagem para mim)</b> do WhatsApp.</div>
+
+        <div class="sec-t">Papel</div>
+        <div class="radio on"><i></i><div><b>Administrador</b><div class="mut">Entra no painel ImobAdm (super admin) e também atende como consultor.</div></div></div>
+        <div class="radio"><i></i><div><b>Consultor</b><div class="mut">Não entra no painel: atende pelo WhatsApp, recebe os avisos e as reuniões na agenda dele.</div></div></div>
+
+        <div class="sec-t">Atendimento ONLINE (Sophia)</div>
+        <div class="tg"><span class="switch"></span><div><b>Na fila do rodízio</b><div class="mut">Recebe os leads que a Sophia passa para um consultor.</div></div></div>
+        <div class="tg"><span class="switch"></span><div><b>Apto agora</b><div class="mut">Desligue em férias ou folga: sai do rodízio sem perder a configuração.</div></div></div>
+        <div style="padding:9px 0"><b style="font-size:13.5px">Sistemas que atende</b> <span class="mut">(nenhum marcado = todos)</span><div style="margin-top:6px"><span class="chip">Imobimoveis</span><span class="chip">ImobSuprimentos</span><span class="chip">ImobDoceria</span><span class="chip">ImobDisparos</span><span class="chip">ImobPesagem</span><span class="chip">Imobdesk</span><span class="chip">ImobEduca</span></div></div>
+
+        <div class="sec-t">Agenda das demonstrações</div>
+        <div class="row"><span class="pill p-ok">Google conectado</span><span class="mut">wsasistemas.ia@gmail.com</span><span class="sp"></span><button class="btn ghost sm">Trocar</button></div>
+        <div class="hint">Os horários livres desta agenda entram nas opções que a Sophia oferece.</div>
+
+        <div class="sec-t">Avisos pelo WhatsApp (OpenWA) <span class="new">NOVO</span></div>
+        <div class="tg"><span class="switch"></span><div><b>Demonstração marcada pela Sophia</b><div class="mut">Na hora em que o lead escolhe o horário.</div></div></div>
+        <div class="tg"><span class="switch"></span><div><b>Lead pediu para falar com um consultor</b><div class="mut">Também quando nenhum horário serviu ou a Sophia não soube responder.</div></div></div>
+        <div class="tg"><span class="switch"></span><div><b>Lembrete 1 h antes da demonstração</b><div class="mut">Com o nome do lead, a empresa e o link do Meet.</div></div></div>
+        <div class="tg"><span class="switch off"></span><div><b>Demonstração remarcada ou cancelada</b><div class="mut">Quando o lead muda o horário pelo WhatsApp ou pelo link.</div></div></div>
+
+        <div class="sec-t">Prévia dos avisos</div>
+        <div class="wa">
+          <div class="msg"><small>WSA · Atendimento ONLINE</small>📅 <b>Demonstração marcada</b> pela Sophia<br>Iris Trindade Chacon (Construtora Alfa)<br>sex, 14/11 às 10:00 · 30 min<br>Meet: meet.google.com/abc-defg-hij<br>WhatsApp do lead: (21) 9 9724-1073</div>
+          <div class="msg"><small>WSA · Atendimento ONLINE</small>🔔 <b>Lead quer falar com você</b><br>Carlos Souza (Imobiliária Horizonte) · Quente 82<br>Motivo: perguntou o preço do Imobimoveis<br>Responda pelo WhatsApp: (21) 9 8877-6655</div>
+        </div>
+
+        <div class="row" style="margin-top:14px"><button class="btn ghost">Desativar</button><span class="sp"></span><button class="btn ghost">Cancelar</button><button class="btn">Salvar usuário</button></div>
+      </div>
+    </div>
+
+    <div class="card ana">
+      <h3>Para aprovar</h3>
+      <ol>
+        <li><b>Usuário = consultor.</b> Um cadastro só. A aba <i>Fila e horários</i> do Atendimento ONLINE passa a ler desta tela, sem duplicar.</li>
+        <li><b>Dois papéis:</b> Administrador (entra no painel e atende) e Consultor (não entra no painel: atende pelo WhatsApp e recebe avisos). Login de consultor no painel fica para depois.</li>
+        <li><b>WhatsApp obrigatório para entrar na fila</b>, com botão de teste pelo OpenWA.</li>
+        <li><b>4 avisos ligáveis por usuário</b>: reunião marcada, lead pediu consultor, lembrete 1 h antes e remarcada/cancelada (este começa desligado).</li>
+        <li><b>Mesmo número da sessão</b>: o aviso vai para o chat "mensagem para mim", em vez de não ir.</li>
+        <li>O usuário criado sozinho ao conectar a agenda ("wsasistemas.ia") vira <b>Wagner Antunes</b>, Administrador, e só falta você pôr o WhatsApp.</li>
+      </ol>
+    </div>
+  </main>
+</div>
+</body>
+</html>

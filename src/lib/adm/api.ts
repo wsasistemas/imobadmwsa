@@ -303,6 +303,15 @@ export interface AtendMensagem { id: number; autor: "lead" | "robo" | "consultor
 export interface AtendWhatsInfo { webhook_conectado: boolean; proximo_envio_em: string | null; na_janela: boolean; enviadas_hoje: number; limite_dia: number; falhas_hoje: number }
 export interface AtendSessao { ok: boolean; configurado: boolean; webhook_url: string; erro?: string; sessao?: { ok: boolean; status: string | null; telefone: string | null; erro: string | null } }
 
+// Configurações › Usuários (usuário = consultor) -------------------------------------------------
+export interface AvisosUsuario { reuniao_marcada: boolean; pediu_consultor: boolean; lembrete_1h: boolean; remarcada: boolean }
+export interface Usuario {
+  id: string; nome: string; email: string | null; whatsapp: string | null; cargo: string | null; papel: "administrador" | "consultor";
+  ativo: boolean; avisos: AvisosUsuario; na_fila: boolean; apto: boolean; apps: string[];
+  agenda: { email: string | null; conectada: boolean; detalhe: string | null } | null; reunioes_futuras: number;
+}
+export type UsuarioSalvar = Partial<Pick<Usuario, "id" | "nome" | "email" | "whatsapp" | "cargo" | "papel" | "avisos" | "na_fila" | "apto" | "apps">>;
+
 export type OfertaAgenda =
   | { tipo: "horarios"; slots: string[]; expira: string }
   | { tipo: "recusou"; depois: string | null; expira: string };
@@ -435,6 +444,9 @@ export const api = {
   atendFila: () => rpc<AtendFila>("com_atend_fila"),
   atendSimular: (body: SimulacaoPedido) =>
     edge<SimulacaoResposta>("atend-simulador", body as unknown as Record<string, unknown>),
+  usuarios: () => rpc<Usuario[]>("com_usuarios"),
+  usuarioSalvar: (p: UsuarioSalvar) => rpc<string>("com_usuario_salvar", { p }),
+  usuarioAtivo: (id: string, ativo: boolean) => rpc<void>("com_usuario_ativo", { p_id: id, p_ativo: ativo }),
   atendConversas: (busca?: string) => rpc<AtendConversa[]>("com_atend_conversas", { p_busca: busca || null }),
   atendMensagens: (conversa: string) => rpc<AtendMensagem[]>("com_atend_mensagens", { p_conversa: conversa }),
   atendAssumir: (conversa: string, assumir: boolean) => rpc<void>("com_atend_assumir", { p_conversa: conversa, p_assumir: assumir }),

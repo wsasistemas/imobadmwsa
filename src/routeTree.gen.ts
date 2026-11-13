@@ -28,6 +28,7 @@ import { Route as AuthenticatedPermissoesRouteImport } from './routes/_authentic
 import { Route as AuthenticatedReguaRouteImport } from './routes/_authenticated/regua'
 import { Route as AuthenticatedRelatoriosComerciaisRouteImport } from './routes/_authenticated/relatorios-comerciais'
 import { Route as AuthenticatedSistemasRouteImport } from './routes/_authenticated/sistemas'
+import { Route as AuthenticatedUsuariosRouteImport } from './routes/_authenticated/usuarios'
 import { Route as AgendarTokenRouteImport } from './routes/agendar.$token'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
@@ -139,6 +140,11 @@ const AuthenticatedSistemasRoute = AuthenticatedSistemasRouteImport.update({
   path: '/sistemas',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedUsuariosRoute = AuthenticatedUsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AgendarTokenRoute = AgendarTokenRouteImport.update({
   id: '/agendar/$token',
   path: '/agendar/$token',
@@ -203,6 +209,7 @@ export interface FileRoutesByFullPath {
   '/regua': typeof AuthenticatedReguaRoute
   '/relatorios-comerciais': typeof AuthenticatedRelatoriosComerciaisRoute
   '/sistemas': typeof AuthenticatedSistemasRoute
+  '/usuarios': typeof AuthenticatedUsuariosRoute
   '/agendar/$token': typeof AgendarTokenRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -231,6 +238,7 @@ export interface FileRoutesByTo {
   '/regua': typeof AuthenticatedReguaRoute
   '/relatorios-comerciais': typeof AuthenticatedRelatoriosComerciaisRoute
   '/sistemas': typeof AuthenticatedSistemasRoute
+  '/usuarios': typeof AuthenticatedUsuariosRoute
   '/agendar/$token': typeof AgendarTokenRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -261,6 +269,7 @@ export interface FileRoutesById {
   '/_authenticated/regua': typeof AuthenticatedReguaRoute
   '/_authenticated/relatorios-comerciais': typeof AuthenticatedRelatoriosComerciaisRoute
   '/_authenticated/sistemas': typeof AuthenticatedSistemasRoute
+  '/_authenticated/usuarios': typeof AuthenticatedUsuariosRoute
   '/agendar/$token': typeof AgendarTokenRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -291,6 +300,7 @@ export interface FileRouteTypes {
     | '/regua'
     | '/relatorios-comerciais'
     | '/sistemas'
+    | '/usuarios'
     | '/agendar/$token'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -319,6 +329,7 @@ export interface FileRouteTypes {
     | '/regua'
     | '/relatorios-comerciais'
     | '/sistemas'
+    | '/usuarios'
     | '/agendar/$token'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -348,6 +359,7 @@ export interface FileRouteTypes {
     | '/_authenticated/regua'
     | '/_authenticated/relatorios-comerciais'
     | '/_authenticated/sistemas'
+    | '/_authenticated/usuarios'
     | '/agendar/$token'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -507,6 +519,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSistemasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/usuarios': {
+      id: '/_authenticated/usuarios'
+      path: '/usuarios'
+      fullPath: '/usuarios'
+      preLoaderRoute: typeof AuthenticatedUsuariosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/agendar/$token': {
       id: '/agendar/$token'
       path: '/agendar/$token'
@@ -579,6 +598,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedReguaRoute: typeof AuthenticatedReguaRoute
   AuthenticatedRelatoriosComerciaisRoute: typeof AuthenticatedRelatoriosComerciaisRoute
   AuthenticatedSistemasRoute: typeof AuthenticatedSistemasRoute
+  AuthenticatedUsuariosRoute: typeof AuthenticatedUsuariosRoute
   AuthenticatedEmpresasIdRoute: typeof AuthenticatedEmpresasIdRoute
   AuthenticatedFontesLandingRoute: typeof AuthenticatedFontesLandingRoute
   AuthenticatedFontesMetaRoute: typeof AuthenticatedFontesMetaRoute
@@ -599,6 +619,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRelatoriosComerciaisRoute:
     AuthenticatedRelatoriosComerciaisRoute,
   AuthenticatedSistemasRoute: AuthenticatedSistemasRoute,
+  AuthenticatedUsuariosRoute: AuthenticatedUsuariosRoute,
   AuthenticatedEmpresasIdRoute: AuthenticatedEmpresasIdRoute,
   AuthenticatedFontesLandingRoute: AuthenticatedFontesLandingRoute,
   AuthenticatedFontesMetaRoute: AuthenticatedFontesMetaRoute,

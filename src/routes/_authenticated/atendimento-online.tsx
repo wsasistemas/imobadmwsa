@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDown, ArrowUp, Loader2, Lock, Plus, RotateCcw, Send, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { toast } from "sonner";
@@ -196,7 +196,7 @@ function AtendimentoOnline() {
           {aba === "boasvindas" && <AbaBoasVindas cfg={cfg} set={set} painel={q.data} />}
           {aba === "base" && <AbaBase painel={q.data} aoMudar={recarregar} />}
           {aba === "prompt" && <AbaPrompt cfg={cfg} set={set} />}
-          {aba === "fila" && <AbaFila cfg={cfg} set={set} painel={q.data} aoMudar={recarregar} />}
+          {aba === "fila" && <AbaFila cfg={cfg} set={set} painel={q.data} />}
           {aba === "painel" && <AbaPainel />}
           {aba === "sim" && (
             <AbaSimulador painel={q.data} cfg={q.data.config} aoTestar={recarregar} />
@@ -1595,119 +1595,52 @@ function AbaFila({
   cfg,
   set,
   painel,
-  aoMudar,
 }: {
   cfg: AtendConfig;
   set: (p: Partial<AtendConfig>) => void;
   painel: AtendPainel;
-  aoMudar: () => Promise<void>;
 }) {
-  const [lista, setLista] = useState(painel.consultores);
-  useEffect(() => setLista(painel.consultores), [painel.consultores]);
-  const mudou = JSON.stringify(lista) !== JSON.stringify(painel.consultores);
-  const salvar = useMutation({
-    mutationFn: () =>
-      api.atendConsultoresSalvar(
-        lista
-          .filter((c) => c.na_fila)
-          .map((c) => ({ vendedor_id: c.vendedor_id, apps: c.apps, apto: c.apto })),
-      ),
-    onSuccess: async () => {
-      toast.success("Fila de consultores salva.");
-      await aoMudar();
-    },
-    onError: (e) => toast.error(mensagemErro(e)),
-  });
-  const up = (id: string, p: Partial<(typeof lista)[number]>) =>
-    setLista((l) => l.map((c) => (c.vendedor_id === id ? { ...c, ...p } : c)));
-  const mover = (i: number, d: -1 | 1) =>
-    setLista((l) => {
-      const r = [...l];
-      const j = i + d;
-      if (j < 0 || j >= r.length) return l;
-      [r[i], r[j]] = [r[j], r[i]];
-      return r;
-    });
-  const appsBase = painel.sistemas
-    .filter((s) => s.app)
-    .map((s) => [s.app!, s.nome.split(" (")[0]] as [string, string]);
+  // A fila vem de Configurações › Usuários (um cadastro só): aqui só o resumo.
+  const lista = painel.consultores.filter((c) => c.na_fila);
+  const nomeApp = (a: string) => painel.sistemas.find((s) => s.app === a)?.nome.split(" (")[0] ?? a;
 
   return (
     <div className="grid gap-4 xl:grid-cols-2">
-      <Cartao icone="fluent-color:people-24" titulo="Consultores (rodízio)" semPadding>
+      <Cartao
+        icone="fluent-color:people-24"
+        titulo="Consultores (rodízio)"
+        semPadding
+        extra={
+          <Link to="/usuarios" className="text-xs font-semibold text-primary">
+            Gerenciar em Usuários
+          </Link>
+        }
+      >
         {lista.length === 0 ? (
           <Vazio
             icone="fluent-color:people-24"
-            titulo="Nenhum vendedor cadastrado"
-            texto="Cadastre vendedores no Funil de Vendas."
+            titulo="Ninguém na fila"
+            texto="Em Configurações › Usuários, ative 'Na fila do rodízio' e cadastre o WhatsApp de quem atende."
           />
         ) : (
           <ul className="divide-y divide-border">
-            {lista.map((c, i) => (
+            {lista.map((c) => (
               <li
                 key={c.vendedor_id}
-                className={cn("space-y-2 px-4 py-3 text-sm", !c.na_fila && "opacity-60")}
+                className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 text-sm"
               >
-                <div className="flex flex-wrap items-center gap-2">
-                  <b className="flex-1">{c.nome}</b>
-                  <label className="flex items-center gap-1.5 text-xs">
-                    <Switch
-                      checked={c.na_fila}
-                      onCheckedChange={(v) =>
-                        up(c.vendedor_id, { na_fila: v, apto: v ? true : c.apto })
-                      }
-                      aria-label="Na fila"
-                    />
-                    Na fila
-                  </label>
-                  {c.na_fila ? (
-                    <label className="flex items-center gap-1.5 text-xs">
-                      <Switch
-                        checked={c.apto}
-                        onCheckedChange={(v) => up(c.vendedor_id, { apto: v })}
-                        aria-label="Apto agora"
-                      />
-                      Apto
-                    </label>
-                  ) : null}
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    aria-label="Subir"
-                    disabled={i === 0}
-                    onClick={() => mover(i, -1)}
-                  >
-                    <ArrowUp className="size-4" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    aria-label="Descer"
-                    disabled={i === lista.length - 1}
-                    onClick={() => mover(i, 1)}
-                  >
-                    <ArrowDown className="size-4" />
-                  </Button>
+                <div className="min-w-0">
+                  <b className="block">{c.nome}</b>
+                  <span className="text-xs text-muted-foreground">
+                    {c.apps.length ? c.apps.map(nomeApp).join(", ") : "todos os sistemas"}
+                  </span>
                 </div>
-                {c.na_fila ? (
-                  <div>
-                    <span className="text-xs text-muted-foreground">
-                      Sistemas que atende ({c.apps.length ? "só os marcados" : "todos"}):
-                    </span>
-                    <div className="mt-1">
-                      <Pilulas
-                        opcoes={appsBase}
-                        valor={c.apps}
-                        onChange={(v) => up(c.vendedor_id, { apps: v })}
-                      />
-                    </div>
-                  </div>
-                ) : null}
+                {c.apto ? <Selo tom="ok">Apto</Selo> : <Selo tom="war">Pausado</Selo>}
               </li>
             ))}
           </ul>
         )}
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border p-4">
+        <div className="flex flex-wrap items-center gap-2 border-t border-border p-4">
           <label className="flex items-center gap-2 text-sm">
             Consultor sem resposta em
             <Input
@@ -1721,9 +1654,6 @@ function AbaFila({
             />
             min → passa para o próximo
           </label>
-          <Button disabled={!mudou || salvar.isPending} onClick={() => salvar.mutate()}>
-            Salvar fila
-          </Button>
         </div>
       </Cartao>
 
