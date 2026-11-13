@@ -68,7 +68,7 @@ export function boasVindas(ctx: Contexto, lead: Lead): string {
     .replaceAll("{{sistemas}}", nomesDosSistemas(ctx, lead.sistemas));
 }
 
-export function montarPrompt(ctx: Contexto, lead: Lead, foraDoHorario: boolean): string {
+export function montarPrompt(ctx: Contexto, lead: Lead, foraDoHorario: boolean, agenda = ""): string {
   const c = ctx.config;
   const roteiro = c.roteiro.map((p, i) => `${i + 1}. ${p.titulo}${p.obrigatorio ? " (obrigatório)" : " (opcional)"}: ${p.descricao}`).join("\n");
   const passar = Object.entries(c.passar_consultor).filter(([, v]) => v).map(([k]) => `- ${PASSAR[k] ?? k}`).join("\n");
@@ -114,6 +114,12 @@ Nome: ${lead.nome}${lead.empresa ? ` · Empresa: ${lead.empresa}` : ""}
 Interesse marcado no cadastro: ${nomesDosSistemas(ctx, lead.sistemas)}
 Nota atual: ${lead.pontuacao} (${lead.temperatura})
 
+AGENDAMENTO DA DEMONSTRAÇÃO
+- Quem marca é o sistema, com os horários livres do Google Agenda. Você NUNCA escreve horários, datas nem links de agendamento.
+- Quando o lead aceitar ver o sistema, pedir para marcar ou perguntar horários: responda curto (ex.: "Ótimo! Vou te mostrar
+  os horários livres.") e marque "oferecer_agenda": true. O sistema envia as opções numeradas logo abaixo da sua mensagem.
+- Nunca escreva links que não estejam na Base de conhecimento.${agenda ? `\n- Situação agora: ${agenda}` : ""}
+
 FORMATO DA SAÍDA: responda SOMENTE um JSON, sem texto fora dele:
 {"resposta": "mensagem para o WhatsApp",
  "botoes": ["até 3 opções curtas de resposta, ou lista vazia"],
@@ -121,7 +127,7 @@ FORMATO DA SAÍDA: responda SOMENTE um JSON, sem texto fora dele:
  "resposta_pronta": número da resposta pronta usada ou null,
  "sistema_indicado": "código do sistema indicado nesta mensagem" ou null,
  "enviar_pagina": true se é hora de mandar a página do sistema indicado,
- "oferecer_agenda": true se está oferecendo marcar a demonstração,
+ "oferecer_agenda": true quando o lead quer marcar a demonstração ou ver horários (o sistema mostra os horários),
  "passar_consultor": true ou false,
  "motivo_consultor": "por quê" ou null,
  "temperatura": nota de 0 a 100 do lead depois desta mensagem,
@@ -145,7 +151,8 @@ export async function chamarIA(sistema: string, mensagens: { autor: "lead" | "ro
       return await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST", signal: ctl.signal,
         headers: { Authorization: `Bearer ${chave}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ model: modelo, messages, temperature: 0.3, max_tokens: 900, ...(comFormato ? { response_format: { type: "json_object" } } : {}) }),
+        // Folga de tokens: modelos com raciocínio interno gastam parte do limite antes de escrever (resposta cortada = JSON quebrado).
+        body: JSON.stringify({ model: modelo, messages, temperature: 0.3, max_tokens: 4000, ...(comFormato ? { response_format: { type: "json_object" } } : {}) }),
       });
     } catch {
       throw new Error("A IA não respondeu a tempo. Tente de novo.");
@@ -161,12 +168,28 @@ export async function chamarIA(sistema: string, mensagens: { autor: "lead" | "ro
   if (!res.ok) throw new Error(`A IA recusou o pedido (${res.status}).`);
   const corpo = await res.json().catch(() => null) as { choices?: { message?: { content?: string } }[] } | null;
   const texto = String(corpo?.choices?.[0]?.message?.content ?? "").trim().replace(/^```(?:json)?\s*/i, "").replace(/```$/, "").trim();
+  return lerJsonDaIA(texto);
+}
+
+/** JSON da IA; se vier cortado ou fora do formato, salva o que der e nunca devolve JSON cru para o lead. */
+export function lerJsonDaIA(texto: string): Json {
+  const ini = texto.indexOf("{"), fim = texto.lastIndexOf("}");
   try {
-    const ini = texto.indexOf("{"), fim = texto.lastIndexOf("}");
     return JSON.parse(ini >= 0 && fim > ini ? texto.slice(ini, fim + 1) : texto) as Json;
   } catch {
-    // A IA respondeu fora do formato: usa o texto como resposta, sem ações.
-    return { resposta: texto.slice(0, 1200) };
+    if (ini < 0) return { resposta: texto.slice(0, 1200) };
+    // JSON cortado: aproveita os campos que chegaram inteiros.
+    const campo = (nome: string) => {
+      const m = new RegExp(`"${nome}"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"`).exec(texto);
+      if (!m) return null;
+      try { return JSON.parse(`"${m[1]}"`) as string; } catch { return m[1]; }
+    };
+    const booleano = (nome: string) => new RegExp(`"${nome}"\\s*:\\s*true`).test(texto);
+    const resposta = campo("resposta") ?? (/"resposta"\s*:\s*"((?:[^"\\]|\\.)*)$/.exec(texto)?.[1]?.replace(/\\n/g, "\n").replace(/\s+\S*$/, "") ?? "");
+    return {
+      resposta: resposta || null, regra: campo("regra"), sistema_indicado: campo("sistema_indicado"),
+      oferecer_agenda: booleano("oferecer_agenda"), passar_consultor: booleano("passar_consultor"), enviar_pagina: booleano("enviar_pagina"),
+    };
   }
 }
 

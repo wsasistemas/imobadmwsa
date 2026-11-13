@@ -145,6 +145,18 @@ await db.query("select public.com_srv_atend_registrar($1, 'robo', 'Texto do rob�
 check("eco do robô sem id não pausa", (await r("select public.com_srv_atend_saida_celular('5521999990001', 'Texto do robô sem id', 'eco-1') r")).acao === "ja_registrada"
   && (await um("select situacao from comercial.atend_conversas where id = $1", [p1.conversa_id])).situacao === "robo");
 check("celular para quem não tem conversa é ignorado", (await r("select public.com_srv_atend_saida_celular('5511900001111', 'oi', 'cel-2') r")).acao === "ignorar");
+console.log("\nOferta de horários e aviso");
+await db.query("select public.com_srv_atend_oferta($1, $2::jsonb)", [p1.conversa_id, JSON.stringify({ tipo: "horarios", slots: ["2026-11-20T13:00:00Z"], expira: "2099-01-01T00:00:00Z" })]);
+check("oferta guardada e lida", (await r("select public.com_srv_atend_oferta_ler($1) r", [p1.conversa_id])).slots[0] === "2026-11-20T13:00:00Z");
+await db.query("select public.com_srv_atend_oferta($1, null)", [p1.conversa_id]);
+check("oferta limpa", (await r("select public.com_srv_atend_oferta_ler($1) r", [p1.conversa_id])) === null);
+const ag = await r("select public.com_srv_atend_agenda_geral() r");
+check("agenda geral para o simulador", !!ag.config && Array.isArray(ag.agendas) && ag.minha === null);
+const reu = (await um("insert into comercial.reunioes (negocio_id, vendedor_id, inicio, fim) values ($1, $2, now() + interval '1 day', now() + interval '1 day 30 min') returning id", [q1.negocio_id, v1])).id;
+const av = await r("select public.com_srv_atend_reuniao_aviso($1) r", [reu]);
+check("aviso da reunião traz consultor e lead", av.consultor.nome === "Ana" && av.lead.nome === "Quente Um", JSON.stringify(av));
+check("roteiro passo 4 sem link", !(await um("select roteiro->3->>'descricao' d from comercial.atend_config")).d.includes("link"));
+
 console.log("\nPainel e webhook");
 const cs = await r("select public.com_atend_conversas() r");
 check("lista de conversas", cs.length === 3 && cs.some((c) => c.situacao === "saiu"), cs.map((c) => c.situacao).join());

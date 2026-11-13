@@ -291,6 +291,7 @@ export interface SimulacaoPedido {
     sistemas: string[];
   };
   fora_do_horario: boolean;
+  oferta: OfertaAgenda | null;
 }
 export type SituacaoConversa = "aguardando" | "robo" | "consultor" | "encerrada" | "saiu" | "falhou";
 export interface AtendConversa {
@@ -301,6 +302,10 @@ export interface AtendConversa {
 export interface AtendMensagem { id: number; autor: "lead" | "robo" | "consultor" | "sistema"; texto: string; detalhe: Record<string, unknown>; criado_em: string }
 export interface AtendWhatsInfo { webhook_conectado: boolean; proximo_envio_em: string | null; na_janela: boolean; enviadas_hoje: number; limite_dia: number; falhas_hoje: number }
 export interface AtendSessao { ok: boolean; configurado: boolean; webhook_url: string; erro?: string; sessao?: { ok: boolean; status: string | null; telefone: string | null; erro: string | null } }
+
+export type OfertaAgenda =
+  | { tipo: "horarios"; slots: string[]; expira: string }
+  | { tipo: "recusou"; depois: string | null; expira: string };
 
 export interface SimulacaoResposta {
   ok: true;
@@ -319,6 +324,8 @@ export interface SimulacaoResposta {
     passo_roteiro: number | null;
   };
   simulado: boolean;
+  oferta: OfertaAgenda | null;
+  agendamento: { inicio: string } | null;
 }
 
 export interface AgendaPainel {

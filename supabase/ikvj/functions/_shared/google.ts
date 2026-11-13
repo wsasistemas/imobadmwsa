@@ -154,7 +154,57 @@ export async function enviarTemplate(para: string | null, nome: string, parametr
 }
 
 export function linkAgenda(token: string): string {
-  return `${(env("ADM_AGENDA_URL") || "https://imobwsa.vercel.app").replace(/\/+$/, "")}/agendar/${token}`;
+  return `${(env("ADM_AGENDA_URL") || "https://imobadmwsa.imobsystems.com.br").replace(/\/+$/, "")}/agendar/${token}`;
+}
+
+export type ResultadoMarcar =
+  | { ok: true; reuniao: { id: string; inicio: string; fim: string; meet_url: string | null } }
+  | { ok: false; erro: string; conflito?: boolean; status: number };
+
+/**
+ * Marca (ou remarca) uma reunião: confere o horário no Google → reserva com trava no banco → cria o evento → confirma.
+ * Se o Google falhar, solta a reserva. Usado pela página /agendar e pela Sophia (Atendimento ONLINE).
+ */
+export async function marcarHorario(db: Db, app: AppGoogle, token: string, c: Contexto, inicio: string, substitui: string | null, origemTexto: string): Promise<ResultadoMarcar> {
+  const ocupado = "Esse horário acabou de ser ocupado. Escolha outro.";
+  const pedido = new Date(inicio).getTime();
+  if (!Number.isFinite(pedido)) return { ok: false, erro: "Horário inválido.", status: 400 };
+  const livre = (await horariosLivres(db, app, c)).find((h) => new Date(h.inicio).getTime() === pedido);
+  if (!livre) return { ok: false, erro: ocupado, conflito: true, status: 409 };
+
+  const { data, error } = await db.rpc("com_srv_agenda_reservar", { p_token: token, p_inicio: livre.inicio, p_agendas: livre.agendas, p_substitui: substitui });
+  if (error) return { ok: false, erro: "Não foi possível marcar agora. Tente de novo.", status: 500 };
+  const r = data as { ok: boolean; motivo?: string; reuniao_id: string; calendar_id: string; refresh_token: string; inicio: string; fim: string; criar_meet: boolean };
+  if (!r.ok) {
+    if (r.motivo === "ja_marcada") return { ok: false, erro: "Você já tem uma reunião marcada. Use Remarcar.", status: 409 };
+    return { ok: false, erro: ocupado, conflito: true, status: 409 };
+  }
+
+  let evento: { id: string; meet: string | null };
+  try {
+    evento = await criarEvento(app, r.refresh_token, r.calendar_id, {
+      titulo: `Demonstração WSA · ${c.empresa || c.nome}`,
+      descricao: `${origemTexto}\nContato: ${c.nome}${c.whatsapp ? ` · WhatsApp ${c.whatsapp}` : ""}${c.email ? ` · ${c.email}` : ""}`,
+      inicio: r.inicio, fim: r.fim, convidado: c.email, meet: r.criar_meet, idPedido: r.reuniao_id,
+    });
+  } catch (e) {
+    console.error("[google] marcar", e instanceof Error ? e.message : String(e));
+    await db.rpc("com_srv_agenda_soltar", { p_reuniao: r.reuniao_id });
+    return { ok: false, erro: "O Google Agenda não respondeu. Tente de novo em instantes.", status: 502 };
+  }
+
+  const { data: conf, error: eConf } = await db.rpc("com_srv_agenda_confirmar", { p_reuniao: r.reuniao_id, p_evento: evento.id, p_meet: evento.meet ?? "", p_substitui: substitui });
+  if (eConf) console.error("[google] confirmar", eConf.message);
+  const antiga = conf as { antiga_evento?: string; antiga_calendar?: string; antiga_refresh?: string } | null;
+  if (antiga?.antiga_evento) await apagarEvento(app, antiga.antiga_refresh ?? null, antiga.antiga_calendar ?? null, antiga.antiga_evento);
+  return { ok: true, reuniao: { id: r.reuniao_id, inicio: r.inicio, fim: r.fim, meet_url: evento.meet } };
+}
+
+/** Contexto da agenda pelo token do negócio, sem o limite de chamadas da página pública (uso interno). */
+export async function contextoDoToken(db: Db, token: string): Promise<Contexto | null> {
+  if (!TOKEN_OK.test(token)) return null;
+  const { data } = await db.rpc("com_srv_agenda_contexto", { p_token: token });
+  return (data as Contexto | null) ?? null;
 }
 
 export const TOKEN_OK = /^[A-Za-z0-9_-]{16,200}$/;

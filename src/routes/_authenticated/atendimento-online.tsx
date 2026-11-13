@@ -1841,11 +1841,13 @@ function AbaSimulador({
   const [texto, setTexto] = useState("");
   const [ultima, setUltima] = useState<SimulacaoResposta | null>(null);
   const [nota, setNota] = useState(lead.pontuacao);
+  const [oferta, setOferta] = useState<SimulacaoResposta["oferta"]>(null);
   const fim = useRef<HTMLDivElement>(null);
 
   const recomecar = () => {
     setMsgs(inicio());
     setUltima(null);
+    setOferta(null);
     setNota(lead.pontuacao);
     setTexto("");
   };
@@ -1867,10 +1869,12 @@ function AbaSimulador({
           sistemas: lead.sistemas,
         },
         fora_do_horario: fora,
+        oferta,
       }),
     onSuccess: async (r) => {
       setMsgs((m) => [...m, { autor: "robo", texto: r.resposta, botoes: r.botoes }]);
       setUltima(r);
+      setOferta(r.oferta);
       setNota(r.acoes.temperatura);
       if (r.simulado && !cfg.simulado_em) {
         toast.success("Robô testado: já pode ser ligado.");
@@ -2010,7 +2014,23 @@ function AbaSimulador({
                   {a.enviar_pagina ? " · mandou a página" : ""}
                 </li>
               ) : null}
-              {a.oferecer_agenda ? <li>📅 Ofereceu o link de agendamento</li> : null}
+              {ultima?.agendamento ? (
+                <li className="font-semibold text-success">
+                  📅 Marcaria a demonstração para{" "}
+                  {new Date(ultima.agendamento.inicio).toLocaleString("pt-BR", {
+                    weekday: "short",
+                    day: "2-digit",
+                    month: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}{" "}
+                  e avisaria o consultor da agenda
+                </li>
+              ) : ultima?.oferta?.tipo === "horarios" ? (
+                <li>📅 Ofereceu {ultima.oferta.slots.length} horários livres do Google Agenda</li>
+              ) : ultima?.oferta?.tipo === "recusou" ? (
+                <li>📅 Nenhum horário serviu: perguntou se quer consultor ou mais horários</li>
+              ) : null}
               {a.passar_consultor ? (
                 <li className="font-semibold text-warning-strong">
                   👤 Passa para um consultor: {a.motivo_consultor ?? "regra marcada"}

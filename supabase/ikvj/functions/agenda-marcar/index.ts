@@ -1,51 +1,15 @@
 // agenda-marcar — marca, remarca ou cancela pela página pública. verify_jwt = false: a proteção é o token com validade.
-// Ordem ao marcar: confere o horário no Google → reserva com trava no banco → cria o evento → confirma. Se o Google falhar, solta a reserva.
+// Ordem ao marcar (em _shared/google.ts → marcarHorario): confere o horário no Google → reserva com trava no banco →
+// cria o evento → confirma. Se o Google falhar, solta a reserva.
 // Templates na Meta (pt_BR): reuniao_confirmada com {{1}} nome, {{2}} data e hora, {{3}} link.
 import { admin, cors, json } from "../_shared/asaas.ts";
-import {
-  abrirToken, apagarEvento, appGoogle, criarEvento, dataHoraBr, enviarTemplate, horariosLivres, linkAgenda, type AppGoogle, type Contexto, type Db,
-} from "../_shared/google.ts";
-
-const OCUPADO = "Esse horário acabou de ser ocupado. Escolha outro.";
+import { abrirToken, apagarEvento, appGoogle, dataHoraBr, enviarTemplate, linkAgenda, marcarHorario, type AppGoogle, type Contexto, type Db } from "../_shared/google.ts";
 
 async function marcar(db: Db, app: AppGoogle, token: string, c: Contexto, inicio: string, substitui: string | null) {
-  const pedido = new Date(inicio).getTime();
-  if (!Number.isFinite(pedido)) return json({ ok: false, erro: "Horário inválido." }, 400);
-  const livre = (await horariosLivres(db, app, c)).find((h) => new Date(h.inicio).getTime() === pedido);
-  if (!livre) return json({ ok: false, erro: OCUPADO, conflito: true }, 409);
-
-  const { data, error } = await db.rpc("com_srv_agenda_reservar", {
-    p_token: token, p_inicio: livre.inicio, p_agendas: livre.agendas, p_substitui: substitui,
-  });
-  if (error) return json({ ok: false, erro: "Não foi possível marcar agora. Tente de novo." }, 500);
-  const r = data as { ok: boolean; motivo?: string; reuniao_id: string; calendar_id: string; refresh_token: string; inicio: string; fim: string; criar_meet: boolean };
-  if (!r.ok) {
-    if (r.motivo === "ja_marcada") return json({ ok: false, erro: "Você já tem uma reunião marcada. Use Remarcar." }, 409);
-    return json({ ok: false, erro: OCUPADO, conflito: true }, 409);
-  }
-
-  let evento: { id: string; meet: string | null };
-  try {
-    evento = await criarEvento(app, r.refresh_token, r.calendar_id, {
-      titulo: `Demonstração WSA · ${c.empresa || c.nome}`,
-      descricao: `Reunião marcada pelo link de agendamento.\nContato: ${c.nome}`,
-      inicio: r.inicio, fim: r.fim, convidado: c.email, meet: r.criar_meet, idPedido: r.reuniao_id,
-    });
-  } catch (e) {
-    console.error("[agenda-marcar]", e instanceof Error ? e.message : String(e));
-    await db.rpc("com_srv_agenda_soltar", { p_reuniao: r.reuniao_id });
-    return json({ ok: false, erro: "O Google Agenda não respondeu. Tente de novo em instantes." }, 502);
-  }
-
-  const { data: conf, error: eConf } = await db.rpc("com_srv_agenda_confirmar", {
-    p_reuniao: r.reuniao_id, p_evento: evento.id, p_meet: evento.meet ?? "", p_substitui: substitui,
-  });
-  if (eConf) console.error("[agenda-marcar] confirmar", eConf.message);
-  const antiga = conf as { antiga_evento?: string; antiga_calendar?: string; antiga_refresh?: string } | null;
-  if (antiga?.antiga_evento) await apagarEvento(app, antiga.antiga_refresh ?? null, antiga.antiga_calendar ?? null, antiga.antiga_evento);
-
-  await enviarTemplate(c.whatsapp, "reuniao_confirmada", [c.nome.trim().split(/\s+/)[0] || "tudo bem", dataHoraBr(r.inicio), evento.meet ?? linkAgenda(token)]);
-  return json({ ok: true, reuniao: { id: r.reuniao_id, inicio: r.inicio, fim: r.fim, meet_url: evento.meet } });
+  const r = await marcarHorario(db, app, token, c, inicio, substitui, "Reunião marcada pelo link de agendamento.");
+  if (!r.ok) return json({ ok: false, erro: r.erro, ...(r.conflito ? { conflito: true } : {}) }, r.status);
+  await enviarTemplate(c.whatsapp, "reuniao_confirmada", [c.nome.trim().split(/\s+/)[0] || "tudo bem", dataHoraBr(r.reuniao.inicio), r.reuniao.meet_url ?? linkAgenda(token)]);
+  return json({ ok: true, reuniao: r.reuniao });
 }
 
 Deno.serve(async (req) => {
