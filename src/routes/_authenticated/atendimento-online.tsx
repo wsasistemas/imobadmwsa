@@ -74,6 +74,8 @@ const SELECT = "h-10 w-full rounded-md border border-input bg-card px-3 text-sm"
 
 // Só os campos que a tela edita (os que o robô muda sozinho, como o próximo envio, não contam como alteração).
 const NAO_EDITAVEIS = new Set([
+  "bv_imediato",
+  "bv_imediato_horas",
   "ligado",
   "simulado_em",
   "atualizado_em",
@@ -708,6 +710,55 @@ function FilaPrevia({ compacta }: { compacta?: boolean }) {
 }
 
 // Boas-vindas e regras ----------------------------------------------------------------------------------
+// Salva na hora (função própria no banco): lead que acabou de chegar recebe mesmo fora da janela.
+function BoasVindasImediata({ cfg }: { cfg: AtendConfig }) {
+  const qc = useQueryClient();
+  const [ativo, setAtivo] = useState(cfg.bv_imediato ?? true);
+  const [horas, setHoras] = useState(cfg.bv_imediato_horas ?? 2);
+  const salvar = useMutation({
+    mutationFn: (p: { a: boolean; h: number }) => api.atendImediatoSalvar(p.a, p.h),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["atend-painel"] }),
+    onError: (e) => toast.error(mensagemErro(e)),
+  });
+  return (
+    <div className="rounded-lg border border-primary/30 bg-primary-soft/40 p-3">
+      <label className="flex items-start justify-between gap-3">
+        <span>
+          <b>Lead que acabou de chegar recebe na hora</b>
+          <span className="block text-xs text-muted-foreground">
+            Mesmo fora da janela de envio. Se ele pediu demonstração, a primeira mensagem já traz os
+            horários livres da agenda.
+          </span>
+        </span>
+        <Switch
+          checked={ativo}
+          aria-label="Boas-vindas imediata"
+          onCheckedChange={(v) => {
+            setAtivo(v);
+            salvar.mutate({ a: v, h: horas });
+          }}
+        />
+      </label>
+      {ativo ? (
+        <label className="mt-2 flex items-center gap-2 text-xs">
+          "Acabou de chegar" = até
+          <Input
+            aria-label="Horas"
+            type="number"
+            min={1}
+            max={48}
+            className="h-8 w-16"
+            value={horas}
+            onChange={(e) => setHoras(Number(e.target.value))}
+            onBlur={() => salvar.mutate({ a: ativo, h: Math.min(48, Math.max(1, horas || 2)) })}
+          />
+          horas depois de entrar
+        </label>
+      ) : null}
+    </div>
+  );
+}
+
 function AbaBoasVindas({
   cfg,
   set,
@@ -816,6 +867,7 @@ function AbaBoasVindas({
 
       <Cartao icone="fluent-color:clock-24" titulo="Quando e quanto envia">
         <div className="space-y-4 text-sm">
+          <BoasVindasImediata cfg={cfg} />
           <Campo rotulo="Janela de envio">
             <EditorJanela
               prefixo="bv"

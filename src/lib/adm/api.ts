@@ -212,6 +212,8 @@ export interface AtendConfig {
   consultor_espera_min: number;
   palavras_sair: string[];
   simulado_em: string | null;
+  bv_imediato?: boolean;
+  bv_imediato_horas?: number;
   atualizado_em: string;
   atualizado_por: string | null;
 }
@@ -434,6 +436,7 @@ export const api = {
   atendPainel: () => rpc<AtendPainel>("com_atend_painel"),
   atendConfigSalvar: (p: Partial<AtendConfig>) => rpc<void>("com_atend_config_salvar", { p }),
   atendLigar: (ligado: boolean) => rpc<void>("com_atend_ligar", { p_ligado: ligado }),
+  atendImediatoSalvar: (ativo: boolean, horas: number) => rpc<void>("com_atend_imediato_salvar", { p_ativo: ativo, p_horas: horas }),
   atendSistemaSalvar: (p: Partial<AtendSistema>) => rpc<string>("com_atend_sistema_salvar", { p }),
   atendSistemaExcluir: (id: string) => rpc<void>("com_atend_sistema_excluir", { p_id: id }),
   atendRespostaSalvar: (p: Partial<AtendResposta>) =>

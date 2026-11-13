@@ -4,7 +4,9 @@
 // Nos dois casos envia o aviso "demonstração em 1 hora" aos consultores que querem (Configurações › Usuários).
 // Secrets: ADM_OPEWA_URL, ADM_OPEWA_API_KEY, ADM_OPEWA_SESSAO.
 import { admin, cors, json } from "../_shared/asaas.ts";
-import { boasVindas, type Contexto } from "../_shared/atendimento.ts";
+import { agendaDoLead } from "../_shared/agenda-lead.ts";
+import { ofertarHorarios } from "../_shared/atend-fluxo.ts";
+import { boasVindas, type Contexto, nomesDosSistemas } from "../_shared/atendimento.ts";
 import { avisarConsultor, textoLembrete } from "../_shared/avisos.ts";
 import { comOpcoes, enviarTexto, opewaConfigurado } from "../_shared/opewa.ts";
 
@@ -22,14 +24,26 @@ Deno.serve(async (req) => {
 
   if (corpo.so_avisos !== true) {
     const { data: p } = await db.rpc("com_srv_atend_bv_pegar");
-    const bv = p as { ok: boolean; motivo?: string; conversa_id?: string; nome?: string; chat_id?: string; sistemas?: string[] };
+    const bv = p as { ok: boolean; motivo?: string; conversa_id?: string; nome?: string; chat_id?: string; sistemas?: string[]; token_agenda?: string; pediu_demo?: boolean };
     if (bv?.ok) {
       const { data: c } = await db.rpc("com_srv_atend_contexto");
       const ctx = c as Contexto;
-      const texto = comOpcoes(boasVindas(ctx, { nome: bv.nome ?? "", temperatura: "morno", pontuacao: 50, sistemas: bv.sistemas ?? [] }), ctx.config.bv_botoes);
+      let texto = comOpcoes(boasVindas(ctx, { nome: bv.nome ?? "", temperatura: "morno", pontuacao: 50, sistemas: bv.sistemas ?? [] }), ctx.config.bv_botoes);
+      let oferta: unknown = null;
+      // Pediu demonstração no site: a primeira mensagem já traz os horários livres da agenda.
+      if (bv.pediu_demo && bv.token_agenda) {
+        const ag = await agendaDoLead(db, bv.token_agenda, "Reunião marcada pela Sophia (Atendimento ONLINE, WhatsApp).");
+        const o = await ofertarHorarios(ag.porta);
+        if (o.oferta) {
+          const nome = primeiro(bv.nome ?? "");
+          texto = `Olá${nome ? `, ${nome}` : ""}! 👋 Seja bem-vindo(a) ao Ecossistema WSA Sistemas IA. Recebi o seu pedido de demonstração do ${nomesDosSistemas(ctx, bv.sistemas ?? [])}.\n\n${o.texto}`;
+          oferta = o.oferta;
+        }
+      }
       const r = await enviarTexto(bv.chat_id!, texto);
       await db.rpc("com_srv_atend_bv_resultado", { p_conversa: bv.conversa_id, p_ok: r.ok, p_texto: texto, p_wa_id: r.id, p_erro: r.erro });
-      saida.boas_vindas = r.ok ? "enviada" : `falhou: ${r.erro}`;
+      if (r.ok && oferta) await db.rpc("com_srv_atend_oferta", { p_conversa: bv.conversa_id, p_oferta: oferta });
+      saida.boas_vindas = r.ok ? (oferta ? "enviada com horários" : "enviada") : `falhou: ${r.erro}`;
     } else saida.boas_vindas = bv?.motivo ?? "nada";
 
     const { data: l } = await db.rpc("com_srv_atend_lembretes_pegar");

@@ -5,9 +5,9 @@
 // Responde 200 na hora e processa em segundo plano (o OpeWA espera no máximo ~10 s).
 import { admin, json } from "../_shared/asaas.ts";
 import { type Oferta, ofertaValida, rotulo } from "../_shared/agendar.ts";
-import { ofertarHorarios, type PassoAgenda, type PortaAgenda, tratarOferta } from "../_shared/atend-fluxo.ts";
+import { agendaDoLead } from "../_shared/agenda-lead.ts";
+import { ofertarHorarios, type PassoAgenda, tratarOferta } from "../_shared/atend-fluxo.ts";
 import { aplicarRegras, chamarIA, type Contexto, type Lead, montarPrompt } from "../_shared/atendimento.ts";
-import { appGoogle, contextoDoToken, horariosLivres, marcarHorario } from "../_shared/google.ts";
 import { avisarConsultor, type DadosLead, textoPediuConsultor, textoReuniao } from "../_shared/avisos.ts";
 import { assinaturaValida, chatDe, comOpcoes, enviarTexto, telefoneDoRemetente } from "../_shared/opewa.ts";
 
@@ -67,7 +67,7 @@ async function entrada(db: Db, d: Msg) {
   const lead = e.lead!;
   const { data: of } = await db.rpc("com_srv_atend_oferta_ler", { p_conversa: e.conversa_id });
   const oferta = (of as Oferta | null) ?? null;
-  const ag = await agendaReal(db, e.token_agenda ?? "");
+  const ag = await agendaDoLead(db, e.token_agenda ?? "", "Reunião marcada pela Sophia (Atendimento ONLINE, WhatsApp).");
 
   let resposta: string, acoes: Record<string, unknown>, novaOferta: Oferta | null = oferta, passo: PassoAgenda | null = null;
   try {
@@ -126,30 +126,4 @@ async function entrada(db: Db, d: Msg) {
     await avisarConsultor(db, res.consultor.whatsapp, "pediu_consultor",
       textoPediuConsultor(res.lead ?? { nome: null, whatsapp: null, empresa: null }, String(acoes.motivo_consultor ?? "regra do atendimento")));
   }
-}
-
-/** Agenda do lead (Google), pelo token do negócio. Sem Google configurado, não oferece horários. */
-async function agendaReal(db: Db, token: string): Promise<{ porta: PortaAgenda; email: string | null; minha: { id: string; inicio: string } | null }> {
-  const app = appGoogle();
-  const c = await contextoDoToken(db, token);
-  return {
-    email: c?.email ?? null,
-    minha: c?.minha ?? null,
-    porta: {
-      duracaoMin: c?.config.duracao_min ?? 30,
-      livres: async () => (app && c ? await horariosLivres(db, app, c) : []),
-      marcar: async (inicio) => {
-        if (!app || !c) return { ok: false, erro: "Agenda não configurada" };
-        const r = await marcarHorario(db, app, token, c, inicio, c.minha?.id ?? null, "Reunião marcada pela Sophia (Atendimento ONLINE, WhatsApp).");
-        return r.ok ? { ok: true, inicio: r.reuniao.inicio, meet_url: r.reuniao.meet_url, reuniao_id: r.reuniao.id } : { ok: false, erro: r.erro, conflito: r.conflito };
-      },
-    },
-  };
-}
-
-async function saida(db: Db, d: Msg) {
-  await esperar(4000); // dá tempo de o próprio robô gravar o id do que enviou
-  const fone = await telefoneDoRemetente({ chatId: d.chatId || d.to, from: d.to });
-  if (!fone || !d.id) return;
-  await db.rpc("com_srv_atend_saida_celular", { p_fone: fone, p_texto: textoDa(d) || "[mídia]", p_wa_id: d.id });
 }
